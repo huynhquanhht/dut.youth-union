@@ -1,0 +1,163 @@
+paths:
+  /function:
+    post:
+      summary: Tạo mới chức năng
+      tags: [ Function ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                type:
+                  type: number
+                controllerName:
+                  type: string
+                actionName:
+                  type: string
+                groupFunctionId:
+                  type: number
+      responses:
+        200:
+          description: Tạo dữ liệu thành công
+        400:
+          description: Dữ liệu không hợp lệ
+        500:
+          description: Lỗi khi có exception
+    put:
+      summary: Cập nhật chức năng
+      tags: [ Function ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: number
+                name:
+                  type: string
+                type:
+                  type: number
+                controllerName:
+                  type: string
+                actionName:
+                  type: string
+                groupFunctionId:
+                  type: number
+      responses:
+        200:
+          description: Cập nhật dữ liệu thành công
+        400:
+          description: Dữ liệu không hợp lệ
+        500:
+          description: Lỗi khi có exception
+  /function/all:
+    get:
+      summary: Lấy tất cả chức năng
+      tags: [ Function ]
+      responses:
+        200:
+          description: Lấy tất cả chức năng thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: number
+                  rows:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: number
+                        name:
+                          type: string
+                        type:
+                          type: number
+                        group_function_id:
+                          type: number
+                        controller_name:
+                          type: string
+                        action_name:
+                          type: string
+                        created_at:
+                          type: string
+                          format: date-time
+                          example: "2022-01-01T00:00:00.000Z"
+                        updated_at:
+                          type: string
+                          format: date-time
+                          example: "2022-01-01T00:00:00.000Z"
+                        deleted_at:
+                          type: string
+                          nullable: true
+                          format: date-time
+                          example: "2022-01-01T00:00:00.000Z"
+        500:
+          description: Lỗi khi có exception
+  /function/{id}:
+    get:
+      summary: Lấy chức năng theo id
+      tags: [ Function ]
+      parameters:
+        - in: path
+          description: Id của chức năng muốn lấy
+          name: id
+          type: number
+      responses:
+        200:
+          description: Lấy chức năng theo id thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: number
+                  name:
+                    type: string
+                  type:
+                    type: number
+                  group_function_id:
+                    type: number
+                  controller_name:
+                    type: string
+                  action_name:
+                    type: string
+                  created_at:
+                    type: string
+                    format: date-time
+                    example: "2022-01-01T00:00:00.000Z"
+                  updated_at:
+                    type: string
+                    format: date-time
+                    example: "2022-01-01T00:00:00.000Z"
+                  deleted_at:
+                    type: string
+                    nullable: true
+                    format: date-time
+                    example: "2022-01-01T00:00:00.000Z"
+        400:
+          description: Dữ liệu không hợp lệ
+        500:
+          description: Lỗi khi có exception
+    delete:
+      summary: Xóa chức năng theo id
+      tags: [ Function ]
+      parameters:
+        - in: path
+          description: Id của chức năng muốn xóa
+          name: id
+          type: number
+      responses:
+        200:
+          description: Xóa chức năng thành công
+        400:
+          description: Dữ liệu không hợp lệ
+        500:
+          description: Lỗi khi có exception
