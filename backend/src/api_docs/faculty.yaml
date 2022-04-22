@@ -1,0 +1,134 @@
+paths:
+  /faculty:
+    post:
+      summary: Tạo mới khoa
+      tags: [ faculty ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        200:
+          description: Tạo dữ liệu thành công
+        400:
+          description: Dữ liệu không hợp lệ
+        500:
+          description: Lỗi khi có exception
+    put:
+      summary: Cập nhật khoa
+      tags: [ faculty ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                groupFunction:
+                  type: object
+                  properties:
+                    id:
+                      type: number
+                    name:
+                      type: string
+      responses:
+        200:
+          description: Cập nhật dữ liệu thành công
+        400:
+          description: Dữ liệu không hợp lệ
+        500:
+          description: Lỗi khi có exception
+  /faculty/all:
+    get:
+      summary: Lấy tất cả khoa
+      tags: [ faculty ]
+      responses:
+        200:
+          description: Lấy tất cả khoa thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: number
+                  rows:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: number
+                        name:
+                          type: string
+                        created_at:
+                          type: string
+                          format: date-time
+                          example: "2022-01-01T00:00:00.000Z"
+                        updated_at:
+                          type: string
+                          format: date-time
+                          example: "2022-01-01T00:00:00.000Z"
+                        deleted_at:
+                          type: string
+                          nullable: true
+                          format: date-time
+                          example: "2022-01-01T00:00:00.000Z"
+        500:
+          description: Lỗi khi có exception
+  /faculty/{id}:
+    get:
+      summary: Lấy khoa theo id
+      tags: [ faculty ]
+      parameters:
+        - in: path
+          description: Id của khoa muốn lấy
+          name: id
+          type: number
+      responses:
+        200:
+          description: Lấy khoa theo id thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: number
+                  name:
+                    type: string
+                  created_at:
+                    type: string
+                    format: date-time
+                    example: "2022-01-01T00:00:00.000Z"
+                  updated_at:
+                    type: string
+                    format: date-time
+                    example: "2022-01-01T00:00:00.000Z"
+                  deleted_at:
+                    type: string
+                    nullable: true
+                    format: date-time
+                    example: "2022-01-01T00:00:00.000Z"
+        400:
+          description: Dữ liệu không hợp lệ
+        500:
+          description: Lỗi khi có exception
+    delete:
+      summary: Xóa khoa theo id
+      tags: [ faculty ]
+      parameters:
+        - in: path
+          description: Id của khoa muốn xóa
+          name: id
+          type: number
+      responses:
+        200:
+          description: Xóa khoa thành công
+        400:
+          description: Dữ liệu không hợp lệ
+        500:
+          description: Lỗi khi có exception
