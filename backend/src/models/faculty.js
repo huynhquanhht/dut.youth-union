@@ -4,8 +4,7 @@ module.exports = (sequelize, Datatypes) => {
     'faculty',
     {
       id: {
-        type: Datatypes.INTEGER,
-        autoIncrement: true,
+        type: Datatypes.STRING(3),
         primaryKey: true,
       },
       name: {
@@ -24,5 +23,9 @@ module.exports = (sequelize, Datatypes) => {
       tableName: 'faculty',
     }
   );
+  faculty.associate = (models) => {
+    faculty.hasMany(models.activityClass, {foreignKey: 'faculty_id'});
+    faculty.hasMany(models.lecture, {foreignKey: 'faculty_id'});
+  }
   return faculty;
 };

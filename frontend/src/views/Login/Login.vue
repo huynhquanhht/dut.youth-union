@@ -126,14 +126,12 @@ export default {
         username: this.username,
         password: this.password,
       });
-      console.log('loginResult - ', this.loginResult);
-      if (this.loginResult.Code === 200) {
-        console.log(this.loginResult);
-        localStorageUtils.getService().setToken(this.loginResult.Data.Token);
+      if (this.loginResult.accessToken) {
+        localStorageUtils.getService().setToken(this.loginResult.accessToken);
         localStorageUtils
           .getService()
           .setCurrentUser(this.loginResult.currentUser);
-        this.$router.push('/admin/activity');
+        this.$router.push('/home');
       } else {
         this.incorrectPassword = true;
       }

@@ -47,38 +47,50 @@ service.interceptors.response.use(
   }
 );
 
-const getRequest = (url) => {
+const getRequest = (url, functionId) => {
   return service.request({
     method: 'get',
     url: url,
     responseType: 'json',
+    headers: {
+      function_id: functionId,
+    }
   });
 };
 
-const putRequest = (url, data = {}) => {
+const putRequest = (url, data = {}, functionId) => {
   return service.request({
     method: 'put',
     url: url,
     responseType: 'json',
     data: data,
+    headers: {
+      function_id: functionId,
+    }
   });
 };
 
-const postRequest = (url, data = {}) => {
+const postRequest = (url, data = {}, functionId) => {
   return service.request({
     method: 'post',
     url: url,
     responseType: 'json',
     data: data,
+    headers: {
+      function_id: functionId,
+    }
   });
 };
 
-const deleteRequest = (url, data = {}) => {
+const deleteRequest = (url, data = {}, functionId) => {
   return service.request({
     method: 'delete',
     url: url,
     responseType: 'json',
     data: data,
+    headers: {
+      function_id: functionId,
+    }
   });
 };
 

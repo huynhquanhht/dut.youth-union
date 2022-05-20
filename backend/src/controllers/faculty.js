@@ -21,13 +21,14 @@ const create = async (req, res) => {
   }
 }
 
-// [GET]: /faculty/all
-const getAll = async (req, res) => {
+// [GET]: /faculty
+const get = async (req, res) => {
   try {
-    const result = await facultyService.getAll();
-    console.log('result - ', JSON.parse(JSON.stringify(result)));
+    let query = req.query;
+    const result = await facultyService.get(query);
     res.status(200).send(result);
   } catch (error) {
+    console.log(error);
     res.status(500).send({ message: MESSAGE.SERVER_ERROR});
   }
 }
@@ -37,6 +38,7 @@ const getById = async (req, res) => {
   try {
     const facultyId = req.params.id;
     const result = await facultyService.getById(facultyId);
+    console.log(JSON.parse(JSON.stringify(result)));
     res.status(200).send(result);
   } catch (error) {
     res.status(500).send({ message: MESSAGE.SERVER_ERROR});
@@ -84,7 +86,7 @@ const del = async (req, res) => {
 
 module.exports = {
   create,
-  getAll,
+  get,
   getById,
   update,
   del

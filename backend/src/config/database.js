@@ -17,7 +17,7 @@ const databaseConfig = {
     dialectOptions: {
       options: {
         encrypt: false,
-        useUTC: false,
+        useUTC: true,
         dateFirst: 1,
         enableArithAbort: true,
         trustServerCertificate: true,

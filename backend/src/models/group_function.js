@@ -24,5 +24,10 @@ module.exports = (sequelize, Datatypes) => {
       tableName: 'group_function',
     }
   );
+  groupFunction.associate = (models) => {
+    groupFunction.hasMany(models.func, {
+      foreignKey: 'group_function_id',
+    });
+  };
   return groupFunction;
 };

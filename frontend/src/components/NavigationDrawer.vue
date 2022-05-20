@@ -19,7 +19,7 @@
           </v-list-item-content>
         </template>
         <v-list-item-group class="white--text" active-class="deep-white--text text--accent-4">
-          <v-list-item v-for="list in navList.lists" :key="list.name" :to="list.route" @click="clickListItem">
+          <v-list-item v-for="list in navList.lists" :key="list.name" :to="list.route">
             <v-list-item-icon class="pl-4">
               <v-icon v-text="list.icon"></v-icon>
             </v-list-item-icon>
@@ -34,37 +34,75 @@
 </template>
 
 <script>
+import { mapGetters, mapActions } from 'vuex';
+import localStorageUtils from '@/utils/local_storage';
+import jwtDecode from 'jwt-decode';
 export default {
   name: 'navigation-drawer',
   data() {
     return {
-      navLists: [
+      navLists: [],
+    };
+  },
+  computed: {
+    ...mapGetters({
+      user: 'getUser',
+    }),
+  },
+  methods: {
+    ...mapActions({
+      fetchGetUserById: 'fetchGetUserById',
+    }),
+    changePage(link, index) {
+      if (link) {
+        this.navLists.forEach((item) => {
+          item.active = false;
+        });
+        this.navLists[index].active = true;
+        this.$router.push(link);
+      }
+    },
+    clickListItem() {
+      this.navLists.forEach((item) => {
+        item.active = false;
+      });
+    }
+  },
+  async created() {
+    this.currentUser = jwtDecode(localStorageUtils.getToken());
+    await this.fetchGetUserById({ userId: this.currentUser.userId });
+    if (this.user.roles[0].name === 'Quản trị viên') {
+      this.navLists = [{
+        name: 'Bảng điều khiển',
+        icon: 'mdi-view-dashboard',
+        active: false,
+      },
         {
           name: 'Quản lý đoàn cơ sở',
           icon: 'mdi-atlassian',
-          active: null,
+          active: false,
           lists: [
             {
               name: 'Quản lý liên chi đoàn',
-              icon: 'mdi-manjaro',
-              route: '/admin/association-union-branch',
+              icon: 'mdi-home-city',
+              route: '/faculty',
             },
             {
               name: 'Quản lý chi đoàn',
               icon: 'mdi-bank',
-              route: '/admin/union-branch'
+              route: '/activity-class'
             },
             {
-              name: 'Quản lý sinh viên',
+              name: 'Quản lý đoàn viên',
               icon: 'mdi-account-group',
-              route: '/admin/union-member'
+              route: '/student'
             },
           ],
         },
         {
           name: 'Quản lý hoạt động',
           icon: 'mdi-flag-variant',
-          route: '/admin/activity',
+          route: '/activity',
           active: false,
         },
         {
@@ -75,32 +113,189 @@ export default {
         {
           name: 'Quản lý người dùng',
           icon: 'mdi-account-cog',
+          route: '/user',
           active: false,
         },
         {
           name: 'Quản lý hệ thống',
           icon: 'mdi-cogs',
           active: false,
-        },
-      ],
-    };
-  },
-  methods: {
-    changePage(link, index) {
-      if (link) {
-        this.navLists.forEach((item) => {
-          item.active = false;
-        })
-        this.navLists[index].active = true;
-        this.$router.push(link);
-      }
-    },
-    clickListItem() {
-      this.navLists.forEach((item) => {
-        item.active = false;
-      })
+          lists: [
+            {
+              name: 'Phân quyền',
+              icon: 'mdi-lock-open',
+              route: '/author',
+            },
+            {
+              name: 'Nhóm tài khoản',
+              icon: 'mdi-account-group',
+              route: '/account-group',
+            },
+            {
+              name: 'Chức năng hệ thống',
+              icon: 'mdi-rhombus-split',
+              route: '/function',
+            },
+          ]
+        },]
     }
-  },
+    if (this.user.roles[0].name === 'Chuyên viên') {
+      this.navLists = [
+        {
+          name: 'Quản lý đoàn cơ sở',
+          icon: 'mdi-atlassian',
+          active: false,
+          lists: [
+            {
+              name: 'Quản lý liên chi đoàn',
+              icon: 'mdi-home-city',
+              route: '/faculty',
+            },
+            {
+              name: 'Quản lý chi đoàn',
+              icon: 'mdi-home-city',
+              route: '/activity-class',
+            },
+            {
+              name: 'Quản lý đoàn viên',
+              icon: 'mdi-home-city',
+              route: '/student',
+            },
+            {
+              name: 'Sổ tay đoàn viên',
+              icon: 'mdi-home-city',
+              route: '/union-textbook',
+            },
+            {
+              name: 'Đoàn phí',
+              icon: 'mdi-home-city',
+              route: '/union-fee-of-student',
+            },
+          ],
+        },
+      ];
+    }
+    if (this.user.roles[0].name === 'Bí thư đoàn trường') {
+      this.navLists = [
+        {
+          name: 'Quản lý đoàn cơ sở',
+          icon: 'mdi-atlassian',
+          active: false,
+          lists: [
+            {
+              name: 'Quản lý liên chi đoàn',
+              icon: 'mdi-home-city',
+              route: '/faculty',
+            },
+            {
+              name: 'Quản lý chi đoàn',
+              icon: 'mdi-home-city',
+              route: '/activity-class',
+            },
+            {
+              name: 'Quản lý đoàn viên',
+              icon: 'mdi-home-city',
+              route: '/student',
+            },
+            {
+              name: 'Sổ tay đoàn viên',
+              icon: 'mdi-home-city',
+              route: '/union-textbook',
+            },
+            {
+              name: 'Đoàn phí',
+              icon: 'mdi-home-city',
+              route: '/union-fee-of-student',
+            },
+          ],
+        },
+      ];
+    }
+    if (this.user.roles[0].name === 'Bí thư liên chi') {
+      this.navLists = [
+        {
+          name: 'Quản lý đoàn cơ sở',
+          icon: 'mdi-atlassian',
+          active: false,
+          lists: [
+            {
+              name: 'Quản lý chi đoàn',
+              icon: 'mdi-home-city',
+              route: '/activity-class',
+            },
+            {
+              name: 'Quản lý đoàn viên',
+              icon: 'mdi-home-city',
+              route: '/student',
+            },
+            {
+              name: 'Sổ tay đoàn viên',
+              icon: 'mdi-home-city',
+              route: '/union-textbook',
+            },
+            {
+              name: 'Đoàn phí',
+              icon: 'mdi-home-city',
+              route: '/union-fee-of-student',
+            },
+          ],
+        },
+      ];
+    }
+    if (this.user.roles[0].name === 'Bí thư chi đoàn') {
+      this.navLists = [
+        {
+          name: 'Quản lý đoàn cơ sở',
+          icon: 'mdi-atlassian',
+          active: false,
+          lists: [
+            {
+              name: 'Quản lý đoàn viên',
+              icon: 'mdi-account-group',
+              route: '/student'
+            },
+            {
+              name: 'Sổ tay đoàn viên',
+              icon: 'mdi-home-city',
+              route: '/union-textbook',
+            },
+            {
+              name: 'Đoàn phí',
+              icon: 'mdi-home-city',
+              // route: '/faculty',
+            },
+          ],
+        },
+        {
+          name: 'Thông tin đoàn viên',
+          icon: 'mdi-flag-variant',
+          // route: '/activity',
+          active: false,
+        },
+      ];
+    }
+    if (this.user.roles[0].name === 'Sinh viên') {
+      this.navLists = [
+        {
+          name: 'Thông tin đoàn viên',
+          icon: 'mdi-flag-variant',
+          // route: '/activity',
+          active: false,
+        },
+        {
+          name: 'Thông tin hoạt động',
+          icon: 'mdi-flag-variant',
+          route: '/activity',
+          active: false,
+        },
+        {
+          name: 'Điểm tích lũy',
+          icon: 'mdi-flag-variant',
+          // route: '/activity',
+          active: false,
+        }]
+    }
+  }
 };
 </script>
 

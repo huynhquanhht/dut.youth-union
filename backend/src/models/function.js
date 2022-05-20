@@ -12,15 +12,7 @@ module.exports = (sequelize, Datatypes) => {
         type: Datatypes.STRING(255),
         allowNull: false,
       },
-      type: {
-        type: Datatypes.INTEGER,
-        allowNull: false,
-      },
       controller_name: {
-        type: Datatypes.STRING(255),
-        allowNull: false,
-      },
-      action_name: {
         type: Datatypes.STRING(255),
         allowNull: false,
       },
@@ -43,5 +35,14 @@ module.exports = (sequelize, Datatypes) => {
       tableName: 'function',
     }
   );
+  func.associate = (models) => {
+    func.belongsToMany(models.role, {
+      through: models.permission,
+      foreignKey: 'function_id',
+    });
+    func.belongsTo(models.groupFunction, {
+      foreignKey: 'group_function_id',
+    });
+  };
   return func;
 };

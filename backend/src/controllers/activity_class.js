@@ -2,7 +2,7 @@
 const activityClassService = require('../services/activity_class');
 const MESSAGE = require('../utils/message');
 
-// [POST]: /activity_class
+// [POST]: /activity-class
 const create = async (req, res) => {
   const name = req.body.name;
   if (!name) {
@@ -21,18 +21,19 @@ const create = async (req, res) => {
   }
 }
 
-// [GET]: /activity_class/all
-const getAll = async (req, res) => {
+// [GET]: /activity-class
+const get = async (req, res) => {
   try {
-    const result = await activityClassService.getAll();
-    console.log('result - ', JSON.parse(JSON.stringify(result)));
+    let query = req.query;
+    let result = await activityClassService.get(query);
     res.status(200).send(result);
   } catch (error) {
+    console.log(error);
     res.status(500).send({ message: MESSAGE.SERVER_ERROR});
   }
 }
 
-// [GET]: /activity_class/:id
+// [GET]: /activity-class/:id
 const getById = async (req, res) => {
   try {
     const activityClassId = req.params.id;
@@ -43,7 +44,7 @@ const getById = async (req, res) => {
   }
 }
 
-// [PUT]: /activity_class
+// [PUT]: /activity-class
 const update = async (req, res) => {
   try {
     const activityClass = req.body.activityClass;
@@ -63,7 +64,7 @@ const update = async (req, res) => {
   }
 };
 
-// [DELETE]: /activity_class/:id
+// [DELETE]: /activity-class/:id
 const del = async (req, res) => {
   try {
     const activityClassId = req.params.id;
@@ -84,7 +85,7 @@ const del = async (req, res) => {
 
 module.exports = {
   create,
-  getAll,
+  get,
   getById,
   update,
   del

@@ -16,16 +16,16 @@ module.exports = (sequelize, Datatypes) => {
           key: 'id',
         },
       },
-      group_function_id: {
+      function_id: {
         type: Datatypes.INTEGER,
         allowNull: false,
         references: {
-          model: 'group_function',
+          model: 'function',
           key: 'id',
         },
       },
-      enable: {
-        type: Datatypes.INTEGER,
+      is_access: {
+        type: Datatypes.BOOLEAN,
         allowNull: false,
         default: false,
       },

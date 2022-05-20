@@ -8,6 +8,14 @@ const actions = {
     } catch (error) {
       commit('setLoginResult', null);
     }
+  },
+  fetchGetUsers: async ({commit}, query) => {
+    let res = await userApi.get(query);
+    commit('setUsers', res.data);
+  },
+  fetchGetUserById: async ({commit}, query) => {
+    let res = await userApi.getById(query.userId);
+    commit('setUser', res.data);
   }
 };
 

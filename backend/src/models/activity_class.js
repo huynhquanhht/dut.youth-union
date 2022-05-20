@@ -5,7 +5,6 @@ module.exports = (sequelize, Datatypes) => {
     {
       id: {
         type: Datatypes.INTEGER,
-        autoIncrement: true,
         primaryKey: true,
       },
       name: {
@@ -40,5 +39,10 @@ module.exports = (sequelize, Datatypes) => {
       tableName: 'activity_class',
     }
   );
+  activityClass.associate = (models) => {
+    activityClass.belongsTo(models.faculty, { foreignKey: 'faculty_id'});
+    activityClass.belongsTo(models.course, { foreignKey: 'course_id'});
+    activityClass.hasMany(models.student, { foreignKey: 'activity_class_id'});
+  }
   return activityClass;
 };

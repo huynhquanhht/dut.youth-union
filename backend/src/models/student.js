@@ -4,32 +4,10 @@ module.exports = (sequelize, Datatypes) => {
     'student',
     {
       id: {
-        type: Datatypes.INTEGER,
-        autoIncrement: true,
+        type: Datatypes.STRING(9),
         primaryKey: true,
       },
       name: {
-        type: Datatypes.STRING(255),
-        allowNull: false,
-        unique: true,
-      },
-      gender: {
-        type: Datatypes.BOOLEAN,
-        allowNull: false,
-      },
-      birthday: {
-        type: Datatypes.DATE,
-        allowNull: false,
-      },
-      address: {
-        type: Datatypes.STRING(255),
-        allowNull: false,
-      },
-      email: {
-        type: Datatypes.STRING(255),
-        allowNull: false,
-      },
-      phone: {
         type: Datatypes.STRING(255),
         allowNull: false,
       },
@@ -40,6 +18,15 @@ module.exports = (sequelize, Datatypes) => {
           model: 'activity_class',
           key: 'id',
         }
+      },
+      is_union_member: {
+        type: Datatypes.BOOLEAN,
+        allowNull: true,
+      },
+      is_class_secretary: {
+        type: Datatypes.BOOLEAN,
+        allowNull: false,
+        default: false,
       },
       submitted_union_book_at: {
         type: Datatypes.DATE,
@@ -62,7 +49,16 @@ module.exports = (sequelize, Datatypes) => {
       updatedAt: 'updated_at',
       deletedAt: 'deleted_at',
       tableName: 'student',
-    }
+    },
   );
+  student.associate = (models) => {
+    student.belongsTo(models.activityClass, { foreignKey: 'activity_class_id'});
+    student.hasOne(models.unionTextbook, { foreignKey: 'student_id'});
+    student.belongsTo(models.user, { foreignKey: 'user_id' });
+    student.belongsToMany(models.unionFee, {
+      through: models.submitUnionFee,
+      foreignKey: 'student_id',
+    });
+  }
   return student;
 };

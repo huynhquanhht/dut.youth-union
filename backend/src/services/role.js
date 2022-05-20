@@ -1,6 +1,10 @@
 'use strict'
 const roleRepo = require('../repositories/role');
+const groupFunctionRepo = require('../repositories/group_function');
 const MESSAGE = require('../utils/message');
+const models = require('../models');
+const sequelizeUtils = require('../utils/sequelize');
+
 
 const create = async (name) => {
   const option = { where: { name: name }};
@@ -26,13 +30,46 @@ const create = async (name) => {
 };
 
 const getAll = async () => {
-  const option = { where: { deleted_at: null }};
-  return roleRepo.getAll(option);
+  let options = {};
+  options.include = {
+    model: models.user,
+    attributes: ['id'],
+    where: { deleted_at: null },
+    require: false,
+  };
+  options.where = { deleted_at: null };
+  return roleRepo.getAll(options);
 };
 
 const getById = async (roleId) => {
-  const option = { where: { id: roleId, deleted_at: null }};
-  return roleRepo.getOne(option);
+  let option = {};
+  option.where = { id: roleId, deleted_at: null};
+  option.include = [{
+      model: models.func,
+      where: { deleted_at: null },
+      require: false,
+      include: [{
+        model: models.group_function,
+        where: {deleted_at: null},
+        require: false,
+        group: ['group_function_id'],
+      }]
+    }];
+  let role = await roleRepo.getOne(option);
+  let groupFunctions = await groupFunctionRepo.getAll();
+  role = JSON.parse(JSON.stringify(role));
+  groupFunctions = JSON.parse(JSON.stringify(groupFunctions));
+  for (let groupFunction of groupFunctions.rows) {
+    groupFunction.functions = [];
+    for (let func of role.functions) {
+      if (func.group_function_id == groupFunction.id) {
+        delete func.group_function;
+        groupFunction.functions.push(func);
+      }
+    }
+  }
+  console.log(JSON.parse(JSON.stringify(groupFunctions)));
+  return groupFunctions;
 };
 
 const update = async (role) => {

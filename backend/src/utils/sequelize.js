@@ -1,8 +1,8 @@
 'use strict'
-const convertData = (data) => {
+const convertJsonToObject = (data) => {
   return JSON.parse(JSON.stringify(data));
 };
 
 module.exports = {
-  convertData,
+  convertJsonToObject,
 }

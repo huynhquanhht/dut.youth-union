@@ -15,6 +15,10 @@ const MESSAGE = {
   EXISTED_NAME: 'Tên đã tồn tại, vui lòng chọn tên khác',
   INVALID_DATA: 'Dữ liệu không hợp lệ!',
   EMPTY_DATA_UPDATE: 'Không tìm thấy dữ liệu cần cập nhật.',
+  EMPTY_DATA_CONFIRM: 'Không tìm thấy dữ liệu cần xác nhận',
+  NO_PERMISSION: 'Không có quyền truy cập tính năng này',
+  CONFIRM_SUCCESS_UNION_TEXTBOOK: 'Xác nhận nộp sổ đoàn thành công',
+  CONFIRM_FAIL_UNION_TEXTBOOK: 'Xác nhận nộp sổ đoàn thất bại',
 };
 
 module.exports = MESSAGE;

@@ -8,8 +8,13 @@ const app = express();
 const SERVER_PORT = process.env.SERVER_PORT || 3000;
 app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-database.sequelizeConfig.sync();
+app.use(express.urlencoded({ extended: true }))
+try {
+  database.sequelizeConfig.sync();
+} catch (error) {
+  console.log(error);
+}
+
 routes(app);
 app.listen(SERVER_PORT, () => {
   console.log('Server is listening on port 3000');

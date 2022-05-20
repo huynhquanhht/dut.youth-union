@@ -14,8 +14,8 @@ const getOne = (option) => {
   return facultyModel.findOne(option);
 };
 
-const getAll = () => {
-  return facultyModel.findAndCountAll();
+const get = (option) => {
+  return facultyModel.findAndCountAll(option);
 };
 
 const update = (condition, newFaculty) => {
@@ -30,7 +30,7 @@ module.exports = {
   create,
   getByPk,
   getOne,
-  getAll,
+  get,
   update,
   del,
 };

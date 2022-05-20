@@ -7,7 +7,7 @@ const routes = [
   {
     path: '/login',
     name: 'login',
-    component: () => import('@/views/Login/Login'),
+    component: ()  => import('@/views/Login/Login'),
     meta: { title: 'Đăng nhập' },
     beforeEnter: async (to, from, next) => {
       const token = localStorageUtils.getService().getToken();
@@ -19,20 +19,21 @@ const routes = [
     },
   },
   {
-    path: '/',
+    path: '/home',
     name: 'home',
     component: () => import('@/views/Home/Home'),
-    redirect: () => { return 'login' },
+    meta: { title: 'DUT Union - Hệ thống quản lý đoàn thanh niên Đại học Bách Khoa Đà Nẵng' },
+    // redirect: () => { return 'login' },
   },
   {
-    path: '/admin',
-    component: () => import('@/views/Admin/AdminPage'),
+    path: '/',
+    component: () => import('@/views/MainPage/MainPage'),
     children: [
       {
-        path: 'association-union-branch',
-        name: 'association-union-branch-list',
+        path: 'faculty',
+        name: 'faculty',
         meta: { title: 'Quản lý Liên chi đoàn' },
-        component: () => import('@/views/AssociationUnionBranch/List'),
+        component: () => import('@/views/Faculty/List'),
       },
       {
         path: 'activity',
@@ -59,30 +60,98 @@ const routes = [
         component: () => import('@/views/Activity/ActivityForm'),
       },
       {
-        path: 'union-branch',
-        name: 'union-branch-list',
-        meta: { title: 'Quản lý chi đoàn'},
+        path: 'activity-class',
+        name: 'activity-class-list',
+        meta: { title: 'Quản lý lớp sinh hoạt'},
         props: (route) => ({
-          CurrentPage: !+route.query.CurrentPage ? 1 : +route.query.CurrentPage,
-          PageSize: !+route.query.PageSize ? 10 : +route.query.PageSize,
-          Course: !+route.query.Course ? null : +route.query.Course,
+          page: !+route.query.page ? 1 : +route.query.page,
+          size: !+route.query.size ? 10 : +route.query.size,
+          name: !route.query.name ? null: route.query.name,
+          courseName: !route.query.courseName ? null: route.query.courseName,
+          facultyName: !route.query.facultyName ? null : route.query.facultyName,
         }),
-        component: () => import('@/views/UnionBranch/List'),
+        component: () => import('@/views/ActivityClass/List'),
       },
-
       {
-        path: 'union-member',
-        name: 'union-member-list',
+        path: 'student',
+        name: 'student-list',
         meta: { title: 'Quản lý đoàn viên'},
         props: (route) => ({
-          CurrentPage: !+route.query.CurrentPage ? 1 : +route.query.CurrentPage,
-          PageSize: !+route.query.PageSize ? 10 : +route.query.PageSize,
-          ActivityClass: !route.query.ActivityClass ? null : route.query.ActivityClass,
-          Email: !route.query.Email ? null : route.query.Email,
-          Phone: !route.query.Phone ? null : route.query.Phone,
+          page: !+route.query.page ? 1 : +route.query.page,
+          size: !+route.query.size ? 10 : +route.query.size,
+          name: !route.query.name ? null : route.query.name,
+          className: !route.query.className ? null : route.query.className,
         }),
-        component: () => import('@/views/UnionMember/List'),
+        component: () => import('@/views/Student/List'),
+      },
+      {
+        path: 'user',
+        name: 'user-list',
+        meta: { title: 'Quản lý người dùng'},
+        props: (route) => ({
+          page: !+route.query.page ? 1 : +route.query.page,
+          size: !+route.query.size ? 10 : +route.query.size,
+        }),
+        component: () => import('@/views/User/List'),
+      },
+      {
+        path: 'author',
+        name: 'author-list',
+        meta: { title: 'Quản lý phân quyền'},
+        component: () => import('@/views/Author/List'),
+      },
+      {
+        path: 'account-group',
+        name: 'account-group-list',
+        meta: { title: 'Nhóm tài khoản'},
+        component: () => import('@/views/AccountGroup/List'),
+      },
+      {
+        path: 'union-textbook',
+        name: 'union-textbook-list',
+        props: (route) => ({
+          page: !+route.query.page ? 1 : +route.query.page,
+          size: !+route.query.size ? 10 : +route.query.size,
+          name: !route.query.name ? null : route.query.name,
+          className: !route.query.className ? null : route.query.className,
+        }),
+        meta: { title: 'Quản lý sổ đoàn'},
+        component: () => import('@/views/UnionTextbook/List'),
+      },
+      {
+        path: 'union-fee',
+        name: 'union-fee-list',
+        props: (route) => ({
+          page: !+route.query.page ? 1 : +route.query.page,
+          size: !+route.query.size ? 10 : +route.query.size,
+          name: !route.query.name ? null : route.query.name,
+          className: !route.query.className ? null : route.query.className,
+        }),
+        meta: { title: 'Quản lý đợt thu đoàn phí'},
+        component: () => import('@/views/UnionFee/List'),
+      },
+      {
+        path: 'union-fee-of-student',
+        name: 'union-fee-of-student-list',
+        props: (route) => ({
+          page: !+route.query.page ? 1 : +route.query.page,
+          size: !+route.query.size ? 10 : +route.query.size,
+          name: !route.query.name ? null : route.query.name,
+          className: !route.query.className ? null : route.query.className,
+        }),
+        meta: { title: 'Quản lý đoàn phí'},
+        component: () => import('@/views/UnionFeeOfStudent/List'),
       }
+      // {
+      //   path: 'function',
+      //   name: 'functions',
+      //   meta: { title: 'Quanr lý chức năng'},
+      //   props: (route) => ({
+      //     page: !+route.query.page ? 1 : +route.query.page,
+      //     size: !+route.query.size ? 10 : +route.query.size,
+      //   }),
+      //   component: () => import('@/views/Function/List'),
+      // }
     ],
   },
   {

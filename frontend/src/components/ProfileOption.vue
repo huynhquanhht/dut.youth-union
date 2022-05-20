@@ -17,10 +17,10 @@
     <v-card class="profile-info-block">
       <v-list-item-content class="justify-center profile-info">
         <div class="text-center profile-menu">
-          <!--          <p class="fullname">{{ currentUser.name }}</p>-->
-          <!--          <p class="email">-->
-          <!--            {{ currentUser.email }}-->
-          <!--          </p>-->
+          <p class="fullname">{{ currentUser.name }}</p>
+<!--          <p class="email">-->
+<!--            {{ currentUser.email }}-->
+<!--          </p>-->
           <v-divider class="mt-2"></v-divider>
           <v-btn class="option-btn" text width="100%">Thông tin cá nhân</v-btn>
           <v-divider></v-divider>
@@ -52,6 +52,7 @@ export default {
     },
   },
   created() {
+    console.log(this.currentUser);
   },
 };
 </script>

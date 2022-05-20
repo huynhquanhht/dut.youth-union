@@ -1,6 +1,8 @@
 'use strict'
 const facultyRepo = require('../repositories/faculty');
 const MESSAGE = require('../utils/message');
+const models = require('../models');
+const sequelizeUtils = require('../utils/sequelize');
 
 const create = async (name) => {
   const option = { where: { name: name }};
@@ -25,9 +27,23 @@ const create = async (name) => {
   return { message: MESSAGE.CREATE_FAIL, result: false };
 };
 
-const getAll = async () => {
-  const option = { where: { deleted_at: null }};
-  return facultyRepo.getAll(option);
+const get = async () => {
+  const option = {};
+  option.include = [
+    {
+      model: models.activityClass,
+      where: {deleted_at: null},
+      required: false,
+    },
+  ];
+  option.where = {deleted_at: null};
+  console.log('option - ', option);
+  let faculties = await facultyRepo.get(option);
+  faculties = sequelizeUtils.convertJsonToObject(faculties);
+  for (let faculty of faculties.rows) {
+    faculty.classQuantity = faculty.activity_classes.length;
+  }
+  return faculties;
 };
 
 const getById = async (facultyId) => {
@@ -72,7 +88,7 @@ const del = async (facultyId) => {
 
 module.exports = {
   create,
-  getAll,
+  get,
   getById,
   update,
   del,

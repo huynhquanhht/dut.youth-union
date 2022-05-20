@@ -2,7 +2,7 @@ paths:
   /role:
     post:
       summary: Tạo mới role
-      tags: [ Role ]
+      tags: [ Author ]
       requestBody:
         content:
           application/json:
@@ -20,7 +20,7 @@ paths:
           description: Lỗi khi có exception
     put:
       summary: Cập nhật role
-      tags: [ Role ]
+      tags: [ Author ]
       requestBody:
         content:
           application/json:
@@ -44,7 +44,7 @@ paths:
   /role/all:
     get:
       summary: Lấy tất cả role
-      tags: [ Role ]
+      tags: [ Author ]
       responses:
         200:
           description: Lấy tất cả role thành công
@@ -82,7 +82,7 @@ paths:
   /role/{id}:
     get:
       summary: Lấy role theo id
-      tags: [ Role ]
+      tags: [ Author ]
       parameters:
         - in: path
           description: Id của role muốn lấy
@@ -119,7 +119,7 @@ paths:
           description: Lỗi khi có exception
     delete:
       summary: Xóa role theo id
-      tags: [ Role ]
+      tags: [ Author ]
       parameters:
         - in: path
           description: Id của role muốn xóa
