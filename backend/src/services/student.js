@@ -28,7 +28,7 @@ const get = async (query) => {
       }
     }
   }
-  console.log(option);
+
   let students = await studentRepo.get(option);
   students = sequelizeUtils.convertJsonToObject(students);
   return students;

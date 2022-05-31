@@ -183,7 +183,7 @@ export default {
       searchText: '',
       selectedOption: {},
       query: {},
-      changedUnionTextbook: new Map(),
+      changeUnionFee: new Map(),
       command: '',
       loadingButton: false,
       searchOptions: [
@@ -219,8 +219,8 @@ export default {
   methods: {
     ...mapActions({
       fetchGetUnionFeeOfStudents: 'fetchGetUnionFeeOfStudents',
-      fetchUpdateUnionTextbooks: 'fetchUpdateUnionTextbooks',
-      fetchConfirmSubmission: 'fetchConfirmSubmission',
+      fetchSubmitUnionFee: 'fetchSubmitUnionFee',
+      fetchConfirmSubmissionUnionFee: 'fetchConfirmSubmissionUnionFee',
     }),
     ...mapMutations({
       setSnackbar: 'setSnackbar',
@@ -286,8 +286,8 @@ export default {
       return timeUtils.convertDateTimeToDate(time);
     },
     checkSubmission(student) {
-      console.log(student);
-      this.changedUnionTextbook.set(student.union_textbook.id, student.union_textbook.submitted_union_textbook);
+      console.log(student.unionFee.submit_union_fee.submitted);
+      this.changeUnionFee.set(student.unionFee.submit_union_fee.id, student.unionFee.submit_union_fee.submitted);
     },
     save() {
       this.command = 'Save';
@@ -300,11 +300,12 @@ export default {
         console.log('mmm');
         console.log(this.command)
         if (this.command == 'Save') {
-          const changedUnionTextbook = Array.from(this.changedUnionTextbook, ([key, value]) => {
-            return { id: key, submitted_union_textbook: value };
+          const changeUnionFee = Array.from(this.changeUnionFee, ([key, value]) => {
+            return { id: key, submitted: value };
           });
+          console.log('changeUnionFee - ', changeUnionFee);
           this.loadingButton = true;
-          let isSuccess = await this.fetchUpdateUnionTextbooks({changedUnionTextbook});
+          let isSuccess = await this.fetchSubmitUnionFee({changeUnionFee});
           this.loadingButton = false;
           if (isSuccess) {
             this.confirmDialog = false;
@@ -312,9 +313,10 @@ export default {
           }
         }
         if (this.command == 'Confirm') {
-          const unionTextbookIds = this.selected.map(item => item.union_textbook.id);
+          console.log(this.selected);
+          const unionFeeIds = this.selected.map(item => item.unionFee.submit_union_fee.id);
           this.loadingButton = true;
-          let isSuccess = await this.fetchConfirmSubmission({unionTextbookIds});
+          let isSuccess = await this.fetchConfirmSubmissionUnionFee({unionFeeIds});
           this.loadingButton = false;
           if (isSuccess) {
             this.confirmDialog = false;

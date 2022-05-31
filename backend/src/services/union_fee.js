@@ -7,6 +7,9 @@ const roleUtils = require("../utils/role");
 const userRepo = require("../repositories/user");
 const studentRepo = require("../repositories/student");
 const unionFeeRepo = require('../repositories/union_fee');
+const submitUnionFeeRepo = require('../repositories/submit_union_fee');
+const timeUtils = require("../utils/time");
+const unionTextbookRepo = require("../repositories/union_textbook");
 
 const get = async (currentUserId, query) => {
   let option = {};
@@ -80,10 +83,64 @@ const getOfStudent = async (currentUserId, query) => {
   unionFees = await studentRepo.get(option);
   unionFees = sequelizeUtils.convertJsonToObject(unionFees);
   unionFees.rows.forEach(item => {
-    console.log(item);
     item.unionFee = item.union_fees.slice(-1)[0];
   });
   return unionFees;
 }
 
-module.exports = { get, getOfStudent };
+const submit = async (unionFees) => {
+  let falseUpdation = [];
+  let trueUpdation = [];
+  unionFees.forEach(unionFee => {
+    if (unionFee.submitted) {
+      trueUpdation.push(unionFee.id);
+    } else {
+      falseUpdation.push(unionFee.id);
+    }
+  });
+  const transaction = await models.sequelizeConfig.transaction();
+  try {
+    if (trueUpdation.length) {
+      await submitUnionFeeRepo.update({
+        submitted: true,
+        submitted_at: timeUtils.getCurrentTime()
+      }, trueUpdation, transaction);
+    }
+    if (falseUpdation.length) {
+      await submitUnionFeeRepo.update({
+        submitted: false,
+        submitted_at: null,
+      }, falseUpdation, transaction);
+    }
+    await transaction.commit();
+  } catch (error) {
+    await transaction.rollback();
+    return false;
+  }
+  return true;
+}
+
+const confirmSubmission = async (currentUserId, submitUnionFeeIds) => {
+  let option = {};
+  let userRole = await commonService.getUserAndRole(currentUserId);
+  userRole = JSON.parse(JSON.stringify(userRole));
+  const transaction = await models.sequelizeConfig.transaction();
+  try {
+    if (userRole.roles[0].name === roleUtils.CLASS_SECRETARY) {
+      await submitUnionFeeRepo.update({
+        class_confirmed: timeUtils.getCurrentTime()
+      }, submitUnionFeeIds, transaction);
+    } else {
+      await submitUnionFeeRepo.update({
+        school_confirmed: timeUtils.getCurrentTime()
+      }, submitUnionFeeIds, transaction);
+    }
+    await transaction.commit();
+    return true;
+  } catch (error) {
+    await transaction.rollback();
+    return false;
+  }
+}
+
+module.exports = { get, getOfStudent, submit, confirmSubmission };

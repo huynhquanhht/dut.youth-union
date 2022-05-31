@@ -34,7 +34,7 @@ const update = async (req, res) => {
   }
 }
 
-// [PUT]: /confirm-submission
+// [PUT]: /union-textbook/confirm-submission
 const confirmSubmission = async (req, res) => {
   try {
     let unionTextbookIds = req.body.unionTextbookIds;

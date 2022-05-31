@@ -59,6 +59,10 @@ module.exports = (sequelize, Datatypes) => {
       through: models.submitUnionFee,
       foreignKey: 'student_id',
     });
+    student.belongsToMany(models.activity, {
+      through: models.registerJoin,
+      foreignKey: 'student_id',
+    });
   }
   return student;
 };

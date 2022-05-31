@@ -19,6 +19,8 @@ const MESSAGE = {
   NO_PERMISSION: 'Không có quyền truy cập tính năng này',
   CONFIRM_SUCCESS_UNION_TEXTBOOK: 'Xác nhận nộp sổ đoàn thành công',
   CONFIRM_FAIL_UNION_TEXTBOOK: 'Xác nhận nộp sổ đoàn thất bại',
+  CONFIRM_SUCCESS_UNION_FEE: 'Xác nhận nộp đoàn phí thành công',
+  CONFIRM_FAIL_UNION_FEE: 'Xác nhận nộp đoàn phí thất bại',
 };
 
 module.exports = MESSAGE;

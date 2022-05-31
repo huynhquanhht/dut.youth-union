@@ -81,9 +81,6 @@ export default {
     height: 120% !important;
     margin-left: -8px !important;
   }
-
-
-
   .app-bar-block {
     box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.25) !important;
     background-color: #ffffff !important;
@@ -94,7 +91,7 @@ export default {
   }
 
   .v-main__wrap {
-    background-color: #FFFFFF;
+    background-color: #F6F6F6;
   }
 
   .container {

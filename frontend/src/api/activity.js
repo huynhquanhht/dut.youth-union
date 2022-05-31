@@ -18,6 +18,19 @@ const get = (query) => {
   return axiosUtils.getRequest(url);
 };
 
+const getByCurrentStudent = (query) => {
+  let url = BASE_URL;
+  let queryString = '';
+  for (let attribute in query) {
+    queryString += `&${attribute}=${query[attribute]}`;
+  }
+  if (queryString) {
+    queryString = queryString.slice(1, queryString.length);
+    url += '?' + queryString;
+  }
+  return axiosUtils.getRequest(url);
+}
+
 const create = (activity) => {
   return axiosUtils.postRequest(`${BASE_URL}/create`, activity);
 };
@@ -36,4 +49,4 @@ const deleteActivities = (activityIds) => {
 
 
 
-export default {getAll, create, getById, update, deleteActivities, get };
+export default {getAll, create, getById, update, deleteActivities, get, getByCurrentStudent };

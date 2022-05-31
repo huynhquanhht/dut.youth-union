@@ -37,7 +37,6 @@ const get = async () => {
     },
   ];
   option.where = {deleted_at: null};
-  console.log('option - ', option);
   let faculties = await facultyRepo.get(option);
   faculties = sequelizeUtils.convertJsonToObject(faculties);
   for (let faculty of faculties.rows) {

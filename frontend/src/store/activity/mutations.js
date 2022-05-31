@@ -10,6 +10,9 @@ const mutations = {
   },
   setActivity(state, activity) {
     state.activity = activity;
+  },
+  setMyActivities(state, activites) {
+    state.myActivities = activites;
   }
 };
 export default mutations;

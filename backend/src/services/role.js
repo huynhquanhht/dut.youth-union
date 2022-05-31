@@ -68,7 +68,6 @@ const getById = async (roleId) => {
       }
     }
   }
-  console.log(JSON.parse(JSON.stringify(groupFunctions)));
   return groupFunctions;
 };
 

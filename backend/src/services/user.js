@@ -59,9 +59,7 @@ const getById = async (userId) => {
   }];
   options.where = { id: userId, deleted_at: null };
   options.attributes = ['id', 'name', 'username']
-  console.log('abc');
   const user = await userRepo.getOne(options);
-  console.log(user);
   return user;
 };
 

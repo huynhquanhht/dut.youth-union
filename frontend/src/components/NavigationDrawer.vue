@@ -173,6 +173,11 @@ export default {
             },
           ],
         },
+        {
+          name: 'Quản lý hoạt động',
+          icon: 'mdi-atlassian',
+          active: false,
+        }
       ];
     }
     if (this.user.roles[0].name === 'Bí thư đoàn trường') {
@@ -209,6 +214,11 @@ export default {
             },
           ],
         },
+        {
+          name: 'Quản lý hoạt động',
+          icon: 'mdi-atlassian',
+          active: false,
+        }
       ];
     }
     if (this.user.roles[0].name === 'Bí thư liên chi') {
@@ -240,6 +250,11 @@ export default {
             },
           ],
         },
+        {
+          name: 'Quản lý hoạt động',
+          icon: 'mdi-atlassian',
+          active: false,
+        }
       ];
     }
     if (this.user.roles[0].name === 'Bí thư chi đoàn') {
@@ -262,7 +277,7 @@ export default {
             {
               name: 'Đoàn phí',
               icon: 'mdi-home-city',
-              // route: '/faculty',
+              route: '/union-fee-of-student',
             },
           ],
         },
@@ -289,11 +304,18 @@ export default {
           active: false,
         },
         {
+          name: 'Hoạt động - Sự kiện',
+          icon: 'mdi-flag-variant',
+          route: '/activity-event',
+          active: false,
+        },
+        {
           name: 'Điểm tích lũy',
           icon: 'mdi-flag-variant',
           // route: '/activity',
           active: false,
-        }]
+        }
+      ]
     }
   }
 };

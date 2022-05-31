@@ -12,6 +12,7 @@ const studentRouter = require('./student');
 const userRouter = require('./user');
 const unionTextbook = require('./union_textbook');
 const unionFee = require('./union_fee');
+const activity = require('./activity');
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 const routes = (app) => {
@@ -26,6 +27,7 @@ const routes = (app) => {
   app.use('/user', userRouter);
   app.use('/union-textbook', unionTextbook);
   app.use('/union-fee', unionFee);
+  app.use('/activity', activity);
 };
 
 module.exports = routes;

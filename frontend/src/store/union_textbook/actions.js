@@ -25,7 +25,6 @@ const actions = {
   },
   fetchConfirmSubmission: async ({commit}, payload) => {
     try {
-      console.log(payload);
       const res = await unionTextbookApi.confirmSubmission(payload.unionTextbookIds);
       commit('setSnackbar', {
         type: 'success',

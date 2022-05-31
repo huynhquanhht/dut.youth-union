@@ -3,12 +3,13 @@ import MESSAGE from '@/utils/message';
 const actions = {
   fetchGetActivityList: async ({commit}, query) => {
     const res = await activityApi.get(query);
+    console.log('res -', res);
     commit('setActivityList', res.data);
   },
-  // fetchGetActivityList: async ({commit}, options) => {
-  //   const res = await activityApi.getAll(options.page, options.size);
-  //   commit('setActivityList', res.data);
-  // },
+  fetchGetActivitiesByCurrentStudent: async ({commit}, query) => {
+    const res = await activityApi.get(query);
+    commit('setMyActivities', res.data);
+  },
   fetchCreateActivity: async ({commit}, payload) => {
     try {
       await activityApi.create({activity: payload.activity});

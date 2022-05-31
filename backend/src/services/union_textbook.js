@@ -120,7 +120,6 @@ const confirmSubmission = async (currentUserId, unionTextbookIds) => {
     await transaction.commit();
     return true;
   } catch (error) {
-    console.log(error);
     await transaction.rollback();
     return false;
   }

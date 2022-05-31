@@ -15,7 +15,8 @@ const student = require('./student');
 const unionTextbook = require('./union_textbook');
 const unionFee = require('./union_fee');
 const submitUnionFee = require('./submit_union_fee');
-
+const activity = require('./activity');
+const registerJoin = require('./register_join');
 
 const sequelizeConfig = new sequelize(
   databaseConfig.name,
@@ -41,6 +42,8 @@ let database = {
   unionTextbook: unionTextbook(sequelizeConfig, sequelize),
   unionFee: unionFee(sequelizeConfig, sequelize),
   submitUnionFee: submitUnionFee(sequelizeConfig, sequelize),
+  activity: activity(sequelizeConfig, sequelize),
+  registerJoin: registerJoin(sequelizeConfig, sequelize),
 };
 
 Object.keys(database).forEach((modelName) => {

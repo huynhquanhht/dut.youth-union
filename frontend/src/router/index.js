@@ -36,6 +36,18 @@ const routes = [
         component: () => import('@/views/Faculty/List'),
       },
       {
+        path: 'activity-event',
+        name: 'activity-event',
+        meta: { title: 'Hoạt động - Sự kiện' },
+        component: () => import('@/views/ActivityEvent/List'),
+      },
+      {
+        path: 'activity-event/1',
+        name: 'activity-event-1',
+        meta: { title: 'Chi tiết sự kiện' },
+        component: () => import('@/views/ActivityEvent/Detail'),
+      },
+      {
         path: 'activity',
         name: 'activity-list',
         component: () => import('@/views/Activity/List'),

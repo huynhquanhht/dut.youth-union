@@ -18,6 +18,8 @@ module.exports = (sequelize, Datatypes) => {
       },
       role_id: {
         type: Datatypes.INTEGER,
+        primaryKey: false,
+        unique: false,
         references: {
           model: 'role',
           key: 'id',

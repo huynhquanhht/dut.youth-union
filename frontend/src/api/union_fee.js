@@ -27,4 +27,14 @@ const getOfStudent = (query) => {
   return axiosUtils.getRequest(url);
 }
 
-export default { get, getOfStudent };
+const submit = (unionFees) => {
+  let url = `${BASE_URL}/submit`;
+  return axiosUtils.putRequest(url, { unionFees });
+};
+
+const confirmSubmission = (submitUnionFeeIds) => {
+  let url = `${BASE_URL}/confirm-submission`;
+  return axiosUtils.putRequest(url, { submitUnionFeeIds });
+};
+
+export default { get, getOfStudent, submit, confirmSubmission };
