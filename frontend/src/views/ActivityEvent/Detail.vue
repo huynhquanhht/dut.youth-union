@@ -41,19 +41,40 @@
                 <span class="box-title">Đóng đăng ký</span>
               </div>
             </div>
-
+            <div class="activity-button">
+            </div>
           </div>
+        </div>
+      </div>
+      <div class="information">
+        <div class="detail">
+          <div class="activity-content">
+            <div class="box-title">Chi tiết</div>
+            <div class="host">
+              <v-icon>mdi-account</v-icon>
+              <span>Được tổ chức bởi khoa Công nghệ thông tin</span>
+            </div>
+            <div class="time">
+              <v-icon>mdi-timer</v-icon>
+              <span>Thứ năm, ngày 22 tháng 6</span>
+            </div>
+            <div class="location">
+              <v-icon>mdi-map-marker-radius</v-icon>
+              <span>Hội trường khu F, Đại học Bách Khoa Đà Nẵng</span>
+            </div>
+            <div class="content">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vel metus mollis, tincidunt diam a, finibus justo. Donec nec interdum enim. Integer et leo quis turpis lobortis pellentesque. Phasellus vel ipsum egestas, tempus quam vitae, fermentum libero. Etiam mattis leo urna, sit amet maximus nibh faucibus sit amet. Vivamus pretium purus nisi, ac varius velit aliquam tristique. Integer aliquet lorem mauris, sed ornare libero eleifend at. Maecenas commodo, eros ac accumsan ultricies, turpis massa ornare orci, sed finibus turpis ante nec ante. Suspendisse vitae lectus scelerisque, tempor libero et, mollis leo. Suspendisse tincidunt, ligula vel pretium molestie, tellus nisi auctor magna, vel mollis odio eros vitae est. Ut auctor cursus turpis, in tristique felis egestas et. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Nulla facilisi. Nulla nec lacus felis. Mauris a massa cursus lectus rhoncus iaculis.
+              Fusce at aliquam felis, ac dignissim nunc. Donec tincidunt in enim vitae tristique. Suspendisse auctor ultricies dolor, eu convallis felis ultrices non. Praesent lectus ex, porttitor ut risus sed, sollicitudin viverra quam. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Aliquam tellus nibh, egestas in augue at, consectetur viverra lacus. Aliquam erat volutpat. Praesent maximus ultricies sapien, id porttitor mi finibus a. Proin purus lacus, gravida in tristique eget, finibus sit amet sem. Aenean vel laoreet erat, ut aliquam lectus.
+              Praesent nec tempor orci. Fusce molestie viverra lacus id feugiat. Quisque et mauris nunc. Vivamus interdum mi non blandit dictum. Quisque sed viverra leo. Nunc aliquam, lectus ut vehicula varius, augue tortor sagittis orci, at luctus neque nunc a quam. Sed ultrices est et mauris iaculis dignissim. Etiam ante elit, gravida id magna eu, malesuada euismod dui. Curabitur consectetur fringilla dolor. Quisque aliquam finibus quam, in accumsan justo sollicitudin a. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Etiam blandit nisl at lacinia auctor. Pellentesque congue vel nulla ac dignissim. Nunc nunc augue, pellentesque ut mattis ut, mollis in augue. Morbi eget iaculis ex, nec faucibus ligula. Fusce neque eros, euismod id massa ornare, iaculis rutrum ex.
+            </div>
+          </div>
+          <div class="map">
+            <google-map />
+          </div>
+        </div>
+      </div>
+    </div>
 
-        </div>
-      </div>
-    </div>
-    <div class="information">
-      <div class="detail">
-        <div class="map">
-          <google-map />
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -67,14 +88,13 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .activity-detail {
   .main-block {
     .cover-block {
       display: flex;
       justify-content: center;
       column-gap: 16px;
-
       .cover {
         img {
           max-width: 600px;
@@ -94,16 +114,6 @@ export default {
         .registration-time {
           display: flex;
           column-gap: 16px;
-          //.quantity-text {
-          //  font: normal 500 24px Roboto;
-          //
-          //  margin-top: 8px;
-          //  margin-bottom: 4px;
-          //}
-          //.quantity-title {
-          //  font: normal 400 15px Roboto;
-          //  color: #99abb4;
-          //}
 
           .box-title {
             font: normal 400 15px Roboto;
@@ -122,20 +132,13 @@ export default {
             display: flex;
             column-gap: 20px;
             color: #455a64;
+            background: #FFFFFF;
             box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
             .open-time, .close-time {
               display: flex;
               flex-direction: column;
               align-items: center;
             }
-          }
-          .open-time-block {
-            //border-top: 4px solid #00ACED;
-            background: #FFFFFF;
-          }
-          .close-time-block {
-            //border-top: 4px solid #F44336;
-            background: #FFFFFF;
           }
         }
         .registration-quantity {
@@ -176,12 +179,37 @@ export default {
         }
       }
     }
+  }
+  .information {
+    width: 880px;
+    .detail {
+      display: flex;
+      column-gap: 16px;
+      justify-content: center;
+      width: 880px;
+      .activity-content {
+        width: 600px;
+        //height: 500px;
+        background-color: #FFFFFF;
+        padding: 16px;
+        .box-title {
+          font: normal 500 20px Roboto;
+          color: #455a64;
+        }
+        .host, .time, .location {
+          display: flex;
+          column-gap: 6px;
+          align-items: center;
+          color: #455a64;
+          height: 28px;
+        }
+        .content {
+          height: 100%;
+          text-align: justify;
+        }
+      }
+      .map {
 
-    .information-block {
-      background-color: #ffffff;
-
-      span {
-        display: block;
       }
     }
   }

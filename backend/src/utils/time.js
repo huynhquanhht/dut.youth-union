@@ -11,7 +11,6 @@ const getCurrentDate = () => moment().format('YYYY-MM-DD');
 const formatTime = (time) => moment(time).format('hh:mm DD/MM/YYYY');
 
 const formatTimeText = (time) => {
-  console.log('time - ', time);
   let clock = formatClock(time);
   let day = getDay(time);
   let date = getDate(time);

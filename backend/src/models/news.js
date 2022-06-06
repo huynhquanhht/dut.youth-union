@@ -1,16 +1,25 @@
 'use strict';
 module.exports = (sequelize, Datatypes) => {
-  const faculty = sequelize.define(
-    'faculty',
+  const news = sequelize.define(
+    'news',
     {
       id: {
-        type: Datatypes.STRING(3),
+        type: Datatypes.INTEGER,
         primaryKey: true,
+        autoIncrement: true,
       },
-      name: {
+      title: {
         type: Datatypes.STRING(255),
         allowNull: false,
         unique: true,
+      },
+      cover_url: {
+        type: Datatypes.TEXT,
+        allowNull: false,
+      },
+      content: {
+        type: Datatypes.TEXT,
+        allowNull: false,
       },
       university_union_id: {
         type: Datatypes.INTEGER,
@@ -20,6 +29,12 @@ module.exports = (sequelize, Datatypes) => {
           key: 'id',
         }
       },
+      // 1: Information
+      // 2: Notification
+      category: {
+        type: Datatypes.INTEGER,
+        allowNull: false,
+      }
     },
     {
       timestamps: true,
@@ -28,13 +43,11 @@ module.exports = (sequelize, Datatypes) => {
       createdAt: 'created_at',
       updatedAt: 'updated_at',
       deletedAt: 'deleted_at',
-      tableName: 'faculty',
+      tableName: 'news',
     }
   );
-  faculty.associate = (models) => {
-    faculty.hasMany(models.activityClass, {foreignKey: 'faculty_id'});
-    faculty.hasMany(models.lecture, {foreignKey: 'faculty_id'});
-    faculty.belongsTo(models.universityUnion, {foreignKey: 'university_union_id'});
+  news.associate = (models) => {
+    news.belongsTo(models.universityUnion, {foreignKey: 'university_union_id'});
   }
-  return faculty;
+  return news;
 };

@@ -1,29 +1,25 @@
 <template>
-  <div>
-    <div>
-      <h2>Search and add a pin</h2>
-      <label>
-        <gmap-autocomplete
-          @place_changed="setPlace">
-        </gmap-autocomplete>
-        <button @click="addMarker">Add</button>
-      </label>
-      <br/>
-
-    </div>
-    <br>
-    <gmap-map
+  <div class="google-map-block">
+    <GmapMap
       :center="center"
-      :zoom="12"
-      style="width:100%;  height: 400px;"
+      :zoom="18"
+      map-style-id="roadmap"
+      :options="mapOptions"
+      style="width: 488px; height: 400px"
+      ref="mapRef"
+      @click="handleMapClick"
     >
-      <gmap-marker
-        :key="index"
-        v-for="(m, index) in markers"
-        :position="m.position"
-        @click="center=m.position"
-      ></gmap-marker>
-    </gmap-map>
+      <GmapMarker
+        :position="marker.position"
+        :clickable="true"
+        :draggable="true"
+        @drag="handleMarkerDrag"
+        @click="panToMarker"
+      />
+    </GmapMap>
+    <button @click="geolocate">Detect Location</button>
+
+    <p>Selected Position: {{ marker.position }}</p>
   </div>
 </template>
 
@@ -32,43 +28,51 @@ export default {
   name: "GoogleMap",
   data() {
     return {
-      //mặc định là Montreal
-      center: { lat: 45.508, lng: -73.587 },
-      markers: [],
-      places: [],
-      currentPlace: 'Núi Ngũ Hành Sơn'
+      marker: { position: { lat: 10, lng: 10 } },
+      center: { lat: 10, lng: 10 },
+
+      mapOptions: {
+        disableDefaultUI: true,
+      },
     };
   },
-
   mounted() {
     this.geolocate();
   },
-
   methods: {
-    // nhận địa điểm thông qua autocomplete component
-    setPlace(place) {
-      this.currentPlace = place;
-    },
-    addMarker() {
-      if (this.currentPlace) {
-        const marker = {
-          lat: this.currentPlace.geometry.location.lat(),
-          lng: this.currentPlace.geometry.location.lng()
-        };
-        this.markers.push({ position: marker });
-        this.places.push(this.currentPlace);
-        this.center = marker;
-        this.currentPlace = null;
-      }
-    },
-    geolocate: function() {
-      navigator.geolocation.getCurrentPosition(position => {
-        this.center = {
+    //detects location from browser
+    geolocate() {
+      navigator.geolocation.getCurrentPosition((position) => {
+        this.marker.position = {
           lat: position.coords.latitude,
-          lng: position.coords.longitude
+          lng: position.coords.longitude,
         };
+
+        this.panToMarker();
       });
-    }
-  }
+    },
+
+    //sets the position of marker when dragged
+    handleMarkerDrag(e) {
+      this.marker.position = { lat: e.latLng.lat(), lng: e.latLng.lng() };
+    },
+
+    //Moves the map view port to marker
+    panToMarker() {
+      this.$refs.mapRef.panTo(this.marker.position);
+      this.$refs.mapRef.setZoom(18);
+    },
+
+    //Moves the marker to click position on the map
+    handleMapClick(e) {
+      this.marker.position = { lat: e.latLng.lat(), lng: e.latLng.lng() };
+      console.log(e);
+    },
+  },
 };
 </script>
+<style lang="scss" scoped>
+.google-map-block {
+  width: 267px;
+}
+</style>

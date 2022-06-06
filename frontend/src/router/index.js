@@ -72,6 +72,12 @@ const routes = [
         component: () => import('@/views/Activity/ActivityForm'),
       },
       {
+        path: 'news',
+        name: 'news-list',
+        meta: { title: 'Quản lý tin tức'},
+        component: () => import('@/views/News/List'),
+      },
+      {
         path: 'activity-class',
         name: 'activity-class-list',
         meta: { title: 'Quản lý lớp sinh hoạt'},
@@ -95,6 +101,12 @@ const routes = [
           className: !route.query.className ? null : route.query.className,
         }),
         component: () => import('@/views/Student/List'),
+      },
+      {
+        path: 'profile/student/:id',
+        name: 'student/profile',
+        meta: { title: 'Thông tin cá nhân'},
+        component: () => import('@/views/Profile/Student'),
       },
       {
         path: 'user',
@@ -167,14 +179,35 @@ const routes = [
     ],
   },
   {
-    path: '/error403',
-    name: 'error403',
+    path: '/error',
+    name: 'error',
     component: () => import('@/views/ErrorPage/ErrorPage'),
-  },
-  {
-    path: '*',
-    name: 'error404',
-    component: () => import('@/views/ErrorPage/ErrorPage'),
+    children: [
+      {
+        path: 'denied-access',
+        name: 'denied-access',
+        component: () => import('@/views/ErrorPage/ErrorDeniedAccess'),
+        meta: { title: 'Error 403 - Forbidden' },
+      },
+      {
+        path: 'other-error',
+        name: 'other-error',
+        component: () => import('@/views/ErrorPage/ErrorOther'),
+        meta: { title: 'Other error' },
+      },
+      {
+        path: 'invalid-token',
+        name: 'invalid-token',
+        meta: { title: 'Invalid token' },
+        component: () => import('../views/ErrorPage/ErrorToken'),
+      },
+      {
+        path: 'internal-server',
+        name: 'internal-server',
+        meta: { title: 'Error 500 - Internal Server Error' },
+        component: () => import('../views/ErrorPage/ErrorInternalServer.vue'),
+      },
+    ],
   },
 ];
 

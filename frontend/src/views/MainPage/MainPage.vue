@@ -20,7 +20,10 @@
     </v-app-bar>
     <v-main>
       <v-container>
-        <router-view class="main-content"></router-view>
+        <router-view
+          transition="fade-transition"
+          class="main-content">
+        </router-view>
       </v-container>
     </v-main>
     <v-snackbar
@@ -71,10 +74,10 @@ export default {
 .require {
   color: red;
 }
-.v-application .primary--text {
-  color: unset !important;
-  caret-color: unset !important;
-}
+//.v-application .primary--text {
+//  color: unset !important;
+//  caret-color: unset !important;
+//}
 .main-page-wrapper {
   .v-navigation-drawer__image {
     width: 120% !important;

@@ -1,79 +1,79 @@
 <template>
   <div>
     <v-data-table
-        v-model="selected"
-        :headers="headers"
-        :items="activityList ? activityList.rows : []"
-        :single-select="singleSelect"
-        :items-per-page="selectedSize"
-        scroll.sync="scrollSync"
-        item-key="id"
-        show-select
-        loading-text="Đang tải dữ liệu... Vui lòng chờ"
-        :loading="loading"
-        class="activity-table pl-3 pr-3 pb-3"
-        fixed-header
-        hide-default-footer
+      v-model="selected"
+      :headers="headers"
+      :items="activityList ? activityList.rows : []"
+      :single-select="singleSelect"
+      :items-per-page="selectedSize"
+      scroll.sync="scrollSync"
+      item-key="id"
+      show-select
+      loading-text="Đang tải dữ liệu... Vui lòng chờ"
+      :loading="loading"
+      class="activity-table pl-3 pr-3 pb-3"
+      fixed-header
+      hide-default-footer
     >
       <template v-if="activityList && !activityList.count" v-slot:no-data>
         Không có dữ liệu để hiển thị!
       </template>
       <template v-slot:top>
-        <v-card-title>Danh sách hoạt động</v-card-title>
+        <v-card-title>Danh sách tin tức</v-card-title>
         <div class="toolbar mb-1" flat>
           <div class="toolbar-block">
             <div class="search-block d-flex">
               <v-select
-                  filled
-                  label="Tìm kiếm theo"
-                  class="search-select mr-2"
-                  :items="searchOptions"
-                  item-text="name"
-                  hide-details="false"
-                  v-model="selectedOption"
-                  solo
-                  dense
+                filled
+                label="Tìm kiếm theo"
+                class="search-select mr-2"
+                :items="searchOptions"
+                item-text="name"
+                hide-details="false"
+                v-model="selectedOption"
+                solo
+                dense
               ></v-select>
               <v-text-field
-                  solo
-                  dense
-                  filled
-                  prepend-inner-icon="mdi-magnify"
-                  hide-details="false"
-                  class="input-search"
-                  @keyup.enter="search"
-                  v-model="searchText"
-                  :disabled="!selectedOption"
+                solo
+                dense
+                filled
+                prepend-inner-icon="mdi-magnify"
+                hide-details="false"
+                class="input-search"
+                @keyup.enter="search"
+                v-model="searchText"
+                :disabled="!selectedOption"
               ></v-text-field>
             </div>
             <div class="tool-block d-flex align-center">
-                <v-btn
-                    icon
-                    width="100px"
-                    class="tool-button"
-                    @click="$router.push('/activity/create')"
-                >
-                  <v-icon dark size="24">mdi-plus</v-icon>
-                  Thêm mới
-                </v-btn>
               <v-btn
-                  text
-                  width="100px"
-                  class="tool-button"
-                  @click="edit"
+                icon
+                width="100px"
+                class="tool-button"
+                @click="$router.push('/activity/create')"
+              >
+                <v-icon dark size="24">mdi-plus</v-icon>
+                Thêm mới
+              </v-btn>
+              <v-btn
+                text
+                width="100px"
+                class="tool-button"
+                @click="edit"
               >
                 <v-icon dark size="20">mdi-square-edit-outline</v-icon>
                 Chỉnh sửa
               </v-btn>
-                <v-btn
-                    text
-                    width="50px"
-                    class="tool-button"
-                    @click="deleteActivities"
-                >
-                  <v-icon dark size="20">mdi-trash-can-outline</v-icon>
-                  Xóa
-                </v-btn>
+              <v-btn
+                text
+                width="50px"
+                class="tool-button"
+                @click="deleteActivities"
+              >
+                <v-icon dark size="20">mdi-trash-can-outline</v-icon>
+                Xóa
+              </v-btn>
             </div>
           </div>
         </div>
@@ -81,41 +81,41 @@
       </template>
       <template v-slot:footer>
         <div
-            class="footer-block pagination-block d-flex align-center justify-end mt-2"
+          class="footer-block pagination-block d-flex align-center justify-end mt-2"
         >
           <div class="selected-row-block pagi-info d-flex align-center">
             <span>Hiển thị:</span>
             <v-select
-                filled
-                solo
-                dense
-                hide-details="false"
-                v-model="selectedSize"
-                class="row-count-select"
-                :items="listSize"
-                item-text="name"
-                @change="changePageSize"
-                return-object
-                single-line
+              filled
+              solo
+              dense
+              hide-details="false"
+              v-model="selectedSize"
+              class="row-count-select"
+              :items="listSize"
+              item-text="name"
+              @change="changePageSize"
+              return-object
+              single-line
             ></v-select>
           </div>
           <v-pagination
             v-if="activityList.count > selectedSize"
-              v-model="currentPage"
-              :length="
+            v-model="currentPage"
+            :length="
                activityList ? Math.ceil(activityList.count / selectedSize) : 0
             "
-              :totalVisible="totalVisible"
-              @input="handlePageChange"
+            :totalVisible="totalVisible"
+            @input="handlePageChange"
           ></v-pagination>
         </div>
       </template>
     </v-data-table>
     <v-dialog v-model="dialog" width="400px">
       <confirm-dialog
-          @confirm-dialog="handleConfirm"
-          :title="dialogTitle"
-          :content="dialogContent"
+        @confirm-dialog="handleConfirm"
+        :title="dialogTitle"
+        :content="dialogContent"
       ></confirm-dialog>
     </v-dialog>
   </div>
@@ -180,12 +180,9 @@ export default {
           sortable: false,
           value: 'id',
         },
-        {text: 'Tên hoạt động', value: 'name'},
-        {text: 'Đơn vị tổ chức', value: 'organization_unit'},
-        {text: 'Địa điểm', value: 'place'},
-        {text: 'Bắt đầu', value: 'begin_at'},
-        {text: 'Kết thúc', value: 'end_at'},
-        {text: 'Trạng thái', value: 'status'},
+        {text: 'Tiêu đề', value: 'name'},
+        {text: 'Loại thông báo', value: 'organization_unit'},
+        {text: 'Ngày tạo', value: 'place'},
       ],
       dialogTitle: null,
       dialogContent: null,

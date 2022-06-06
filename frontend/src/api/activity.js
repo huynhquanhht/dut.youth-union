@@ -32,7 +32,7 @@ const getByCurrentStudent = (query) => {
 }
 
 const create = (activity) => {
-  return axiosUtils.postRequest(`${BASE_URL}/create`, activity);
+  return axiosUtils.postRequest(`${BASE_URL}`, { newActivity: activity });
 };
 
 const getById = (id) => {
@@ -40,11 +40,12 @@ const getById = (id) => {
 };
 
 const update = (id, activity) => {
-  return axiosUtils.putRequest(`${BASE_URL}/update/${id}`, {activity});
+  console.log('mnk');
+  return axiosUtils.putRequest(`${BASE_URL}`, {activityId: id, newActivity: activity});
 };
 
 const deleteActivities = (activityIds) => {
-  return axiosUtils.deleteRequest(`${BASE_URL}/delete`, {activityIds});
+  return axiosUtils.deleteRequest(`${BASE_URL}`, {activityIds});
 };
 
 

@@ -1,6 +1,6 @@
 <template>
   <v-card>
-    <v-card-title class="text-h5">
+    <v-card-title class="card-title">
       {{ title }}
     </v-card-title>
     <v-card-text class="content">
@@ -55,6 +55,9 @@ export default {
   font: normal 400 15px Roboto;
   letter-spacing: 0;
   color: #616161 !important;
+}
+.card-title {
+  font: normal 600 19px Roboto !important;
 }
 .v-dialog > .v-card > .v-card__text {
   padding: 0 24px 0px;

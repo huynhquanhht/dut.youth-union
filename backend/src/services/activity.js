@@ -99,8 +99,61 @@ const getAll = async (page, size) => {
   };
 };
 
+const getById = async (activityId) => {
+  let options = {};
+  options.where = { id: activityId };
+  return await activityRepo.getById(options);
+}
+
+const create = async (newActivity, currentUserId) => {
+  const data = {
+    name: newActivity.activityName,
+    organization_unit: newActivity.organizationUnit,
+    begin_at: newActivity.beginAt,
+    end_at: newActivity.endAt,
+    begin_registration_at: newActivity.beginRegistrationAt,
+    end_registration_at: newActivity.endRegistrationAt,
+    place: newActivity.place,
+    participant_quantity: newActivity.participantQuantity,
+    point: newActivity.point,
+    content: newActivity.content,
+    cover_url: newActivity.coverUrl,
+    created_by: currentUserId,
+  }
+  return await activityRepo.create(data);
+};
+
+const update = async (activityId, newActivity) => {
+  let condition = {};
+  condition.where = { id: activityId };
+  const data = {
+    name: newActivity.activityName,
+    organization_unit: newActivity.organizationUnit,
+    begin_at: newActivity.beginAt,
+    end_at: newActivity.endAt,
+    begin_registration_at: newActivity.beginRegistrationAt,
+    end_registration_at: newActivity.endRegistrationAt,
+    place: newActivity.place,
+    participant_quantity: newActivity.participantQuantity,
+    point: newActivity.point,
+    content: newActivity.content,
+    cover_url: newActivity.coverUrl,
+  }
+  return await activityRepo.updateById(data, condition);
+};
+
+const deleteByIds = async (activityIds) => {
+  const options = { where: { id: activityIds } };
+  const deletionResult = await activityRepo.deleteByIds(options);
+  return deletionResult;
+};
+
 module.exports = {
   get,
   getAll,
   getByStudent,
+  getById,
+  create,
+  update,
+  deleteByIds,
 };

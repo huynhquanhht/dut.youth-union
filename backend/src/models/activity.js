@@ -36,10 +36,6 @@ module.exports = (sequelize, Datatypes) => {
         type: Datatypes.INTEGER,
         allowNull: false,
       },
-      status: {
-        type: Datatypes.INTEGER,
-        allowNull: false,
-      },
       begin_registration_at: {
         type: Datatypes.DATE,
         allowNull: true,
@@ -56,6 +52,10 @@ module.exports = (sequelize, Datatypes) => {
         type: Datatypes.TEXT,
         allowNull: false,
       },
+      // qr_code: {
+      //   type: Datatypes.TEXT,
+      //   allowNull: false,
+      // },
       created_by: {
         type: Datatypes.INTEGER,
         allowNull: false,

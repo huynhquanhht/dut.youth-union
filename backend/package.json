@@ -19,6 +19,7 @@
     "lodash": "^4.17.21",
     "moment": "^2.29.2",
     "node-fetch": "^3.2.3",
+    "qrcode.vue": "^3.3.3",
     "sequelize": "^6.19.0",
     "swagger-jsdoc": "^6.2.0",
     "swagger-ui-express": "^4.3.0",

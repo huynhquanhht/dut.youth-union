@@ -106,8 +106,9 @@ export default {
           active: false,
         },
         {
-          name: 'Quản lý thông báo',
+          name: 'Quản lý tin tức',
           icon: 'mdi-bullhorn ',
+          route: '/news',
           active: false,
         },
         {
@@ -284,7 +285,7 @@ export default {
         {
           name: 'Thông tin đoàn viên',
           icon: 'mdi-flag-variant',
-          // route: '/activity',
+          route: '/profile/student',
           active: false,
         },
       ];
@@ -298,7 +299,7 @@ export default {
           active: false,
         },
         {
-          name: 'Thông tin hoạt động',
+          name: 'Đoàn phí',
           icon: 'mdi-flag-variant',
           route: '/activity',
           active: false,

@@ -36,11 +36,11 @@ service.interceptors.response.use(
       return;
     }
     if (error.response.status === 404) {
-      router.replace({ path: '/error404' });
+      router.replace({ path: '/error/not-found' });
       return;
     }
     if (error.response.status === 500) {
-      router.replace({ path: '/error500' });
+      router.push({ name: 'internal-server' });
       return;
     }
     return Promise.reject(error);

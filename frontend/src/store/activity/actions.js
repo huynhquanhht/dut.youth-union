@@ -1,4 +1,5 @@
 import activityApi from '@/api/activity';
+import cloudinaryApi from "@/api/cloudinary";
 import MESSAGE from '@/utils/message';
 const actions = {
   fetchGetActivityList: async ({commit}, query) => {
@@ -12,7 +13,7 @@ const actions = {
   },
   fetchCreateActivity: async ({commit}, payload) => {
     try {
-      await activityApi.create({activity: payload.activity});
+      await activityApi.create(payload.activity);
       commit('setSnackbar', {
         type: 'success',
         visible: true,
@@ -72,6 +73,22 @@ const actions = {
         });
       }
       return false;
+    }
+  },
+  uploadActivityCover: async ({ commit }, payload) => {
+    try {
+      console.log(payload)
+      let res = await cloudinaryApi.uploadActivityCover(payload.file);
+      console.log(res)
+      return res.data.url;
+    } catch (error) {
+      console.log(error.response);
+      commit('setSnackbar', {
+        type: 'error',
+        visible: true,
+        text: error.response.data.error.message,
+      });
+      return null;
     }
   }
 };
