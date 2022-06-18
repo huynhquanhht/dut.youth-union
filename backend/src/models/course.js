@@ -4,7 +4,8 @@ module.exports = (sequelize, Datatypes) => {
     'course',
     {
       id: {
-        type: Datatypes.INTEGER,
+        type: Datatypes.STRING(2),
+        unique: true,
         primaryKey: true,
       },
       name: {

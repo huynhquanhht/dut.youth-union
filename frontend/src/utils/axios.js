@@ -27,9 +27,11 @@ service.interceptors.response.use(
     return Promise.resolve(response);
   },
   function (error) {
+    console.log('error - ', error);
     if (error.response.status === 401) {
       localStorageUtils.getService().clearAll();
       if (error.response.data.message === MESSAGE.LOGIN_FAIL) {
+        console.log('abc');
         return Promise.reject(error);
       }
       router.replace({ path: '/login' });
@@ -78,6 +80,7 @@ const postRequest = (url, data = {}, functionId) => {
     data: data,
     headers: {
       function_id: functionId,
+      'Content-Type': 'multipart/form-data',
     }
   });
 };

@@ -10,6 +10,7 @@ const authorize = async (req, res, next) => {
       return;
     }
     const user = await userService.authorize(req.payload, functionId);
+    console.log('author - ', user);
     if (user) {
       req.currentUser = user;
       next();

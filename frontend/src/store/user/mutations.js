@@ -7,6 +7,9 @@ const mutations = {
   },
   setUser: (state, user) => {
     state.user = user;
-  }
+  },
+  setCurrentStudentInfo: (state, currentStudentInfo) => {
+    state.currentStudentInfo = currentStudentInfo;
+  },
 };
 export default mutations;

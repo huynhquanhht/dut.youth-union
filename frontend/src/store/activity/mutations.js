@@ -13,6 +13,9 @@ const mutations = {
   },
   setMyActivities(state, activites) {
     state.myActivities = activites;
+  },
+  setPointListOfCurrentStudent(state, pointList) {
+    state.pointList = pointList;
   }
 };
 export default mutations;

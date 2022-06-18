@@ -1,6 +1,6 @@
 'use strict';
 const models = require('../models');
-const groupFunctionModel = models.group_function;
+const groupFunctionModel = models.groupFunction;
 
 const create = (newGroupFunction) => {
   return groupFunctionModel.create(newGroupFunction);

@@ -33,7 +33,6 @@ const create = async (req, res) => {
     if (!news.title ||
       !news.coverUrl ||
       !news.content ||
-      !news.universityUnionId ||
       !news.category
     ) {
       res.status(400).send({ message: MESSAGE.CREATE_FAIL });
@@ -58,7 +57,6 @@ const update = async (req, res) => {
     if (!news.title ||
       !news.coverUrl ||
       !news.content ||
-      !news.universityUnionId ||
       !news.category
     ) {
       res.status(400).send({ message: MESSAGE.UPDATE_FAIL });

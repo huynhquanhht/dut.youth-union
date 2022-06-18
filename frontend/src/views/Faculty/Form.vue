@@ -1,19 +1,28 @@
 <template>
   <v-card class="form-card">
     <div class="form-toolbar d-flex align-center justify-space-between pl-4 pr-2 py-1">
-      <span v-if="!faculty" class="form-title">Thêm mới Liên chi đoàn</span>
-      <span v-else class="form-title">Chỉnh sửa Liên chi đoàn</span>
+      <span class="form-title"> {{ title }}</span>
       <v-btn
           icon
           dark
-          @click="$emit('close-form')"
+          @click="close"
       >
         <v-icon>mdi-close</v-icon>
       </v-btn>
     </div>
     <form class="form-block px-4 pt-2 pb-2">
+      <div class="input-id">
+        <span class="label">Mã khoa <span class="require">(*)</span></span>
+        <v-text-field
+          class="input-text mb-1"
+          solo
+          dense
+          hide-details
+          v-model="id"
+        ></v-text-field>
+      </div>
         <div class="input-name">
-          <span class="label">Tên <span class="require">(*)</span></span>
+          <span class="label">Tên khoa <span class="require">(*)</span></span>
           <v-text-field
               class="input-text mb-1"
               solo
@@ -27,10 +36,10 @@
           class="btn-save"
           color="primary"
           :disabled="!name"
+          @click="save"
         >Lưu</v-btn>
       </div>
     </form>
-
   </v-card>
 </template>
 
@@ -43,18 +52,58 @@ export default {
       default() {
         return null;
       }
+    },
+    formType: {
+      type: String,
+      default: 'Tạo mới khoa',
     }
   },
   data() {  
     return {
-      id: null,
+      id: this.faculty ? this.faculty.id : '',
       name: this.faculty ? this.faculty.name : '',
       birthday: null,
+      title: ''
     }
   },
-  created() {
-    console.log('faculty - ', this.faculty);
-  }
+  methods: {
+    save() {
+      if (this.formType === 'Create') {
+        this.$emit('faculty-form', {
+          command: 'Create',
+          faculty: { id: this.id, name: this.name },
+        });
+      }
+      if (this.formType === 'Update') {
+        this.$emit('faculty-form', {
+          command: 'Update',
+          faculty: { id: this.id, name: this.name },
+        });
+      }
+    },
+    close() {
+      this.id = null;
+      this.name = null,
+      this.$emit('faculty-form', {
+        command: 'close',
+      })
+    }
+  },
+  watch: {
+    faculty() {
+      this.id = this.faculty ? this.faculty.id : '';
+      this.name = this.faculty ? this.faculty.name : '';
+    },
+    formType() {
+      console.log('abc');
+      if (this.formType === 'Create') {
+        this.title = 'Tạo mới khoa';
+      }
+      if (this.formType === 'Update') {
+        this.title = 'Cập nhật khoa';
+      }
+    }
+  },
 }
 </script>
 

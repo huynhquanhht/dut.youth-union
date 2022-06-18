@@ -1,5 +1,7 @@
 <template>
+  <Transition name="fade">
   <router-view></router-view>
+  </Transition>
 </template>
 
 <script>
@@ -18,5 +20,12 @@ html {
 }
 .v-application p {
   margin-bottom: 0px !important;
+}
+.fade-enter-active {
+  transition: opacity 0.5s;
+}
+
+.fade-enter {
+  opacity: 0;
 }
 </style>

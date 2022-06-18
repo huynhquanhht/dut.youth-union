@@ -1,10 +1,10 @@
 <template>
   <v-menu
-      bottom
-      min-width="200px"
-      rounded
-      offset-y
-      class="profile-option-wrapper"
+    bottom
+    min-width="200px"
+    rounded
+    offset-y
+    class="profile-option-wrapper"
   >
     <template v-slot:activator="{ on }">
       <v-btn width="40px" height="40px" icon v-on="on">
@@ -18,9 +18,9 @@
       <v-list-item-content class="justify-center profile-info">
         <div class="text-center profile-menu">
           <p class="fullname">{{ currentUser.name }}</p>
-<!--          <p class="email">-->
-<!--            {{ currentUser.email }}-->
-<!--          </p>-->
+          <!--          <p class="email">-->
+          <!--            {{ currentUser.email }}-->
+          <!--          </p>-->
           <v-divider class="mt-2"></v-divider>
           <v-btn class="option-btn" text width="100%">Thông tin cá nhân</v-btn>
           <v-divider></v-divider>
@@ -52,7 +52,6 @@ export default {
     },
   },
   created() {
-    console.log(this.currentUser);
   },
 };
 </script>
@@ -73,9 +72,11 @@ export default {
     rgba(60, 64, 67, 0.15) 0px 2px 6px 2px !important;
   }
 }
+
 .profile-info-block {
   box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
   rgba(0, 0, 0, 0.3) 0px 1px 3px -1px !important;
+
   .profile-info {
     .profile-menu {
       .fullname {

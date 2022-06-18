@@ -20,12 +20,12 @@ export default {
   },
   methods: {
     ...mapActions({
-      fetchGetActivityList: 'fetchGetActivityList',
+      fetchGetAllActivity: 'fetchGetAllActivity',
     }),
   },
   async created() {
-    await this.fetchGetActivityList();
-    console.log(this.activityList);
+    // await this.fetchGetAllActivity();
+    // console.log(this.activityList);
   }
 }
 </script>

@@ -1,9 +1,9 @@
 <template>
-  <div class="union-fee-table">
+  <div class="union-fee-of-student-table-wrapper">
     <v-data-table
       v-model="selected"
       :headers="headers"
-      :items="unionFees && unionFees.rows ? unionFees.rows : []"
+      :items="unionFeeOfStudents && unionFeeOfStudents.rows ? unionFeeOfStudents.rows : []"
       :single-select="singleSelect"
       :items-per-page="selectedSize"
       scroll.sync="scrollSync"
@@ -11,15 +11,15 @@
       show-select
       :loading="loading"
       loading-text="Đang tải dữ liệu... Vui lòng chờ"
-      class="union-fee-table pl-3 pr-3 pb-3"
+      class="union-fee-of-student-table"
       fixed-header
       hide-default-footer
     >
-      <template v-if="unionFees && !unionFees.rows" v-slot:no-data>
+      <template v-if="unionFeeOfStudents && !unionFeeOfStudents.rows" v-slot:no-data>
         Không có dữ liệu để hiển thị!
       </template>
       <template v-slot:top>
-        <v-card-title>Quản lý đợt thu đoàn phí</v-card-title>
+        <v-card-title>QUẢN LÝ ĐOÀN PHÍ </v-card-title>
         <div class="toolbar mb-1" flat>
           <div class="toolbar-block">
             <div class="search-block d-flex">
@@ -49,6 +49,24 @@
             <div class="tool-block d-flex">
               <v-btn
                 text
+                width="124px"
+                class="tool-button"
+                @click="collectionPeriođialog = true"
+              >
+                <v-icon dark size="20" class="mr-1">mdi-hand-coin</v-icon>
+                Tạo đợt thu
+              </v-btn>
+              <v-btn
+                text
+                width="124px"
+                class="tool-button"
+                @click="printInvoice"
+              >
+                <v-icon dark size="20" class="mr-1">fa-file-invoice-dollar</v-icon>
+                Xuất hóa đơn
+              </v-btn>
+              <v-btn
+                text
                 width="50px"
                 class="tool-button"
                 @click="save"
@@ -69,14 +87,27 @@
           </div>
         </div>
       </template>
-      <template v-slot:item.amount_of_money="{ item }">
-        <span>{{ formatMoney(item.amount_of_money)}}</span>
+      <!--      <template v-slot:item.data-table-select="{ item}">-->
+      <!--        <v-simple-checkbox-->
+      <!--          :readonly="item.union_textbook.class_confirmed"-->
+      <!--        ></v-simple-checkbox>-->
+      <!--      </template>-->
+      <template v-slot:item.unionFee.submit_union_fee.submitted="{ item }">
+        <v-simple-checkbox
+          color="info"
+          v-model="item.unionFee.submit_union_fee.submitted"
+          @click="checkSubmission(item)"
+          :key="item.id"
+        ></v-simple-checkbox>
       </template>
-      <template v-slot:item.created_at="{ item }">
-        <span>{{ formatTime(item.created_at)}}</span>
+      <template v-slot:item.unionFee.submit_union_fee.submitted_at="{ item }">
+        <span>{{ formatTime(item.unionFee.submit_union_fee.submitted_at)}}</span>
       </template>
-      <template v-slot:item.updated_at="{ item }">
-        <span>{{ formatTime(item.updated_at)}}</span>
+      <template v-slot:item.unionFee.submit_union_fee.class_confirmed="{ item }">
+        <span>{{ formatTime(item.unionFee.submit_union_fee.class_confirmed)}}</span>
+      </template>
+      <template v-slot:item.unionFee.submit_union_fee.school_confirmed="{ item }">
+        <span>{{ formatTime(item.unionFee.submit_union_fee.school_confirmed)}}</span>
       </template>
       <template v-slot:footer>
         <div
@@ -97,8 +128,8 @@
           </div>
           <v-pagination
             v-model="currentPage"
-            v-if="unionFees && unionFees.count"
-            :length="unionFees ? Math.ceil(unionFees.count / selectedSize) : 0"
+            v-if="unionFeeOfStudents.count"
+            :length="unionFeeOfStudents ? Math.ceil(unionFeeOfStudents.count / selectedSize) : 0"
             :totalVisible="totalVisible"
             @input="handlePageChange"
           ></v-pagination>
@@ -114,6 +145,15 @@
         :loadingButton="loadingButton"
       ></confirm-dialog>
     </v-dialog>
+    <v-dialog v-model="collectionPeriođialog" width="400px">
+    <collection-period-dialog
+      :title="dialogTitle"
+      :content="dialogContent"
+    ></collection-period-dialog>
+  </v-dialog>
+  <div class="invoice">
+    <invoice :invoiceInfo="invoice" v-show="false"/>
+  </div>
   </div>
 </template>
 
@@ -122,12 +162,15 @@ import {mapGetters, mapMutations, mapActions} from 'vuex';
 import ConfirmDialog from '@/components/ConfirmDialog';
 // import MESSAGE from '@/utils/message';
 import timeUtils from "@/utils/time";
-import moneyUtils from '@/utils/money';
-
+import CollectionPeriodDialog from "@/views/UnionFee/CollectionPeriodDialog";
+import Invoice from '@/views/UnionFee/Invoice';
+import MESSAGE from "@/utils/message";
 export default {
-  name: 'union-fee-list',
+  name: 'union-fee-of-student-list',
   components: {
+    CollectionPeriodDialog,
     ConfirmDialog,
+    Invoice,
   },
   props: {
     page: {
@@ -163,7 +206,7 @@ export default {
       searchText: '',
       selectedOption: {},
       query: {},
-      changedUnionTextbook: new Map(),
+      changeUnionFee: new Map(),
       command: '',
       loadingButton: false,
       searchOptions: [
@@ -177,28 +220,33 @@ export default {
         },
       ],
       headers: [
-        {text: 'Mã số', value: 'id',},
-        {text: 'Năm học', value: 'school_year'},
-        {text: 'Số tiền', value: 'amount_of_money'},
-        {text: 'Ngày tạo', value: 'created_at',},
-        {text: 'Ngày cập nhật', value: 'updated_at'},
+        {text: 'Mã sinh viên', value: 'id',},
+        {text: 'Họ tên', value: 'name'},
+        {text: 'Chi đoàn', value: 'activity_class.name'},
+        {text: 'Nộp đoàn phí', value: 'unionFee.submit_union_fee.submitted',},
+        {text: 'Ngày nộp', value: 'unionFee.submit_union_fee.submitted_at'},
+        {text: 'Lớp xác nhận', value: 'unionFee.submit_union_fee.class_confirmed'},
+        {text: 'Trường xác nhận', value: 'unionFee.submit_union_fee.school_confirmed'}
       ],
       dialogTitle: null,
       dialogContent: null,
       confirmDialogContent: null,
+      collectionPeriođialog: false,
     };
   },
   computed: {
     ...mapGetters({
-      unionFees: 'getUnionFees',
+      unionFeeOfStudents: 'getUnionFeeOfStudents',
+      invoice: 'getInvoice',
     }),
   },
 
   methods: {
     ...mapActions({
-      fetchGetUnionFees: 'fetchGetUnionFees',
-      fetchUpdateUnionTextbooks: 'fetchUpdateUnionTextbooks',
-      fetchConfirmSubmission: 'fetchConfirmSubmission',
+      fetchGetUnionFeeOfStudents: 'fetchGetUnionFeeOfStudents',
+      fetchSubmitUnionFee: 'fetchSubmitUnionFee',
+      fetchConfirmSubmissionUnionFee: 'fetchConfirmSubmissionUnionFee',
+      fetchGetInvoice: 'fetchGetInvoice',
     }),
     ...mapMutations({
       setSnackbar: 'setSnackbar',
@@ -206,21 +254,21 @@ export default {
     async handlePageChange() {
       this.setQuery();
       await this.$router.push({
-        name: 'union-fee-list',
+        name: 'union-fee-of-student-list',
         query: this.query,
       }).catch(() => {});
       this.loading = true;
-      await this.fetchGetUnionFees(this.query);
+      await this.fetchGetUnionFeeOfStudents(this.query);
       this.loading = false;
     },
     async changePageSize() {
       this.setQuery();
       await this.$router.push({
-        name: 'union-fee-list',
+        name: 'union-fee-of-student-list',
         query: this.query,
       }).catch(() => {});
       this.loading = true;
-      await this.fetchGetUnionFees(this.query);
+      await this.fetchGetUnionFeeOfStudents(this.query);
       this.loading = false;
     },
     processDialog(payload) {
@@ -243,10 +291,10 @@ export default {
       query.page = 1;
       query.size = 10;
       this.$router.push({
-        name: 'union-fee-list',
+        name: 'union-fee-of-student-list',
         query: query,
       }).catch(() => {});
-      await this.fetchGetUnionFees(query);
+      await this.fetchGetUnionFeeOfStudents(query);
     },
     setQuery() {
       this.searchOptions.forEach(option => {
@@ -264,8 +312,8 @@ export default {
       return timeUtils.convertDateTimeToDate(time);
     },
     checkSubmission(student) {
-      console.log(student);
-      this.changedUnionTextbook.set(student.union_textbook.id, student.union_textbook.submitted_union_textbook);
+      console.log(student.unionFee.submit_union_fee.submitted);
+      this.changeUnionFee.set(student.unionFee.submit_union_fee.id, student.unionFee.submit_union_fee.submitted);
     },
     save() {
       this.command = 'Save';
@@ -278,25 +326,27 @@ export default {
         console.log('mmm');
         console.log(this.command)
         if (this.command == 'Save') {
-          const changedUnionTextbook = Array.from(this.changedUnionTextbook, ([key, value]) => {
-            return { id: key, submitted_union_textbook: value };
+          const changeUnionFee = Array.from(this.changeUnionFee, ([key, value]) => {
+            return { id: key, submitted: value };
           });
+          console.log('changeUnionFee - ', changeUnionFee);
           this.loadingButton = true;
-          let isSuccess = await this.fetchUpdateUnionTextbooks({changedUnionTextbook});
+          let isSuccess = await this.fetchSubmitUnionFee({changeUnionFee});
           this.loadingButton = false;
           if (isSuccess) {
             this.confirmDialog = false;
-            await this.fetchGetUnionFees(this.query);
+            await this.fetchGetUnionFeeOfStudents(this.query);
           }
         }
         if (this.command == 'Confirm') {
-          const unionTextbookIds = this.selected.map(item => item.union_textbook.id);
+          console.log(this.selected);
+          const unionFeeIds = this.selected.map(item => item.unionFee.submit_union_fee.id);
           this.loadingButton = true;
-          let isSuccess = await this.fetchConfirmSubmission({unionTextbookIds});
+          let isSuccess = await this.fetchConfirmSubmissionUnionFee({unionFeeIds});
           this.loadingButton = false;
           if (isSuccess) {
             this.confirmDialog = false;
-            await this.fetchGetUnionFees(this.query);
+            await this.fetchGetUnionFeeOfStudents(this.query);
           }
         }
         return;
@@ -310,28 +360,64 @@ export default {
       this.confirmDialogContent = "Bạn chắc chắn muốn lưu thông tin sổ đoàn đã chọn?"
       this.confirmDialog = true;
     },
-    formatMoney(money) {
-      return moneyUtils.formatVND(money);
+    async printInvoice() {
+      if (this.selected.length !== 1) {
+        this.setSnackbar({
+          type: 'info',
+          visible: true,
+          text: MESSAGE.CHOOSE_ONE_RECORD_FOR_EXPORT_BILL,
+        });
+        return;
+      }
+      await this.fetchGetInvoice({
+        studentId: this.selected[0].id,
+        unionFeeId: this.selected[0].unionFee.id
+      });
+      if (this.invoice) {
+        await this.$htmlToPaper('invoice-wrapper', {
+          styles: [
+            './invoice.css'
+          ]
+        });
+        return;
+      }
+      this.setSnackbar({
+        type: 'info',
+        visible: true,
+        text: MESSAGE.GET_INVOICE_FAIL,
+      });
+      // Get student by id, include activity class, faculty
+      // Get union fee
+      // Get date
+      // Get money Text
+      // await this.$htmlToPaper('invoice-wrapper', {
+      //   styles: [
+      //     './invoice.css'
+      //   ]
+      // });
     }
   },
   async created() {
     this.setQuery();
     this.loading = true;
-    await this.fetchGetUnionFees(this.query);
+    await this.fetchGetUnionFeeOfStudents(this.query);
+    console.log('submit-union-fee - ', this.unionFeeOfStudents);
     this.loading = false;
   },
 };
 </script>
 
 <style lang="scss">
-.union-fee-table {
+.union-fee-of-student-table {
   //overflow: auto;
+  padding: 20px;
   background-color: #FFFFFF !important;
   .v-card__title {
     padding: 4px 0px 8px 0px !important;
-    font: normal 500 17px Roboto;
+    font: normal 700 18px Roboto;
+    text-shadow: rgb(0 0 0 / 12%) 0px 3px 6px, rgb(0 0 0 / 23%) 0px 3px 6px;
+    color: #0b8ee7;
   }
-
   .toolbar-block {
     width: 100%;
     display: flex !important;

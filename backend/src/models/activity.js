@@ -21,7 +21,7 @@ module.exports = (sequelize, Datatypes) => {
         allowNull: false,
       },
       place: {
-        type: Datatypes.STRING,
+        type: Datatypes.STRING(255),
         allowNull: false,
       },
       organization_unit: {
@@ -52,10 +52,10 @@ module.exports = (sequelize, Datatypes) => {
         type: Datatypes.TEXT,
         allowNull: false,
       },
-      // qr_code: {
-      //   type: Datatypes.TEXT,
-      //   allowNull: false,
-      // },
+      school_year: {
+        type: Datatypes.STRING(12),
+        allowNull: false,
+      },
       created_by: {
         type: Datatypes.INTEGER,
         allowNull: false,
@@ -65,6 +65,9 @@ module.exports = (sequelize, Datatypes) => {
       timestamps: true,
       underscored: true,
       paranoid: true,
+      createdAt: 'created_at',
+      updatedAt: 'updated_at',
+      deletedAt: 'deleted_at',
       tableName: 'activity',
     }
   );

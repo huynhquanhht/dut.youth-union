@@ -4,5 +4,6 @@ const state = {
   activitySize: null,
   activity: null,
   myActivities: null,
+  pointList: [],
 };
 export default state;

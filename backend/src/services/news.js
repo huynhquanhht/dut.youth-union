@@ -6,9 +6,10 @@ const sequelizeUtils = require('../utils/sequelize');
 const timeUtils = require('../utils/time');
 
 const get = async (query) => {
+  console.log('query - ', query['category']);
   let options = {};
-  // options.limit = query.size ? +query.size : 10;
-  // options.offset = query.page ? (query.page - 1) * query.size : 1;
+  options.limit = query.size ? +query.size : 10;
+  options.offset = query.page ? (query.page - 1) * query.size : 1;
   delete query.page;
   delete query.size;
   for (let attribute in query) {
@@ -16,11 +17,13 @@ const get = async (query) => {
       options.where[attribute] = {[Op.like]: `%${query[attribute]}%`};
     }
   }
+
   let newsList = await newsRepo.getAllAndCount(options);
   newsList = sequelizeUtils.convertJsonToObject(newsList);
   newsList.rows.forEach((item) => {
     item.created_at = timeUtils.formatTime(item.created_at);
   });
+  console.log('newList - ', newsList);
   return newsList;
 };
 
@@ -35,7 +38,7 @@ const create = async (news) => {
     title: news.title,
     cover_url: news.coverUrl,
     content: news.content,
-    university_union_id: news.universityUnionId,
+    university_union_id: 2,
     category: news.category,
   };
   return await newsRepo.create(data);
@@ -48,7 +51,6 @@ const update = async (newsId, news) => {
     title: news.title,
     cover_url: news.coverUrl,
     content: news.content,
-    university_union_id: news.universityUnionId,
     category: news.category,
   };
   return await newsRepo.updateById(data, condition);

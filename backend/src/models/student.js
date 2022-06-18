@@ -12,7 +12,7 @@ module.exports = (sequelize, Datatypes) => {
         allowNull: false,
       },
       activity_class_id: {
-        type: Datatypes.INTEGER,
+        type: Datatypes.STRING(255),
         allowNull: false,
         references: {
           model: 'activity_class',
@@ -27,10 +27,6 @@ module.exports = (sequelize, Datatypes) => {
         type: Datatypes.BOOLEAN,
         allowNull: false,
         default: false,
-      },
-      submitted_union_book_at: {
-        type: Datatypes.DATE,
-        allowNull: true,
       },
       user_id: {
         type: Datatypes.INTEGER,

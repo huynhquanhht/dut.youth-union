@@ -10,7 +10,7 @@ module.exports = (seqeulize, Datatypes) => {
         autoIncrement: true,
       },
       student_id: {
-        type: Datatypes.INTEGER,
+        type: Datatypes.STRING(9),
         allowNull: false,
         references: {
           model: 'student',

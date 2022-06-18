@@ -4,5 +4,6 @@ const getters = {
   getActivitySize: (state) => state.activitySize,
   getActivity: (state) => state.activity,
   getMyActivities: (state) => state.myActivities,
+  getPointListOfCurrentStudent: (state) => state.pointList,
 };
 export default getters;

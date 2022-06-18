@@ -28,12 +28,28 @@ const create = async (name) => {
   return {message: MESSAGE.CREATE_FAIL, result: false};
 };
 
+const createMany = async (activityClasses) => {
+  let transaction;
+  try {
+    transaction = await models.sequelizeConfig.transaction();
+    const isCreated = await activityClassRepo.createMany(activityClasses, {transaction});
+    await transaction.commit();
+    return isCreated;
+  } catch (error) {
+    if (transaction) {
+      await transaction.rollback();
+    }
+    return null;
+  }
+}
+
 const get = async (query) => {
   let option = {};
   option.where = {deleted_at: null};
   option.limit = query.size ? +query.size : 10;
   option.offset = query.page ? (query.page - 1) * query.size : 1;
   query.facultyName = query.facultyName ? query.facultyName : '';
+  query.facultyId = query.facultyId ? query.facultyId : '';
   query.courseName = query.courseName ? query.courseName : '';
   option.include = [
   {
@@ -108,7 +124,7 @@ const update = async (activityClass) => {
 };
 
 const del = async (activityClassId) => {
-  let option = {where: {id: +activityClassId, deleted_at: null}};
+  let option = {where: {id: activityClassId }};
   const activityClass = await activityClassRepo.getOne(option);
   if (!activityClass) {
     return {message: MESSAGE.EMPTY_DATA, result: false};
@@ -122,6 +138,7 @@ const del = async (activityClassId) => {
 
 module.exports = {
   create,
+  createMany,
   getAll,
   getById,
   update,

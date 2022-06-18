@@ -8,40 +8,62 @@
         <div class="registration-info">
           <div class="registration-quantity">
             <div class="open-quantity-block">
-              <v-icon color="#E91E63" size="40">mdi-openid</v-icon>
-              <span class="quantity-text">50</span>
+              <v-icon color="#E91E63" size="24">mdi-openid</v-icon>
+              <span class="quantity-text"> {{ activity.participant_quantity }}</span>
               <span class="quantity-title">SỐ LƯỢNG MỞ</span>
             </div>
             <div class="registered-quantity-block">
-              <v-icon color="#FF5722" size="40">mdi-account-multiple-plus</v-icon>
-              <span class="quantity-text">50</span>
+              <v-icon color="#FF5722" size="24">mdi-account-multiple-plus</v-icon>
+              <span class="quantity-text"> {{activity.students ? activity.students.length : 0}}</span>
               <span class="quantity-title">ĐÃ ĐĂNG KÝ</span>
             </div>
             <div class="attendance-quantity-block">
-              <v-icon color="#4CAF50" size="40">mdi-account-group</v-icon>
-              <span class="quantity-text">50</span>
+              <v-icon color="#4CAF50" size="24">mdi-account-group</v-icon>
+              <span class="quantity-text"> {{ activity.attendanceQuantity }}</span>
               <span class="quantity-title">ĐIỂM DANH</span>
             </div>
           </div>
           <div class="registration-time">
             <div class="open-time-block">
               <v-icon
-                size="48px"
+                size="36px"
                 color="#00ACED">mdi-clock
               </v-icon>
               <div class="open-time">
-                <span class="sub-title">14/05/2022</span>
+                <span class="sub-title"> {{ formatDate(activity.begin_registration_at) }}</span>
                 <span class="box-title">Mở đăng ký</span>
               </div>
             </div>
             <div class="close-time-block">
-              <v-icon size="48px" color="#F44336">mdi-clock-remove</v-icon>
+              <v-icon size="36px" color="#F44336">mdi-clock-remove</v-icon>
               <div class="close-time">
-                <span class="sub-title">14/05/2022</span>
+                <span class="sub-title"> {{ formatDate(activity.end_registration_at) }}</span>
                 <span class="box-title">Đóng đăng ký</span>
               </div>
             </div>
-            <div class="activity-button">
+          </div>
+          <div class="btn-block">
+            <div class="btn-register">
+              <v-btn
+                class="btn btn-register"
+                color="blue darken-1"
+                @click="register"
+                :disabled="disabledRegistrationButton"
+              >
+                <v-icon dark size="24">mdi-file-edit</v-icon>
+                <span class="ml-2">Đăng ký tham gia</span>
+              </v-btn>
+            </div>
+            <div class="btn-attendance">
+              <v-btn
+                class="btn btn-cancel-attendance"
+                color="green darken-1"
+                @click="attend"
+                :disabled="disabledAttendButton"
+              >
+                <v-icon dark size="24">mdi-card-account-details</v-icon>
+                <span class="ml-2">Điểm danh hoạt động</span>
+              </v-btn>
             </div>
           </div>
         </div>
@@ -50,6 +72,7 @@
         <div class="detail">
           <div class="activity-content">
             <div class="box-title">Chi tiết</div>
+            <v-divider class="my-1"></v-divider>
             <div class="host">
               <v-icon>mdi-account</v-icon>
               <span>Được tổ chức bởi khoa Công nghệ thông tin</span>
@@ -68,22 +91,127 @@
               Praesent nec tempor orci. Fusce molestie viverra lacus id feugiat. Quisque et mauris nunc. Vivamus interdum mi non blandit dictum. Quisque sed viverra leo. Nunc aliquam, lectus ut vehicula varius, augue tortor sagittis orci, at luctus neque nunc a quam. Sed ultrices est et mauris iaculis dignissim. Etiam ante elit, gravida id magna eu, malesuada euismod dui. Curabitur consectetur fringilla dolor. Quisque aliquam finibus quam, in accumsan justo sollicitudin a. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Etiam blandit nisl at lacinia auctor. Pellentesque congue vel nulla ac dignissim. Nunc nunc augue, pellentesque ut mattis ut, mollis in augue. Morbi eget iaculis ex, nec faucibus ligula. Fusce neque eros, euismod id massa ornare, iaculis rutrum ex.
             </div>
           </div>
-          <div class="map">
-            <google-map />
-          </div>
         </div>
       </div>
     </div>
-
+    <v-dialog
+      v-model="confirmDialog"
+      width="400px"
+      persistent
+    >
+      <confirm-dialog
+        @confirm-dialog="handleConfirm"
+        :title="dialogTitle"
+        :content="dialogContent"
+      ></confirm-dialog>
+    </v-dialog>
+    <v-dialog
+      v-model="QRCodeReaderDialog"
+      width="400px"
+      height="400px"
+      persistent
+    >
+      <QRCodeReaderDialog @qr-code-reader-dialog="qrCodeReaderDialogHandler"/>
+    </v-dialog>
   </div>
 </template>
 
 <script>
-import GoogleMap from "@/components/GoogleMap";
+import { mapGetters, mapActions} from "vuex";
+import QRCodeReaderDialog from "@/views/ActivityEvent/QRCodeReaderDialog";
+import ConfirmDialog from "@/components/ConfirmDialog";
+import timeUtils from '@/utils/time';
+
 export default {
   name: "Detail",
   components: {
-    GoogleMap
+    QRCodeReaderDialog,
+    ConfirmDialog,
+  },
+  computed: {
+    ...mapGetters({
+      activity: 'getActivity',
+    }),
+    disabledRegistrationButton() {
+      const currentTime = timeUtils.getCurrentTime();
+      const beginRegistrationAt = timeUtils.formatTime(this.activity.begin_registration_at);
+      const endRegistrationAt = timeUtils.formatTime(this.activity.end_registration_at);
+      if (Date.parse(beginRegistrationAt) <= Date.parse(currentTime) ||
+        Date.parse(endRegistrationAt)  > Date.parse(currentTime)
+      ) {
+        return true;
+      }
+      if (this.activity.iscurrentUserRegistered) {
+        return true;
+      }
+      return false;
+    },
+    disabledAttendButton() {
+      if (!this.activity.iscurrentUserRegistered) {
+        return true;
+      }
+      if (this.activity.isCurrentUserAttended) {
+        return true;
+      }
+      return false;
+    }
+  },
+  data() {
+    return {
+      QRCodeReaderDialog: false,
+      confirmDialog: false,
+      dialogTitle: '',
+      dialogContent: '',
+      action: '',
+    }
+  },
+  methods: {
+    ...mapActions({
+      fetchGetActivityById: 'fetchGetActivityById',
+      fetchRegister: 'fetchRegister',
+    }),
+    qrCodeReaderDialogHandler(data) {
+      if (data.command === 'Cancel') {
+        this.QRCodeReaderDialog = false;
+      }
+      if (data.command === 'Ok') {
+        alert(data.code);
+        console.log('code - ', data.code);
+      }
+    },
+    register() {
+      this.action = 'Register';
+      this.dialogTitle = 'Đăng ký tham gia hoạt động';
+      this.dialogContent = 'Bạn có chắc chắn muốn đăng ký tham gia hoạt động này không';
+      this.confirmDialog = true;
+    },
+    attend() {
+      this.QRCodeReaderDialog = true;
+    },
+    async handleConfirm(command) {
+      if (command === 'Ok') {
+        if (this.action === 'Register') {
+          console.log('activity - ', this.activity);
+          let isRegistered = await this.fetchRegister({activityId: this.$route.params.id});
+          if (isRegistered) {
+            const activityId = this.$route.params.id;
+            await this.fetchGetActivityById({ id: activityId });
+          }
+          this.confirmDialog = false;
+          return;
+        }
+      }
+      if (command === 'Cancel') {
+        this.confirmDialog = false;
+      }
+    },
+    formatDate(time) {
+      return timeUtils.formatDate(time)
+    },
+  },
+  async created() {
+    const activityId = this.$route.params.id;
+    await this.fetchGetActivityById({ id: activityId });
   }
 }
 </script>
@@ -91,7 +219,12 @@ export default {
 <style lang="scss">
 .activity-detail {
   .main-block {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     .cover-block {
+      max-width: 1080px;
       display: flex;
       justify-content: center;
       column-gap: 16px;
@@ -111,10 +244,11 @@ export default {
         display: flex;
         flex-direction: column;
         row-gap: 16px;
+        max-width: 480px;
         .registration-time {
           display: flex;
+          justify-content: center;
           column-gap: 16px;
-
           .box-title {
             font: normal 400 15px Roboto;
             text-transform: uppercase;
@@ -126,14 +260,15 @@ export default {
           }
           .open-time-block,
           .close-time-block {
-            width: 236px;
-            height: 90px;
-            padding: 20px;
+            width: 230px;
+            height: 74px;
+            padding: 10px 20px;
             display: flex;
             column-gap: 20px;
             color: #455a64;
             background: #FFFFFF;
             box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+            border-radius: 4px;
             .open-time, .close-time {
               display: flex;
               flex-direction: column;
@@ -143,26 +278,29 @@ export default {
         }
         .registration-quantity {
           display: flex;
+          justify-content: center;
           column-gap: 16px;
+          max-width: 480px;
           .open-quantity-block,
           .registered-quantity-block,
           .attendance-quantity-block {
             box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
-            padding: 20px;
+            border-radius: 4px;
+            padding: 10px;
             display: flex;
             flex-direction: column;
             background-color: #ffffff;
-            height: 140px;
-            width: 150px;
+            height: 100px;
+            width: 148px;
             text-align: center;
             .quantity-text {
-              font: normal 500 24px Roboto;
+              font: normal 500 22px Roboto;
               color: #455a64;
-              margin-top: 8px;
+              margin-top: 4px;
               margin-bottom: 4px;
             }
             .quantity-title {
-              font: normal 400 15px Roboto;
+              font: normal 400 14px Roboto;
               color: #99abb4;
             }
 
@@ -177,21 +315,53 @@ export default {
             border-top: 4px solid #4CAF50;
           }
         }
+        .btn-block {
+          display: flex;
+          column-gap: 16px;
+          .btn-register {
+            .theme--light.v-btn.v-btn--disabled.v-btn--has-bg {
+              background-color: #b0ddee !important;
+              color: #FFFFFF !important;
+            }
+            i {
+              color: #FFFFFF !important;
+            }
+          }
+          .btn-attendance {
+            .theme--light.v-btn.v-btn--disabled.v-btn--has-bg {
+              background-color: #bdfbbf !important;
+              color: #FFFFFF !important;
+            }
+            i {
+              color: #FFFFFF !important;
+            }
+          }
+          .btn {
+            color: #FFFFFF !important;
+            font: normal 300 15px Roboto !important;
+            text-transform: none !important;
+            letter-spacing: 0 !important;
+            width: 230px;
+            height: 48px;
+          }
+        }
       }
     }
   }
   .information {
-    width: 880px;
+    width: 100%;
+    max-width: 1080px;
     .detail {
+      width: 100%;
       display: flex;
       column-gap: 16px;
       justify-content: center;
-      width: 880px;
       .activity-content {
-        width: 600px;
+        width: 100%;
         //height: 500px;
+        border-radius: 4px;
         background-color: #FFFFFF;
-        padding: 16px;
+        padding: 16px 20px;
         .box-title {
           font: normal 500 20px Roboto;
           color: #455a64;
@@ -201,10 +371,11 @@ export default {
           column-gap: 6px;
           align-items: center;
           color: #455a64;
-          height: 28px;
+          height: 30px;
         }
         .content {
           height: 100%;
+          width: 100%;
           text-align: justify;
         }
       }

@@ -28,6 +28,19 @@ const getOfStudent = async (req, res) => {
     const result = await unionFeeService.getOfStudent(currentUserId, query);
     res.status(200).send(result);
   } catch (error) {
+    console.log(error);
+    res.status(500).send({ message: MESSAGE.SERVER_ERROR });
+  }
+}
+
+// [GET]: /union-fee/students
+const getOfStudents = async (req, res) => {
+  try {
+    let query = req.query;
+    let currentUserId = req.payload.userId;
+    const result = await unionFeeService.getOfStudents(currentUserId, query);
+    res.status(200).send(result);
+  } catch (error) {
     res.status(500).send({ message: MESSAGE.SERVER_ERROR });
   }
 }
@@ -73,8 +86,37 @@ const confirmSubmission = async (req, res) => {
   }
 }
 
+// [POST]: /union-fee
+const createUnionFee = async (req, res) => {
+  try {
+    let schoolYear = req.body.schoolYear;
+    let amountOfMoney = req.body.amountOfMoney;
+    const unionFee = { schoolYear, amountOfMoney };
+    let isCreated = await unionFeeService.create(unionFee);
+    if (isCreated) {
+      res.status(200).send({ message: MESSAGE.CREATE_SUCCESS });
+      return;
+    }
+    res.status(400).send({ message: MESSAGE.CREATE_FAIL });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ message: MESSAGE.SERVER_ERROR });
+  }
+}
 
+// [GET]: /union-fee/invoice
+const getInvoice = async (req, res) => {
+  try {
+    const studentId = req.query.studentId;
+    const unionFeeId = req.query.unionFeeId;
+    let invoiceInfo = await unionFeeService.getInvoice(studentId, unionFeeId);
+    res.status(200).send(invoiceInfo);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ message: MESSAGE.SERVER_ERROR });
+  }
+}
 
 module.exports = {
-  get, getOfStudent, submit, confirmSubmission
+  get, getOfStudent, getOfStudents, submit, confirmSubmission, createUnionFee, getInvoice
 };

@@ -4,8 +4,7 @@ module.exports = (sequelize, Datatypes) => {
     'group_function',
     {
       id: {
-        type: Datatypes.INTEGER,
-        autoIncrement: true,
+        type: Datatypes.STRING(10),
         primaryKey: true,
       },
       name: {

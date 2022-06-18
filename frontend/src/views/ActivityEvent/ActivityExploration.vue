@@ -29,7 +29,7 @@
             xl="3"
             class="pa-2 "
             v-for="(activity, index) in activityList.rows" :key="index">
-            <div class="activity-card-block">
+            <div class="activity-card-block" @click="clickActivityCard(activity.id)">
               <activity-card :activity="activity"></activity-card>
             </div>
           </v-col>
@@ -71,12 +71,15 @@ export default {
   },
   methods: {
     ...mapActions({
-      fetchGetActivityList: 'fetchGetActivityList',
+      fetchGetActivityByOption: 'fetchGetActivityByOption',
     }),
+    clickActivityCard(id) {
+      this.$router.push(`activity-event/${id}`);
+    }
   },
   async created() {
     this.loading = true;
-    await this.fetchGetActivityList();
+    await this.fetchGetActivityByOption({option: 'Common'});
     this.loading = false;
     console.log(this.activityList);
   }

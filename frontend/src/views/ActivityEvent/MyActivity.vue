@@ -4,21 +4,7 @@
       <span class="activity-exploration-title"> Hoạt động của bạn </span>
     </div>
     <v-divider></v-divider>
-    <div class="nav-block">
-      <v-btn-toggle
-        class="btn-group"
-        tile
-        group
-      >
-        <v-btn class="btn"> Chung </v-btn>
-        <v-btn class="btn"> Tuần này </v-btn>
-        <v-btn class="btn"> Tháng này </v-btn>
-        <v-btn class="btn"> Sắp diễn ra </v-btn>
-        <v-btn class="btn"> Đang diễn ra </v-btn>
-        <v-btn class="btn"> Khoa của bạn </v-btn>
-      </v-btn-toggle>
-    </div>
-    <div class="activity-cards">
+    <div class="activity-cards mt-4">
       <v-row v-if="!loading">
         <v-col
           cols="12"
@@ -28,12 +14,11 @@
           lg="6"
           xl="6"
           class="py-2 pr-2"
-          v-for="(activity, index)  in myActivities.rows" :key="index">
-          <div class="activity-card-block">
+          v-for="(activity, index) in myActivities" :key="index">
+          <div class="activity-card-block" @click="clickActivityCard(activity.id)">
             <my-activity-card :activity="activity"/>
           </div>
         </v-col>
-
       </v-row>
       <v-row v-else>
         <v-col
@@ -46,7 +31,6 @@
           v-for="index in 10" :key="index">
           >
           <v-skeleton-loader
-            v-bind="attrs"
             type="table-heading, list-item-two-line, image, table-tfoot"
           ></v-skeleton-loader>
         </v-col>
@@ -73,12 +57,16 @@ export default {
   },
   methods: {
     ...mapActions({
-      getMyActivities: 'fetchGetActivitiesByCurrentStudent',
-    })
+      fetchGetActivitiesByCurrentStudent: 'fetchGetActivitiesByCurrentStudent',
+    }),
+    clickActivityCard(id) {
+      console.log('abc');
+      this.$router.push(`activity-event/${id}`);
+    }
   },
   async created() {
     this.loading = true;
-    await this.getMyActivities();
+    await this.fetchGetActivitiesByCurrentStudent();
     this.loading = false;
   }
 }

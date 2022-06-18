@@ -2,7 +2,7 @@ import axiosUtils from '@/utils/axios';
 const BASE_URL = '/activity';
 
 const getAll = (page, size) => {
-  return axiosUtils.getRequest(`${BASE_URL}?page=${page}&size=${size}`);
+  return axiosUtils.getRequest(`${BASE_URL}/all?page=${page}&size=${size}`);
 };
 
 const get = (query) => {
@@ -19,7 +19,7 @@ const get = (query) => {
 };
 
 const getByCurrentStudent = (query) => {
-  let url = BASE_URL;
+  let url = `${BASE_URL}/student`;
   let queryString = '';
   for (let attribute in query) {
     queryString += `&${attribute}=${query[attribute]}`;
@@ -29,7 +29,12 @@ const getByCurrentStudent = (query) => {
     url += '?' + queryString;
   }
   return axiosUtils.getRequest(url);
-}
+};
+
+const getPointListOfCurrentStudent = () => {
+  let url = `${BASE_URL}/student/point-list`;
+  return axiosUtils.getRequest(url);
+};
 
 const create = (activity) => {
   return axiosUtils.postRequest(`${BASE_URL}`, { newActivity: activity });
@@ -48,6 +53,33 @@ const deleteActivities = (activityIds) => {
   return axiosUtils.deleteRequest(`${BASE_URL}`, {activityIds});
 };
 
+const openActivityRegistration = (activityId) => {
+  return axiosUtils.putRequest(`${BASE_URL}/open-registration/${activityId}`);
+};
 
+const closeActivityRegistration = (activityId) => {
+  return axiosUtils.putRequest(`${BASE_URL}/close-registration/${activityId}`);
+};
 
-export default {getAll, create, getById, update, deleteActivities, get, getByCurrentStudent };
+const register = (activityId) => {
+  return axiosUtils.postRequest(`${BASE_URL}/register/${activityId}`);
+}
+
+const attend = (activityId) => {
+  return axiosUtils.putRequest(`${BASE_URL}/attend/${activityId}`);
+}
+
+export default {
+  getAll,
+  create,
+  getById,
+  update,
+  deleteActivities,
+  get,
+  getByCurrentStudent,
+  openActivityRegistration,
+  closeActivityRegistration,
+  getPointListOfCurrentStudent,
+  register,
+  attend
+};

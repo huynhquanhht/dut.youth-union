@@ -14,16 +14,13 @@ const get = (query) => {
   return axiosUtils.getRequest(url);
 };
 
-const getOfStudent = (query) => {
+const getOfStudent = () => {
   let url = `${BASE_URL}/student`;
-  let queryString = '';
-  for (let attribute in query)  {
-    queryString += `&${attribute}=${query[attribute]}`;
-  }
-  if (queryString) {
-    queryString = queryString.slice(1, queryString.length);
-    url += '?' + queryString;
-  }
+  return axiosUtils.getRequest(url);
+}
+
+const getOfStudents = () => {
+  let url = `${BASE_URL}/students`;
   return axiosUtils.getRequest(url);
 }
 
@@ -37,4 +34,9 @@ const confirmSubmission = (submitUnionFeeIds) => {
   return axiosUtils.putRequest(url, { submitUnionFeeIds });
 };
 
-export default { get, getOfStudent, submit, confirmSubmission };
+const getInvoice = (studentId, unionFeeId) => {
+  const url = `${BASE_URL}/invoice?studentId=${studentId}&unionFeeId=${unionFeeId}`;
+  return axiosUtils.getRequest(url);
+};
+
+export default { get, getOfStudent, submit, confirmSubmission, getInvoice, getOfStudents };

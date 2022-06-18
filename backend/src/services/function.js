@@ -36,7 +36,7 @@ const create = async (func) => {
 const getAll = async () => {
   const option = {};
   option.include = {
-    model: models.group_function,
+    model: models.groupFunction,
     where: { deleted_at: null},
   };
   option.where = { deleted_at: null };

@@ -4,7 +4,8 @@ module.exports = (sequelize, Datatypes) => {
     'activity_class',
     {
       id: {
-        type: Datatypes.INTEGER,
+        type: Datatypes.STRING(255),
+        unique: true,
         primaryKey: true,
       },
       name: {
@@ -13,7 +14,7 @@ module.exports = (sequelize, Datatypes) => {
         unique: true,
       },
       course_id: {
-        type: Datatypes.INTEGER,
+        type: Datatypes.STRING(2),
         allowNull: false,
         references: {
           model: 'course',
@@ -21,7 +22,7 @@ module.exports = (sequelize, Datatypes) => {
         }
       },
       faculty_id: {
-        type: Datatypes.INTEGER,
+        type: Datatypes.STRING(3),
         allowNull: false,
         references: {
           model: 'faculty',

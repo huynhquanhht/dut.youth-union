@@ -6,6 +6,10 @@ const create = (newUnionTextbook) => {
   return unionTextbookModel.create(newUnionTextbook);
 };
 
+const createMany = (newUnionTextbooks, transaction) => {
+  return unionTextbookModel.bulkCreate(newUnionTextbooks, { transaction: transaction });
+};
+
 const getByPk = (id) => {
   return unionTextbookModel.findByPk(id);
 };
@@ -35,6 +39,7 @@ const del = (option) => {
 
 module.exports = {
   create,
+  createMany,
   getByPk,
   getOne,
   get,

@@ -9,6 +9,7 @@ import student from './student';
 import role from './role';
 import unionTextbook from './union_textbook';
 import unionFee from './union_fee';
+import news from './news';
 
 Vue.use(Vuex);
 
@@ -20,6 +21,6 @@ export default new Vuex.Store({
   actions: {
   },
   modules: {
-    app, user, faculty, activity, activityClass, student, role, unionTextbook, unionFee,
+    app, user, faculty, activity, activityClass, student, role, unionTextbook, unionFee, news,
   }
 })

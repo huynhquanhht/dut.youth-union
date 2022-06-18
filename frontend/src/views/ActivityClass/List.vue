@@ -11,15 +11,16 @@
       show-select
       :loading="loading"
       loading-text="Đang tải dữ liệu... Vui lòng chờ"
-      class="activity-class-table pl-3 pr-3 pb-3"
+      class="activity-class-table"
       fixed-header
       hide-default-footer
+      @click:row="clickActivityClass"
     >
       <template v-if="activityClassList && activityClassList.rows && !activityClassList.rows.length" v-slot:no-data>
         Không có dữ liệu để hiển thị!
       </template>
       <template v-slot:top>
-        <v-card-title>Danh sách chi đoàn</v-card-title>
+        <v-card-title>QUẢN LÝ CHI ĐOÀN</v-card-title>
         <div class="toolbar mb-1" flat>
           <div class="toolbar-block">
             <div class="search-block d-flex">
@@ -48,17 +49,28 @@
             </div>
             <div class="tool-block d-flex">
               <v-btn
+                text
+                width="100px"
+                class="tool-button"
+                @click="csvDialog = true"
+              >
+                <v-icon dark size="22">fas fa-file-csv</v-icon>
+                <span class="ml-1">Nhập CSV</span>
+              </v-btn>
+              <v-btn
                   text
                   width="100px"
                   class="tool-button"
+                  @click="create"
               >
-                <v-icon dark size="24">mdi-plus</v-icon>
+                <v-icon dark class="mr-1" size="24">mdi-plus</v-icon>
                 Thêm mới
               </v-btn>
               <v-btn
                   text
                   width="100px"
                   class="tool-button"
+                  @click="update"
               >
                 <v-icon dark size="20">mdi-square-edit-outline</v-icon>
                 Chỉnh sửa
@@ -67,6 +79,7 @@
                   text
                   width="50px"
                   class="tool-button"
+                  @click="deleteActivityClass"
               >
                 <v-icon dark size="20">mdi-trash-can-outline</v-icon>
                 Xóa
@@ -100,18 +113,38 @@
             "
               :totalVisible="totalVisible"
               @input="handlePageChange"
-
           ></v-pagination>
         </div>
       </template>
     </v-data-table>
+    <v-dialog v-model="confirmDialog" width="400px">
+      <confirm-dialog
+        @confirm-dialog="handleConfirm"
+        :title="dialogTitle"
+        :content="dialogContent"
+      ></confirm-dialog>
+    </v-dialog>
+    <v-dialog
+      v-model="csvDialog"
+      width="400px"
+      persistent
+    >
+      <csv-popup
+        @csv-dialog="csvDialogHandler"
+        :btnOkLoading="btnOkLoading"
+      />
+    </v-dialog>
   </div>
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex';
+import {mapGetters, mapActions, mapMutations} from 'vuex';
+import CsvPopup from '@/components/CSVPopup';
+import ConfirmDialog from '@/components/ConfirmDialog';
+import MESSAGE from "@/utils/message";
 export default {
   name: 'activity-class-list',
+  components: { CsvPopup, ConfirmDialog, },
   props: {
     page: {
       type: Number,
@@ -180,6 +213,9 @@ export default {
       ],
       dialogTitle: null,
       dialogContent: null,
+      csvDialog: false,
+      btnOkLoading: false,
+      confirmDialog: false,
     };
   },
   computed: {
@@ -190,6 +226,11 @@ export default {
   methods: {
     ...mapActions({
       fetchGetActivityClassList: 'fetchGetActivityClassList',
+      fetchUploadActivityClassCSV: 'fetchUploadActivityClassCSV',
+      fetchDeleteActivityClass: 'fetchDeleteActivityClass',
+    }),
+    ...mapMutations({
+      setSnackbar: 'setSnackbar'
     }),
     async handlePageChange() {
       this.setQuery();
@@ -248,6 +289,67 @@ export default {
       });
       this.query.page = this.currentPage;
       this.query.size = this.selectedSize;
+    },
+    async csvDialogHandler(data) {
+      console.log('data - ', data);
+      if (data.command === 'Ok') {
+        this.btnOkLoading = true;
+        let activityClassFormData = new FormData();
+        activityClassFormData.append('file', data.file);
+        let isCreated = await this.fetchUploadActivityClassCSV({ file: activityClassFormData });
+        this.btnOkLoading = false;
+        this.csvDialog = false;
+        if (isCreated) {
+          await this.fetchGetActivityClassList(this.query);
+        }
+      }
+      if (data.command === 'Cancel') {
+        this.csvDialog = false;
+      }
+    },
+    create() {
+      this.setSnackbar({
+        type: 'info',
+        visible: true,
+        text: MESSAGE.FEATURE_DEVELOP,
+      });
+    },
+    update() {
+      this.setSnackbar({
+        type: 'info',
+        visible: true,
+        text: MESSAGE.FEATURE_DEVELOP,
+      });
+    },
+    async deleteActivityClass() {
+      if (this.selected.length !== 1) {
+        this.setSnackbar({
+          type: 'info',
+          visible: true,
+          text: MESSAGE.CHOOSE_ONE_RECORD_FOR_EDIT,
+        });
+        return;
+      }
+      this.dialogTitle = 'Xác nhận xóa';
+      this.dialogContent = 'Bạn chắc chắn muốn xóa?';
+      this.confirmDialog = true;
+    },
+    async handleConfirm(command) {
+      if (command === 'Ok') {
+        let deleteResult = await this.fetchDeleteActivityClass({activityClassId: this.selected[0].id});
+        if (deleteResult) {
+          this.selected = [];
+          this.setQuery();
+          await this.fetchGetActivityClassList(this.query);
+        }
+        this.confirmDialog = false;
+      }
+      if (command === 'Cancel') {
+        this.confirmDialog = false;
+      }
+    },
+    clickActivityClass(e) {
+      this.$router.push({ name: 'student-list', query: {activityClassId: e.id}})
     }
   },
   async created() {
@@ -261,12 +363,14 @@ export default {
 
 <style lang="scss">
 .activity-class-table {
-  //overflow: auto;
+  padding: 20px 20px 20px 20px;
+  border-radius: 8px !important;
   background-color: #FFFFFF !important;
-
   .v-card__title {
     padding: 4px 0px 8px 0px !important;
-    font: normal 500 17px Roboto;
+    font: normal 700 18px Roboto;
+    text-shadow: rgb(0 0 0 / 12%) 0px 3px 6px, rgb(0 0 0 / 23%) 0px 3px 6px;
+    color: #0b8ee7;
   }
 
   .toolbar-block {
@@ -306,14 +410,8 @@ export default {
       font: normal 400 15px Roboto !important;
     }
 
-    .v-input__control {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
     .v-input__slot {
-      min-height: 28px !important;
+      min-height: 32px !important;
       padding: 0px 0px 0px 8px !important;
       box-shadow: none !important;
       border: 1px solid #d9d9d9 !important;
@@ -330,7 +428,7 @@ export default {
 
     .v-text-field__slot {
       font: normal 400 14px Roboto !important;
-      margin-top: 1px;
+      //margin-top: 1px;
     }
 
     .v-icon {
@@ -393,46 +491,46 @@ export default {
                 font-size: 20px !important;
               }
             }
-            //&:nth-child(1) {
-            //  min-width: 20px !important;
-            //  padding: 0px 8px;
-            //}
-            //
-            //&:nth-child(2) {
-            //  min-width: 100px !important;
-            //}
-            //
-            //&:nth-child(3) {
-            //  min-width: 200px !important;
-            //}
-            //
-            //&:nth-child(4) {
-            //  min-width: 100px !important;
-            //}
-            //
-            //&:nth-child(5) {
-            //  min-width: 100px !important;
-            //}
-            //
-            //&:nth-child(6) {
-            //  min-width: 300px !important;
-            //}
-            //
-            //&:nth-child(7) {
-            //  min-width: 100px !important;
-            //}
-            //
-            //&:nth-child(8) {
-            //  min-width: 300px !important;
-            //}
-            //
-            //&:nth-child(9) {
-            //  min-width: 200px !important;
-            //}
-            //
-            //&:nth-child(10) {
-            //  min-width: 120px !important;
-            //}
+            &:nth-child(1) {
+              min-width: 20px !important;
+              padding: 0px 8px;
+            }
+
+            &:nth-child(2) {
+              min-width: 100px !important;
+            }
+
+            &:nth-child(3) {
+              min-width: 100px !important;
+            }
+
+            &:nth-child(4) {
+              min-width: 100px !important;
+            }
+
+            &:nth-child(5) {
+              min-width: 200px !important;
+            }
+
+            &:nth-child(6) {
+              min-width: 120px !important;
+            }
+
+            &:nth-child(7) {
+              min-width: 120px !important;
+            }
+
+            &:nth-child(8) {
+              min-width: 120px !important;
+            }
+
+            &:nth-child(9) {
+              min-width: 200px !important;
+            }
+
+            &:nth-child(10) {
+              min-width: 120px !important;
+            }
           }
           &:hover {
             td {

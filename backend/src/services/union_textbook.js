@@ -72,7 +72,7 @@ const update = async (unionTextbooks) => {
   let falseUpdation = [];
   let trueUpdation = [];
   unionTextbooks.forEach(unionTextbook => {
-    if (unionTextbook.submitted_union_textbook) {
+    if (unionTextbook.submitted) {
       trueUpdation.push(unionTextbook.id);
     } else {
       falseUpdation.push(unionTextbook.id);
@@ -82,13 +82,13 @@ const update = async (unionTextbooks) => {
   try {
     if (trueUpdation.length) {
       await unionTextbookRepo.update({
-        submitted_union_textbook: true,
+        submitted: true,
         submitted_at: timeUtils.getCurrentTime()
       }, trueUpdation, transaction);
     }
     if (falseUpdation.length) {
       await unionTextbookRepo.update({
-        submitted_union_textbook: false,
+        submitted: false,
         submitted_at: null,
       }, falseUpdation, transaction);
     }

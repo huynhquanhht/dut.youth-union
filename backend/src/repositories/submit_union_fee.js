@@ -6,6 +6,11 @@ const create = (newSubmitUnionFee) => {
   return submitUnionFee.create(newSubmitUnionFee);
 };
 
+const createMany = async (unionFeeSubmission, transaction) => {
+  console.log('bulkCreate - ', unionFeeSubmission);
+  return await submitUnionFee.bulkCreate(unionFeeSubmission, {transaction: transaction});
+};
+
 const getByPk = (id) => {
   return submitUnionFee.findByPk(id);
 };
@@ -35,6 +40,7 @@ const del = (option) => {
 
 module.exports = {
   create,
+  createMany,
   getByPk,
   getOne,
   get,

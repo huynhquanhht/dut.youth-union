@@ -1,0 +1,45 @@
+'use strict';
+const models = require('../models');
+const registerJoinModel = models.registerJoin;
+
+const count = (options) => {
+  return registerJoinModel.count(options);
+};
+const getAll = (options) => {
+  return registerJoinModel.findAll(options);
+};
+
+const getAllAndCount = (options) => {
+  return registerJoinModel.findAndCountAll(options);
+};
+
+const getQuantity = (options) => {
+  return registerJoinModel.count(options);
+};
+
+const getOne = (options) => {
+  return registerJoinModel.findOne(options);
+};
+
+const create = (newRegisterJoin) => {
+  return registerJoinModel.create(newRegisterJoin);
+};
+
+const updateById = (updatedRegisterJoin, condition) => {
+  return registerJoinModel.update(updatedRegisterJoin, condition);
+};
+
+const deleteByIds = (options) => {
+  return registerJoinModel.destroy(options);
+};
+
+module.exports = {
+  getAll,
+  getAllAndCount,
+  getQuantity,
+  getOne,
+  create,
+  updateById,
+  deleteByIds,
+  count,
+}

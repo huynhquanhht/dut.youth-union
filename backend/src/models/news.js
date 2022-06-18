@@ -11,7 +11,6 @@ module.exports = (sequelize, Datatypes) => {
       title: {
         type: Datatypes.STRING(255),
         allowNull: false,
-        unique: true,
       },
       cover_url: {
         type: Datatypes.TEXT,

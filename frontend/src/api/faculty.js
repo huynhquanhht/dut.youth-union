@@ -9,4 +9,14 @@ const getById = (id) => {
   return axiosUtils.getRequest(`${BASE_URL}/${id}`);
 };
 
-export default {get, getById};
+const create = (faculty) => {
+  console.log('faculty - ', faculty);
+  return axiosUtils.postRequest(`${BASE_URL}`, faculty);
+}
+
+const update = (faculty) => {
+  console.log('faculty - ', faculty);
+  return axiosUtils.putRequest(`${BASE_URL}`, {faculty});
+}
+
+export default {get, getById, create, update};

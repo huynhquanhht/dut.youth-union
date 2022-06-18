@@ -15,9 +15,8 @@ const getAll = async (req, res) => {
 
 const get = async (req, res) => {
   try {
-    const query = req.query;
-    const currentUserId = req.userId;
-    const activityList = await activityService.get(query, currentUserId);
+    const option = req.query.option;
+    const activityList = await activityService.get(option);
     res.status(200).send(activityList);
   } catch (error) {
     res.status(500).send({ message: MESSAGE.SERVER_ERROR });
@@ -27,10 +26,24 @@ const get = async (req, res) => {
 const getByCurrentStudent = async (req, res) => {
   try {
     const query = req.query;
-    const currentUserId = req.userId;
+    const currentUserId = req.payload.userId;
     const activityList = await activityService.getByStudent(query, currentUserId);
+    console.log('activityList - ', activityList);
     res.status(200).send(activityList);
   } catch (error) {
+    console.log(error);
+    res.status(500).send({ message: MESSAGE.SERVER_ERROR });
+  }
+};
+
+const getPointListOfCurrentStudent = async (req, res) => {
+  try {
+    const currentUserId = req.payload.userId;
+    const pointList = await activityService.getPointListOfCurrentStudent(currentUserId);
+    console.log('pointList -', pointList);
+    res.status(200).send(pointList);
+  } catch (error) {
+    console.log(error);
     res.status(500).send({ message: MESSAGE.SERVER_ERROR });
   }
 };
@@ -38,7 +51,9 @@ const getByCurrentStudent = async (req, res) => {
 const getById = async (req, res) => {
   try {
     const activityId = req.params.id;
-    const activity = await activityService.getById(activityId);
+    const userId = req.payload.userId;
+    const activity = await activityService.getById(activityId, userId);
+    console.log('activity - ', activity);
     res.status(200).send(activity);
   } catch (error) {
     console.log(error);
@@ -126,14 +141,95 @@ const deleteActivity = async (req, res) => {
     console.log(error);
     res.status(500).send({ message: MESSAGE.SERVER_ERROR });
   }
+};
+
+const openRegistration = async (req, res) => {
+  const activityId = req.params.id;
+  const userId = req.payload.userId;
+  console.log('userId - ', userId);
+  try {
+    const activity = await activityService.getById(activityId);
+    console.log('created_by - ', activity.created_by);
+    if (activity.created_by === userId) {
+      const isOpened = await activityService.openRegistration(activityId);
+      console.log('isOpened - ', isOpened);
+      if (isOpened[0]) {
+        res.status(200).send({ message: MESSAGE.OPEN_REGISTRATION_SUCESSFULLY });
+        return;
+      } else {
+        res.status(400).send({ message: MESSAGE.OPEN_REGISTRATION_FAIL });
+      }
+    }
+    res.status(403).send({ message: MESSAGE.NO_PERMISSION });
+  } catch (error){
+    console.log(error);
+    res.status(500).send({ message: MESSAGE.SERVER_ERROR });
+  }
+};
+
+const closeRegistration = async (req, res) => {
+  const activityId = req.params.id;
+  const userId = req.payload.userId;
+  try {
+    const activity = await activityService.getById(activityId);
+    if (activity.created_by === userId) {
+      const isOpened = await activityService.closeRegistration(activityId);
+      if (isOpened[0]) {
+        res.status(200).send({ message: MESSAGE.CLOSE_REGISTRATION_SUCESSFULLY });
+        return;
+      } else {
+        res.status(400).send({ message: MESSAGE.CLOSE_REGISTRATION_FAIL });
+      }
+    }
+    res.status(403).send({ message: MESSAGE.NO_PERMISSION });
+  } catch (error){
+    res.status(500).send({ message: MESSAGE.SERVER_ERROR });
+  }
+};
+
+const register = async (req, res) => {
+  const activityId = req.params.id;
+  const userId = req.payload.userId;
+  try {
+    const isRegistered = await activityService.register(activityId, userId);
+    if (isRegistered) {
+      res.status(200).send({ message: MESSAGE.REGISTER_SUCCESSFULLY});
+      return;
+    }
+    res.status(400).send({ message: MESSAGE.REGISTER_FAIL});
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ message: MESSAGE.SERVER_ERROR });
+  }
+};
+
+const attend = async (req, res) => {
+  const activityId = req.params.id;
+  const userId = req.payload.userId;
+  try {
+    const isAttend = await activityService.attend(activityId, userId);
+    if (isAttend) {
+      res.status(200).send({ message: MESSAGE.ATTEND_SUCCESSFULLY});
+      return;
+    }
+    res.status(400).send({ message: MESSAGE.ATTEND_FAIL});
+
+  } catch (error) {
+    res.status(500).send({ message: MESSAGE.SERVER_ERROR });
+  }
 }
 
 module.exports = {
   getAll,
   get,
   getByCurrentStudent,
+  getPointListOfCurrentStudent,
   getById,
   create,
   update,
   deleteActivity,
+  openRegistration,
+  closeRegistration,
+  register,
+  attend,
 };

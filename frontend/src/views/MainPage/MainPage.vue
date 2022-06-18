@@ -9,6 +9,7 @@
       v-model="navDrawer"
       v-if="navDrawer"
       dark
+      color="white"
     >
       <navigation-drawer />
     </v-navigation-drawer>
@@ -20,10 +21,9 @@
     </v-app-bar>
     <v-main>
       <v-container>
-        <router-view
-          transition="fade-transition"
-          class="main-content">
-        </router-view>
+        <transition name="fade">
+          <router-view class="main-content"></router-view>
+        </transition>
       </v-container>
     </v-main>
     <v-snackbar
@@ -78,6 +78,13 @@ export default {
 //  color: unset !important;
 //  caret-color: unset !important;
 //}
+.fade-enter-active {
+  transition: opacity 0.5s;
+}
+
+.fade-enter {
+  opacity: 0;
+}
 .main-page-wrapper {
   .v-navigation-drawer__image {
     width: 120% !important;
@@ -98,6 +105,7 @@ export default {
   }
 
   .container {
+    //height: 100vh;
     // display: flex;
     // justify-content: center;
   }

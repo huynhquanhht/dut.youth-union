@@ -1,16 +1,28 @@
 'use strict'
 const studentRepo = require('../repositories/student');
-const MESSAGE = require('../utils/message');
+const roleOfUserRepo = require('../repositories/role_of_user');
 const {Op} = require("sequelize");
 const models = require('../models');
 const sequelizeUtils = require('../utils/sequelize');
+const fs = require("fs");
+const timeUtils = require("../utils/time");
+const {parse} = require("csv-parse");
+const bcrypt = require("bcrypt");
+const userRepo = require('../repositories/user');
+const unionTextbookRepo = require('../repositories/union_textbook');
+const csv = require('csvtojson')
+const MESSAGE = require("../utils/message");
+const activityClassService = require("./activity_class");
+const facultyRepo = require("../repositories/faculty");
+
 
 const get = async (query) => {
   let option = {};
-  option.where = { deleted_at: null};
+  option.where = {deleted_at: null};
   option.limit = query.size ? +query.size : 10;
   option.offset = query.page ? (query.page - 1) * query.size : 1;
-  query.className = query.className ? query.className: '';
+  query.activityClassId = query.activityClassId ? query.activityClassId : '';
+  query.className = query.className ? query.className : '';
   option.include = [
     {
       model: models.activityClass,
@@ -28,12 +40,114 @@ const get = async (query) => {
       }
     }
   }
-
   let students = await studentRepo.get(option);
   students = sequelizeUtils.convertJsonToObject(students);
   return students;
 };
 
+const getCSVData = (file) => new Promise((resolve, reject) => {
+  let data = [];
+  fs.createReadStream(`E:/s-union/code/s-union/backend/src/storage/${timeUtils.getCurrentDate()}-${file.originalname}`)
+    .pipe(parse({delimiter: ",", from_line: 2}))
+    .on("data", (row) => {
+      const item = {
+        id: row[0],
+        name: row[1],
+        activityClassId: row[2],
+        isUnionMember: row[3],
+        isClassSecretary: row[4],
+      }
+      data.push(item);
+    })
+    .on('end', () => {
+      resolve(data);
+    });
+});
+
+const createMany = async (file) => {
+  let users = []
+  let csvData = [];
+  let students = [];
+  let transaction;
+  csvData = await getCSVData(file);
+  csvData.forEach(item => {
+    const user = {
+      name: item.name,
+      username: item.id,
+      password: bcrypt.hashSync(item.id + '@123', bcrypt.genSaltSync(10)),
+      is_active: true,
+    };
+    users.push(user);
+  });
+  try {
+    transaction = await models.sequelizeConfig.transaction();
+    const roleOfUsers = [];
+    // Create users
+    let newUsers = await userRepo.createMany(users, transaction);
+    newUsers = JSON.parse(JSON.stringify(newUsers));
+    if (newUsers.length !== users.length) {
+      await transaction.rollback();
+      return false;
+    }
+    for (let index = 0; index < newUsers.length; ++index) {
+      const roleOfUser = {user_id: newUsers[index].id, role_id: 6};
+      const student = {
+        id: csvData[index].id,
+        name: csvData[index].name,
+        activity_class_id: csvData[index].activityClassId,
+        is_union_member: csvData[index].isUnionMember === 'Y' ? true : false,
+        is_class_secretary: csvData[index].isClassSecretary === 'Y' ? true : false,
+        user_id: newUsers[index].id,
+      };
+      roleOfUsers.push(roleOfUser);
+      students.push(student);
+    }
+    // Create role of user
+    const newRoleOfUsers = await roleOfUserRepo.createMany(roleOfUsers, transaction);
+    if (newRoleOfUsers.length !== newUsers.length) {
+      await transaction.rollback();
+      return false;
+    }
+    // Create students
+    let newStudents = await studentRepo.createMany(students, transaction);
+    if (newStudents.length !== students.length) {
+      await transaction.rollback();
+      return false;
+    }
+    console.log('newStudents - ', newStudents);
+    // Create union fee submission
+    newStudents = JSON.parse(JSON.stringify(newStudents));
+    const unionTextbooks = newStudents.map(student => ({
+      student_id: student.id,
+      submitted: false,
+    }));
+    console.log('newStudentIds - ', unionTextbooks);
+    const unionTextbook = await unionTextbookRepo.createMany(unionTextbooks, transaction);
+    console.log('unionTextbook - ', unionTextbook);
+    if (unionTextbook.length !== unionTextbooks.length) {
+      await transaction.rollback();
+      return false;
+    }
+    await transaction.commit();
+  } catch (error) {
+    console.log(error);
+    if (transaction) {
+      await transaction.rollback();
+    }
+    return false;
+  }
+  return true;
+};
+
+const deleteStudent = async (studentId) => {
+  let option = {};
+  option.where = { id: studentId };
+  const result = await studentRepo.del(option);
+  return result ? true : false;
+};
+
 module.exports = {
   get,
+  createMany,
+  deleteStudent,
 };

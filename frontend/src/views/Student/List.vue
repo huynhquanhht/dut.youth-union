@@ -11,7 +11,7 @@
         show-select
         :loading="loading"
         loading-text="Đang tải dữ liệu... Vui lòng chờ"
-        class="students-table pl-3 pr-3 pb-3"
+        class="students-table"
         fixed-header
         hide-default-footer
     >
@@ -19,7 +19,7 @@
         Không có dữ liệu để hiển thị!
       </template>
       <template v-slot:top>
-        <v-card-title>Danh sách đoàn viên</v-card-title>
+        <v-card-title>QUẢN LÝ ĐOÀN VIÊN</v-card-title>
         <div class="toolbar mb-1" flat>
           <div class="toolbar-block">
             <div class="search-block d-flex">
@@ -48,9 +48,19 @@
             </div>
             <div class="tool-block d-flex">
               <v-btn
+                text
+                width="100px"
+                class="tool-button"
+                @click="csvDialog = true"
+              >
+                <v-icon dark size="22">fas fa-file-csv</v-icon>
+                <span class="ml-1">Nhập CSV</span>
+              </v-btn>
+              <v-btn
                   text
                   width="100px"
                   class="tool-button"
+                  @click="create"
               >
                 <v-icon dark size="24">mdi-plus</v-icon>
                 Thêm mới
@@ -59,6 +69,7 @@
                   text
                   width="100px"
                   class="tool-button"
+                  @click="update"
               >
                 <v-icon dark size="20">mdi-square-edit-outline</v-icon>
                 Chỉnh sửa
@@ -124,17 +135,30 @@
           :content="dialogContent"
       ></confirm-dialog>
     </v-dialog>
+    <v-dialog
+      v-model="csvDialog"
+      width="400px"
+      persistent
+    >
+      <csv-popup
+        @csv-dialog="csvDialogHandler"
+        :btnOkLoading="btnOkLoading"
+      />
+    </v-dialog>
   </div>
 </template>
 
 <script>
 import {mapGetters, mapMutations, mapActions} from 'vuex';
 import ConfirmDialog from '@/components/ConfirmDialog';
-// import MESSAGE from '@/utils/message';
+import CsvPopup from '@/components/CSVPopup';
+import MESSAGE from "@/utils/message";
+
 export default {
   name: 'activity-list',
   components: {
     ConfirmDialog,
+    CsvPopup,
   },
   props: {
     page: {
@@ -157,7 +181,7 @@ export default {
   },
   data() {
     return {
-      singleSelect: false,
+      singleSelect: true,
       selected: [],
       loading: false,
       dialog: false,
@@ -189,6 +213,8 @@ export default {
       ],
       dialogTitle: null,
       dialogContent: null,
+      csvDialog: false,
+      btnOkLoading: false,
     };
   },
   computed: {
@@ -260,7 +286,35 @@ export default {
       });
       this.query.page = this.currentPage;
       this.query.size = this.selectedSize;
-    }
+    },
+    async csvDialogHandler(data) {
+      console.log('data - ', data);
+      if (data.command === 'Ok') {
+        this.btnOkLoading = true;
+        let activityClassFormData = new FormData();
+        activityClassFormData.append('file', data.file);
+        await this.fetchUploadActivityClassCSV({ file: activityClassFormData });
+        this.btnOkLoading = false;
+        this.csvDialog = false;
+      }
+      if (data.command === 'Cancel') {
+        this.csvDialog = false;
+      }
+    },
+    create() {
+      this.setSnackbar({
+        type: 'info',
+        visible: true,
+        text: MESSAGE.FEATURE_DEVELOP,
+      });
+    },
+    update() {
+      this.setSnackbar({
+        type: 'info',
+        visible: true,
+        text: MESSAGE.FEATURE_DEVELOP,
+      });
+    },
   },
   async created() {
     this.setQuery();
@@ -274,10 +328,14 @@ export default {
 <style lang="scss">
 .student-table {
   //overflow: auto;
+  padding: 20px 20px 20px 20px;
   background-color: #FFFFFF !important;
+  border-radius: 8px !important;
   .v-card__title {
     padding: 4px 0px 8px 0px !important;
-    font: normal 500 17px Roboto;
+    font: normal 700 18px Roboto;
+    text-shadow: rgb(0 0 0 / 12%) 0px 3px 6px, rgb(0 0 0 / 23%) 0px 3px 6px;
+    color: #0b8ee7;
   }
 
   .toolbar-block {

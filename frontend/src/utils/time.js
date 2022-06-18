@@ -9,6 +9,7 @@ const convertDateTimeToDate = (time) => {
 const getCurrentTime = () => moment().format('YYYY-MM-DD HH:mm:ss.SSS');
 const getCurrentDate = () => moment().format('YYYY-MM-DD');
 const formatTime = (time) => moment(time).format('hh:mm DD/MM/YYYY');
+const formatDate = (time) => moment(time).format('DD/MM/YYYY');
 
 const formatTimeText = (time) => {
   console.log('time - ', time);
@@ -57,6 +58,7 @@ module.exports = {
   getCurrentDate,
   formatTime,
   formatClock,
+  formatDate,
   formatTimeText,
   getDay,
   getDate,

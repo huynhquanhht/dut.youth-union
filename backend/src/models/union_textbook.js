@@ -8,7 +8,7 @@ module.exports = (sequelize, Datatypes) => {
         primaryKey: true,
         autoIncrement: true,
       },
-      submitted_union_textbook: {
+      submitted: {
         type: Datatypes.BOOLEAN,
         allowNull: false,
         default: false,

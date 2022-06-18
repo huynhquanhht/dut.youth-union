@@ -1,25 +1,25 @@
 <template>
-  <div class="union-fee-of-student-table">
+  <div>
     <v-data-table
       v-model="selected"
       :headers="headers"
-      :items="unionFeeOfStudents && unionFeeOfStudents.rows ? unionFeeOfStudents.rows : []"
+      :items="activityList ? activityList.rows : []"
       :single-select="singleSelect"
       :items-per-page="selectedSize"
       scroll.sync="scrollSync"
       item-key="id"
       show-select
-      :loading="loading"
       loading-text="Đang tải dữ liệu... Vui lòng chờ"
-      class="union-fee-of-student-table pl-3 pr-3 pb-3"
+      :loading="loading"
+      class="activity-table"
       fixed-header
       hide-default-footer
     >
-      <template v-if="unionFeeOfStudents && !unionFeeOfStudents.rows" v-slot:no-data>
+      <template v-if="activityList && !activityList.count" v-slot:no-data>
         Không có dữ liệu để hiển thị!
       </template>
       <template v-slot:top>
-        <v-card-title>Quản lý đoàn phí </v-card-title>
+        <v-card-title>DANH SÁCH HOẠT ĐỘNG</v-card-title>
         <div class="toolbar mb-1" flat>
           <div class="toolbar-block">
             <div class="search-block d-flex">
@@ -27,9 +27,9 @@
                 filled
                 label="Tìm kiếm theo"
                 class="search-select mr-2"
-                hide-details="false"
                 :items="searchOptions"
                 item-text="name"
+                hide-details="false"
                 v-model="selectedOption"
                 solo
                 dense
@@ -46,58 +46,56 @@
                 :disabled="!selectedOption"
               ></v-text-field>
             </div>
-            <div class="tool-block d-flex">
+            <div class="tool-block d-flex align-center">
               <v-btn
-                text
-                width="124px"
+                icon
+                width="100px"
                 class="tool-button"
+                @click="$router.push('/activity/create')"
               >
-                <v-icon dark size="20" class="mr-1">fa-file-invoice-dollar</v-icon>
-                Xuất hóa đơn
-              </v-btn>
-              <v-btn
-                text
-                width="50px"
-                class="tool-button"
-                @click="save"
-              >
-                <v-icon dark size="20" class="mr-1">fa-save</v-icon>
-                Lưu
+                <v-icon dark size="24">mdi-plus</v-icon>
+                Thêm mới
               </v-btn>
               <v-btn
                 text
                 width="100px"
                 class="tool-button"
-                @click="confirm"
+                @click="edit"
               >
-                <v-icon dark size="20">mdi-checkbox-marked-circle-outline</v-icon>
-                Xác nhận
+                <v-icon dark size="20">mdi-square-edit-outline</v-icon>
+                Chỉnh sửa
+              </v-btn>
+              <v-btn
+                text
+                width="50px"
+                class="tool-button"
+                @click="deleteActivities"
+              >
+                <v-icon dark size="20">mdi-trash-can-outline</v-icon>
+                Xóa
+              </v-btn>
+              <v-btn
+                icon
+                width="160px"
+                class="tool-button"
+                @click="$router.push('/activity/create')"
+              >
+                <v-icon dark size="22">mdi-format-list-bulleted-square</v-icon>
+                Danh sách đăng ký
+              </v-btn>
+              <v-btn
+                icon
+                width="90px"
+                class="tool-button"
+                @click="showQR"
+              >
+                <v-icon dark size="22">mdi-qrcode</v-icon>
+                QR Code
               </v-btn>
             </div>
           </div>
         </div>
-      </template>
-      <!--      <template v-slot:item.data-table-select="{ item}">-->
-      <!--        <v-simple-checkbox-->
-      <!--          :readonly="item.union_textbook.class_confirmed"-->
-      <!--        ></v-simple-checkbox>-->
-      <!--      </template>-->
-      <template v-slot:item.unionFee.submit_union_fee.submitted="{ item }">
-        <v-simple-checkbox
-          color="info"
-          v-model="item.unionFee.submit_union_fee.submitted"
-          @click="checkSubmission(item)"
-          :key="item.id"
-        ></v-simple-checkbox>
-      </template>
-      <template v-slot:item.unionFee.submit_union_fee.submitted_at="{ item }">
-        <span>{{ formatTime(item.unionFee.submit_union_fee.submitted_at)}}</span>
-      </template>
-      <template v-slot:item.unionFee.submit_union_fee.class_confirmed="{ item }">
-        <span>{{ formatTime(item.unionFee.submit_union_fee.class_confirmed)}}</span>
-      </template>
-      <template v-slot:item.unionFee.submit_union_fee.school_confirmed="{ item }">
-        <span>{{ formatTime(item.unionFee.submit_union_fee.school_confirmed)}}</span>
+        <v-divider></v-divider>
       </template>
       <template v-slot:footer>
         <div
@@ -113,27 +111,33 @@
               v-model="selectedSize"
               class="row-count-select"
               :items="listSize"
+              item-text="name"
               @change="changePageSize"
+              return-object
+              single-line
             ></v-select>
           </div>
           <v-pagination
+            v-if="activityList.count > selectedSize"
             v-model="currentPage"
-            v-if="unionFeeOfStudents.count"
-            :length="unionFeeOfStudents ? Math.ceil(unionFeeOfStudents.count / selectedSize) : 0"
+            :length="
+               activityList ? Math.ceil(activityList.count / selectedSize) : 0
+            "
             :totalVisible="totalVisible"
             @input="handlePageChange"
           ></v-pagination>
         </div>
       </template>
     </v-data-table>
-    <v-dialog v-model="confirmDialog" width="400px">
+    <v-dialog v-model="dialog" width="400px">
       <confirm-dialog
+        @confirm-dialog="handleConfirm"
         :title="dialogTitle"
-        :content="confirmDialogContent"
-        persistent
-        @confirm-dialog="processConfirmDialog"
-        :loadingButton="loadingButton"
+        :content="dialogContent"
       ></confirm-dialog>
+    </v-dialog>
+    <v-dialog v-model="QRCodeDialog" width="340px">
+      <QRCodeDialog :data="qrData"/>
     </v-dialog>
   </div>
 </template>
@@ -141,13 +145,15 @@
 <script>
 import {mapGetters, mapMutations, mapActions} from 'vuex';
 import ConfirmDialog from '@/components/ConfirmDialog';
-// import MESSAGE from '@/utils/message';
-import timeUtils from "@/utils/time";
+import QRCodeDialog from "@/views/Activity/QRCodeDialog";
+import MESSAGE from '@/utils/message';
+import jwt from 'jsonwebtoken';
 
 export default {
-  name: 'union-fee-of-student-list',
+  name: 'activity-list',
   components: {
     ConfirmDialog,
+    QRCodeDialog,
   },
   props: {
     page: {
@@ -159,9 +165,9 @@ export default {
       type: Number,
       validator: (val) => ([10, 50, 70, 100].indexOf(val) >= 0 ? val : 10),
     },
-    className: {
-      type: String,
-      default: null,
+    id: {
+      type: Number,
+      default: null
     },
     name: {
       type: String,
@@ -173,8 +179,9 @@ export default {
       singleSelect: false,
       selected: [],
       loading: false,
-      confirmDialog: false,
+      dialog: false,
       formDialog: false,
+      QRCodeDialog: false,
       totalNumberOfItems: 0,
       listSize: [10, 50, 70, 100],
       selectedSize: 10,
@@ -182,76 +189,118 @@ export default {
       totalVisible: 5,
       searchText: '',
       selectedOption: {},
-      query: {},
-      changeUnionFee: new Map(),
-      command: '',
-      loadingButton: false,
       searchOptions: [
         {
-          name: 'Họ tên',
-          attribute: 'name'
+          name: 'Mã số',
+          attribute: 'id'
         },
         {
-          name: 'Lớp sinh hoạt',
-          attribute: 'className',
-        },
-      ],
+          name: 'Tên hoạt động',
+          attribute: 'name',
+        }],
       headers: [
-        {text: 'Mã sinh viên', value: 'id',},
-        {text: 'Họ tên', value: 'name'},
-        {text: 'Chi đoàn', value: 'activity_class.name'},
-        {text: 'Nộp đoàn phí', value: 'unionFee.submit_union_fee.submitted',},
-        {text: 'Ngày nộp', value: 'unionFee.submit_union_fee.submitted_at'},
-        {text: 'Lớp xác nhận', value: 'unionFee.submit_union_fee.class_confirmed'},
-        {text: 'Trường xác nhận', value: 'unionFee.submit_union_fee.school_confirmed'}
+        {
+          text: 'Mã số',
+          align: 'start',
+          sortable: false,
+          value: 'id',
+        },
+        {text: 'Tên hoạt động', value: 'name'},
+        {text: 'Đơn vị tổ chức', value: 'organization_unit'},
+        {text: 'Địa điểm', value: 'place'},
+        {text: 'Bắt đầu', value: 'begin_at'},
+        {text: 'Kết thúc', value: 'end_at'},
+        {text: 'Trạng thái', value: 'status'},
       ],
       dialogTitle: null,
       dialogContent: null,
-      confirmDialogContent: null,
+      query: {},
+      action: '',
+      qrData: null,
     };
   },
   computed: {
     ...mapGetters({
-      unionFeeOfStudents: 'getUnionFeeOfStudents',
+      activityList: 'getActivityList',
     }),
   },
-
   methods: {
     ...mapActions({
-      fetchGetUnionFeeOfStudents: 'fetchGetUnionFeeOfStudents',
-      fetchSubmitUnionFee: 'fetchSubmitUnionFee',
-      fetchConfirmSubmissionUnionFee: 'fetchConfirmSubmissionUnionFee',
+      fetchGetAllActivity: 'fetchGetAllActivity',
+      fetchDeleteActivities: 'fetchDeleteActivities',
+      fetchOpenActivityRegistration: 'fetchOpenActivityRegistration',
+      fetchCloseActivityRegistration: 'fetchCloseActivityRegistration'
     }),
     ...mapMutations({
+      setActivityPage: 'setActivityPage',
+      setActivitySize: 'setActivitySize',
       setSnackbar: 'setSnackbar',
     }),
+    async handleConfirm(command) {
+      if (command === 'Ok') {
+        if (this.action === 'Delete') {
+          const activityIds = this.selected.map((activity) => activity.id);
+          let deleteResult = await this.fetchDeleteActivities({activityIds: activityIds});
+          if (deleteResult) {
+            this.selected = [];
+            this.setQuery();
+            await this.fetchGetAllActivity(this.query);
+          }
+          this.selected = [];
+          this.dialog = false;
+          return;
+        }
+      }
+      if (command === 'Cancel') {
+        this.dialog = false;
+      }
+    },
     async handlePageChange() {
       this.setQuery();
-      await this.$router.push({
-        name: 'union-fee-of-student-list',
+      this.$router.push({
+        name: 'activity-list',
         query: this.query,
-      }).catch(() => {});
+      }).catch(() => {
+      });
       this.loading = true;
-      await this.fetchGetUnionFeeOfStudents(this.query);
+      await this.fetchGetAllActivity(this.query);
       this.loading = false;
     },
     async changePageSize() {
       this.setQuery();
-      await this.$router.push({
-        name: 'union-fee-of-student-list',
+      this.$router.push({
+        name: 'activity-list',
         query: this.query,
-      }).catch(() => {});
+      }).catch(() => {
+      });
       this.loading = true;
-      await this.fetchGetUnionFeeOfStudents(this.query);
+      await this.fetchGetAllActivity(this.query);
       this.loading = false;
     },
-    processDialog(payload) {
-      if (payload.command === 'Cancel') {
-        this.formDialog = false;
+    edit() {
+      if (this.selected.length !== 1) {
+        this.setSnackbar({
+          type: 'info',
+          visible: true,
+          text: MESSAGE.CHOOSE_ONE_RECORD_FOR_EDIT,
+        });
+        return;
       }
-      if (payload.command === 'Save') {
-        this.formDialog = false;
+      this.$router.push(`activity/${this.selected[0].id}`);
+    },
+    async deleteActivities() {
+      if (this.selected.length === 0) {
+        this.setSnackbar({
+          type: 'info',
+          visible: true,
+          text: MESSAGE.CHOOSE_RECORD_FOR_DELETE,
+        });
+        return;
       }
+      this.action = 'Delete';
+      this.dialogTitle = 'Xác nhận xóa';
+      this.dialogContent = 'Bạn chắc chắn muốn xóa?';
+      this.dialog = true;
     },
     async search() {
       let query = {};
@@ -260,15 +309,14 @@ export default {
           query[option.attribute] = this.searchText;
         }
       });
-      this.currentPage = 1;
-      this.selectedSize = 10;
       query.page = 1;
       query.size = 10;
       this.$router.push({
-        name: 'union-fee-of-student-list',
+        name: 'activity-list',
         query: query,
-      }).catch(() => {});
-      await this.fetchGetUnionFeeOfStudents(query);
+      }).catch(() => {
+      });
+      await this.fetchGetAllActivity(query);
     },
     setQuery() {
       this.searchOptions.forEach(option => {
@@ -282,75 +330,65 @@ export default {
       this.query.page = this.currentPage;
       this.query.size = this.selectedSize;
     },
-    formatTime(time) {
-      return timeUtils.convertDateTimeToDate(time);
-    },
-    checkSubmission(student) {
-      console.log(student.unionFee.submit_union_fee.submitted);
-      this.changeUnionFee.set(student.unionFee.submit_union_fee.id, student.unionFee.submit_union_fee.submitted);
-    },
-    save() {
-      this.command = 'Save';
-      this.confirmDialogContent = "Bạn chắc chắn muốn lưu thông tin sổ đoàn đã chọn?"
-      this.confirmDialog = true;
-    },
-    async processConfirmDialog(command) {
-      console.log(command);
-      if (command === 'Ok') {
-        console.log('mmm');
-        console.log(this.command)
-        if (this.command == 'Save') {
-          const changeUnionFee = Array.from(this.changeUnionFee, ([key, value]) => {
-            return { id: key, submitted: value };
-          });
-          console.log('changeUnionFee - ', changeUnionFee);
-          this.loadingButton = true;
-          let isSuccess = await this.fetchSubmitUnionFee({changeUnionFee});
-          this.loadingButton = false;
-          if (isSuccess) {
-            this.confirmDialog = false;
-            await this.fetchGetUnionFeeOfStudents(this.query);
-          }
-        }
-        if (this.command == 'Confirm') {
-          console.log(this.selected);
-          const unionFeeIds = this.selected.map(item => item.unionFee.submit_union_fee.id);
-          this.loadingButton = true;
-          let isSuccess = await this.fetchConfirmSubmissionUnionFee({unionFeeIds});
-          this.loadingButton = false;
-          if (isSuccess) {
-            this.confirmDialog = false;
-            await this.fetchGetUnionFeeOfStudents(this.query);
-          }
-        }
+    async showQR() {
+      if (this.selected.length !== 1) {
+        this.setSnackbar({
+          type: 'info',
+          visible: true,
+          text: MESSAGE.CHOOSE_ONE_RECORD_FOR_EXCUTION,
+        });
         return;
       }
-      if (command === 'Cancel') {
-        this.confirmDialog = false;
-      }
-    },
-    confirm() {
-      this.command = 'Confirm';
-      this.confirmDialogContent = "Bạn chắc chắn muốn lưu thông tin sổ đoàn đã chọn?"
-      this.confirmDialog = true;
+      const payload = {
+        activityId: this.selected[0].id,
+        activityName: this.selected[0].name,
+      };
+      console.log(process.env.VUE_APP_QR_KEY);
+      const qrCode = await jwt.sign(payload, process.env.VUE_APP_QR_KEY, {
+        expiresIn: process.env.VUE_APP_TOKEN_TIMEOUT,
+      });
+      this.qrData = {
+        activityId: this.selected[0].id,
+        activityName: this.selected[0].name,
+        code: qrCode,
+      };
+      this.QRCodeDialog = true;
     }
   },
   async created() {
+    for (let props in this.$props) {
+      if (props === 'id' && this[props]) {
+        this.selectedOption = this.searchOptions.find(option => option.attribute === 'id').name;
+        this.searchText = this[props];
+      }
+      if (props === 'name' && this[props]) {
+        this.selectedOption = this.searchOptions.find(option => option.attribute === 'name').name;
+        this.searchText = this[props];
+      }
+    }
     this.setQuery();
-    this.loading = true;
-    await this.fetchGetUnionFeeOfStudents(this.query);
+    await this.fetchGetAllActivity(this.query);
     this.loading = false;
+  },
+  beforeDestroy() {
+    this.setActivityPage(this.page);
+    this.setActivitySize(this.size);
   },
 };
 </script>
 
 <style lang="scss">
-.union-fee-of-student-table {
+.activity-table {
   //overflow: auto;
+  height: 100vh;
   background-color: #FFFFFF !important;
+  padding: 20px 20px 20px 20px;
+  border-radius: 8px !important;
   .v-card__title {
     padding: 4px 0px 8px 0px !important;
-    font: normal 500 17px Roboto;
+    font: normal 700 18px Roboto;
+    text-shadow: rgb(0 0 0 / 12%) 0px 3px 6px, rgb(0 0 0 / 23%) 0px 3px 6px;
+    color: #0b8ee7;
   }
 
   .toolbar-block {
@@ -434,10 +472,12 @@ export default {
       thead {
         tr {
           th {
+            vertical-align: middle !important;
             background-color: #0b8ee7 !important;
             color: #FFFFFF !important;
             position: sticky !important;
             height: 40px !important;
+            font: normal 500 14px Roboto !important;
 
             .v-input--selection-controls__input {
               .v-icon {
@@ -452,7 +492,7 @@ export default {
             }
 
             &:first-child {
-              //padding: 0px 8px;
+              padding: 0px 8px;
               border-top-left-radius: 8px !important;
             }
 
@@ -474,46 +514,48 @@ export default {
           td {
             height: 40px !important;
             font: normal 400 14px Roboto !important;
-
             .v-input--selection-controls__input {
               .v-icon {
                 font-size: 20px !important;
               }
             }
 
+            &:nth-child(1) {
+              min-width: 20px !important;
+              padding: 0px 8px;
+            }
 
-            //&:nth-child(1) {
-            //  min-width: 20px !important;
-            //  padding: 0px 8px;
-            //}
-            //
-            //&:nth-child(2) {
-            //  min-width: 100px !important;
-            //}
-            //
-            //&:nth-child(3) {
-            //  min-width: 200px !important;
-            //}
-            //
-            //&:nth-child(4) {
-            //  min-width: 100px !important;
-            //}
-            //
-            //&:nth-child(5) {
-            //  min-width: 120px !important;
-            //}
-            //
-            //&:nth-child(6) {
-            //  min-width: 120px !important;
-            //}
-            //
-            //&:nth-child(7) {
-            //  min-width: 130px !important;
-            //}
-            //
-            //&:nth-child(8) {
-            //  min-width: 300px !important;
-            //}
+            &:nth-child(2) {
+              min-width: 80px !important;
+            }
+
+            &:nth-child(3) {
+              min-width: 200px !important;
+            }
+
+            &:nth-child(4) {
+              min-width: 200px !important;
+            }
+
+            &:nth-child(5) {
+              min-width: 200px !important;
+            }
+
+            &:nth-child(6) {
+              min-width: 100px !important;
+            }
+
+            &:nth-child(7) {
+              min-width: 100px !important;
+            }
+
+            &:nth-child(8) {
+              min-width: 120px !important;
+            }
+
+            &:nth-child(9) {
+              min-width: 100px !important;
+            }
           }
 
           &:hover {

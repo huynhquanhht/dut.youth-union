@@ -6,6 +6,11 @@ const create = (newStudent) => {
   return studentModel.create(newStudent);
 };
 
+const createMany = async (students, transaction) => {
+  return studentModel.bulkCreate(students, {transaction: transaction});
+};
+
+
 const getByPk = (id) => {
   return studentModel.findByPk(id);
 };
@@ -32,6 +37,7 @@ const del = (option) => {
 
 module.exports = {
   create,
+  createMany,
   getByPk,
   getOne,
   get,

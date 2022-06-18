@@ -1,40 +1,76 @@
-import axiosUtils from '@/utils/axios';
-const BASE_URL = '/news';
-
-const getAll = (page, size) => {
-  return axiosUtils.getRequest(`${BASE_URL}?page=${page}&size=${size}`);
+import newsApi from '@/api/news';
+import MESSAGE from '@/utils/message';
+const actions = {
+  fetchGetNewsList: async ({commit}, query) => {
+    const res = await newsApi.get(query);
+    console.log('res -', res);
+    commit('setNewsList', res.data);
+  },
+  fetchGetInformationList: async ({commit}, query) => {
+    const res = await newsApi.get(query);
+    commit('setInformationList', res.data);
+  },
+  fetchGetNotificationList: async ({commit}, query) => {
+    const res = await newsApi.get(query);
+    commit('setNotificationList', res.data);
+  },
+  fetchCreateNews: async ({commit}, payload) => {
+    try {
+      await newsApi.create(payload.news);
+      commit('setSnackbar', {
+        type: 'success',
+        visible: true,
+        text: MESSAGE.CREATE_SUCCESS,
+      });
+      return true;
+    } catch (error) {
+        commit('setSnackbar', {
+          type: 'error',
+          visible: true,
+          text: error.response.data.message,
+        });
+      return false;
+    }
+  },
+  fetchGetNewsById: async ({commit}, payload) => {
+    const res = await newsApi.getById(payload.id);
+    commit('setNews', res.data);
+  },
+  fetchUpdateNews: async ({commit}, payload) => {
+    try {
+      await newsApi.update(payload.id, payload.news);
+      commit('setSnackbar', {
+        type: 'success',
+        visible: true,
+        text: MESSAGE.UPDATE_SUCCESS,
+      });
+      return true;
+    } catch (error) {
+      commit('setSnackbar', {
+        type: 'error',
+        visible: true,
+        text: error.response.data.message,
+      });
+      return false;
+    }
+  },
+  fetchDeleteActivities: async ({commit}, payload) => {
+    try {
+      const res = await newsApi.deleteActivities(payload.newsIds);
+      commit('setSnackbar', {
+        type: 'success',
+        visible: true,
+        text: res.data.message,
+      });
+      return true;
+    } catch (error) {
+        commit('setSnackbar', {
+          type: 'error',
+          visible: true,
+          text: error.response.data.message,
+        });
+      return false;
+    }
+  },
 };
-
-const get = (query) => {
-  let url = BASE_URL;
-  let queryString = '';
-  for (let attribute in query) {
-    queryString += `&${attribute}=${query[attribute]}`;
-  }
-  if (queryString) {
-    queryString = queryString.slice(1, queryString.length);
-    url += '?' + queryString;
-  }
-  return axiosUtils.getRequest(url);
-};
-
-const create = (news) => {
-  return axiosUtils.postRequest(`${BASE_URL}`, { news });
-};
-
-const getById = (id) => {
-  return axiosUtils.getRequest(`${BASE_URL}/${id}`);
-};
-
-const update = (id, news) => {
-  console.log('mnk');
-  return axiosUtils.putRequest(`${BASE_URL}`, {newsId: id, news: news});
-};
-
-const deleteActivities = (newsIds) => {
-  return axiosUtils.deleteRequest(`${BASE_URL}`, {newsIds});
-};
-
-
-
-export default {getAll, create, getById, update, deleteActivities, get };
+export default actions;

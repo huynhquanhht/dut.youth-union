@@ -17,7 +17,7 @@ module.exports = (sequelize, Datatypes) => {
         },
       },
       function_id: {
-        type: Datatypes.INTEGER,
+        type: Datatypes.STRING(10),
         allowNull: false,
         references: {
           model: 'function',

@@ -4,19 +4,21 @@ const MESSAGE = require('../utils/message');
 
 // [POST]: /faculty
 const create = async (req, res) => {
+  const id = req.body.id;
   const name = req.body.name;
-  if (!name) {
+  if (!name || !id) {
     res.status(400).send({ message: MESSAGE.CREATE_FAIL });
     return;
   }
   try {
-    const creation = await facultyService.create(name);
+    const creation = await facultyService.create(id, name);
     if (!creation.result) {
       res.status(400).send({ message: creation.message });
       return;
     }
     res.status(200).send({ message: creation.message });
   } catch (error) {
+    console.log(error);
     res.status(500).send({ message: MESSAGE.SERVER_ERROR});
   }
 }
@@ -61,6 +63,7 @@ const update = async (req, res) => {
     res.status(400).send({ message: update.message });
     return;
   } catch (error) {
+    console.log(error);
     res.status(500).send({ message: MESSAGE.SERVER_ERROR});
   }
 };

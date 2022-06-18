@@ -1,6 +1,6 @@
 <template>
   <div class="authorization-wrapper pl-3 pr-3">
-    <v-card-title>Quản lý phân quyền</v-card-title>
+    <v-card-title>QUẢN LÝ PHÂN QUYỀN</v-card-title>
     <div class="toolbar-block mb-7">
       <div class="tool-block d-flex justify-space-between">
         <div class="search-block d-flex align-center">
@@ -27,7 +27,6 @@
               class="input-search"
             ></v-text-field>
           </div>
-
         </div>
         <div class="tool-button-block d-flex align-center">
           <v-btn
@@ -50,7 +49,7 @@
         <div class="col-func-block d-flex flex-row">
           <v-col
             class="col-func d-flex align-center"
-            xs="3" sm="3" md="3" lg="3" xl="3"
+            xs="2" sm="2" md="2" lg="2" xl="2"
             v-for="func in groupFunction.functions"
             :key="func.id"
           >
@@ -96,7 +95,9 @@ export default {
   }
   .v-card__title {
     padding: 4px 0px 8px 0px !important;
-    font: normal 500 17px Roboto;
+    font: normal 700 18px Roboto;
+    text-shadow: rgb(0 0 0 / 12%) 0px 3px 6px, rgb(0 0 0 / 23%) 0px 3px 6px;
+    color: #0b8ee7;
   }
   .toolbar-block {
     width: 100%;
@@ -124,12 +125,11 @@ export default {
   }
   .group-func-block {
     padding: 0px 12px;
-
     .row-func-block {
       padding: 8px 12px;
       border-radius: 4px;
       margin-bottom: 8px;
-
+      background-color: #FFFFFF;
       box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
       &:nth-child(odd) {
         border-left: 4px solid #0078D4;

@@ -3,7 +3,7 @@
     <v-data-table
       v-model="selected"
       :headers="headers"
-      :items="activityList ? activityList.rows : []"
+      :items="newsList ? newsList.rows : []"
       :single-select="singleSelect"
       :items-per-page="selectedSize"
       scroll.sync="scrollSync"
@@ -11,15 +11,15 @@
       show-select
       loading-text="Đang tải dữ liệu... Vui lòng chờ"
       :loading="loading"
-      class="activity-table pl-3 pr-3 pb-3"
+      class="news-table"
       fixed-header
       hide-default-footer
     >
-      <template v-if="activityList && !activityList.count" v-slot:no-data>
+      <template v-if="newsList && !newsList.count" v-slot:no-data>
         Không có dữ liệu để hiển thị!
       </template>
       <template v-slot:top>
-        <v-card-title>Danh sách tin tức</v-card-title>
+        <v-card-title>QUẢN LÝ TIN TỨC</v-card-title>
         <div class="toolbar mb-1" flat>
           <div class="toolbar-block">
             <div class="search-block d-flex">
@@ -51,7 +51,7 @@
                 icon
                 width="100px"
                 class="tool-button"
-                @click="$router.push('/activity/create')"
+                @click="$router.push('/news/create')"
               >
                 <v-icon dark size="24">mdi-plus</v-icon>
                 Thêm mới
@@ -100,10 +100,10 @@
             ></v-select>
           </div>
           <v-pagination
-            v-if="activityList.count > selectedSize"
+            v-if="newsList && newsList.count > selectedSize"
             v-model="currentPage"
             :length="
-               activityList ? Math.ceil(activityList.count / selectedSize) : 0
+               newsList ? Math.ceil(newsList.count / selectedSize) : 0
             "
             :totalVisible="totalVisible"
             @input="handlePageChange"
@@ -127,7 +127,7 @@ import ConfirmDialog from '@/components/ConfirmDialog';
 import MESSAGE from '@/utils/message';
 
 export default {
-  name: 'activity-list',
+  name: 'news-list',
   components: {
     ConfirmDialog,
   },
@@ -180,9 +180,9 @@ export default {
           sortable: false,
           value: 'id',
         },
-        {text: 'Tiêu đề', value: 'name'},
-        {text: 'Loại thông báo', value: 'organization_unit'},
-        {text: 'Ngày tạo', value: 'place'},
+        {text: 'Tiêu đề', value: 'title'},
+        {text: 'Loại thông báo', value: 'category'},
+        {text: 'Ngày tạo', value: 'created_at'},
       ],
       dialogTitle: null,
       dialogContent: null,
@@ -191,27 +191,25 @@ export default {
   },
   computed: {
     ...mapGetters({
-      activityList: 'getActivityList',
+      newsList: 'getNewsList',
     }),
   },
   methods: {
     ...mapActions({
-      fetchGetActivityList: 'fetchGetActivityList',
+      fetchGetNewsList: 'fetchGetNewsList',
       fetchDeleteActivities: 'fetchDeleteActivities',
     }),
     ...mapMutations({
-      setActivityPage: 'setActivityPage',
-      setActivitySize: 'setActivitySize',
       setSnackbar: 'setSnackbar',
     }),
     async handleConfirm(command) {
       if (command === 'Ok') {
-        const activityIds = this.selected.map((activity) => activity.id);
-        let deleteResult = await this.fetchDeleteActivities({activityIds: activityIds});
+        const newsIds = this.selected.map((news) => news.id);
+        let deleteResult = await this.fetchDeleteActivities({newsIds: newsIds});
         if (deleteResult) {
           this.selected = [];
           this.setQuery();
-          await this.fetchGetActivityList(this.query);
+          await this.fetchGetNewsList(this.query);
         }
         this.dialog = false;
       }
@@ -222,21 +220,21 @@ export default {
     async handlePageChange() {
       this.setQuery();
       this.$router.push({
-        name: 'activity-list',
+        name: 'news-list',
         query: this.query,
       }).catch(() => {});
       this.loading = true;
-      await this.fetchGetActivityList(this.query);
+      await this.fetchGetNewsList(this.query);
       this.loading = false;
     },
     async changePageSize() {
       this.setQuery();
       this.$router.push({
-        name: 'activity-list',
+        name: 'news-list',
         query: this.query,
       }).catch(() => {});
       this.loading = true;
-      await this.fetchGetActivityList(this.query);
+      await this.fetchGetNewsList(this.query);
       this.loading = false;
     },
     edit() {
@@ -248,7 +246,7 @@ export default {
         });
         return;
       }
-      this.$router.push(`activity/${this.selected[0].id}`);
+      this.$router.push(`news/${this.selected[0].id}`);
     },
     async deleteActivities() {
       if (this.selected.length === 0) {
@@ -273,10 +271,10 @@ export default {
       query.page = 1;
       query.size = 10;
       this.$router.push({
-        name: 'activity-list',
+        name: 'news-list',
         query: query,
       }).catch(() => {});
-      await this.fetchGetActivityList(query);
+      await this.fetchGetNewsList(query);
     },
     setQuery() {
       this.searchOptions.forEach(option => {
@@ -303,24 +301,26 @@ export default {
       }
     }
     this.setQuery();
-    await this.fetchGetActivityList(this.query);
+    await this.fetchGetNewsList(this.query);
     this.loading = false;
   },
   beforeDestroy() {
-    this.setActivityPage(this.page);
-    this.setActivitySize(this.size);
+    // this.setActivityPage(this.page);
+    // this.setActivitySize(this.size);
   },
 };
 </script>
 
 <style lang="scss">
-.activity-table {
-  //overflow: auto;
+.news-table {
+  padding: 20px 20px 20px 20px;
+  border-radius: 8px !important;
   background-color: #FFFFFF !important;
-
   .v-card__title {
     padding: 4px 0px 8px 0px !important;
-    font: normal 500 17px Roboto;
+    font: normal 700 18px Roboto;
+    text-shadow: rgb(0 0 0 / 12%) 0px 3px 6px, rgb(0 0 0 / 23%) 0px 3px 6px;
+    color: #0b8ee7;
   }
 
   .toolbar-block {

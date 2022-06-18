@@ -11,7 +11,7 @@
         show-select
         loading-text="Đang tải dữ liệu... Vui lòng chờ"
         :loading="loading"
-        class="activity-table pl-3 pr-3 pb-3"
+        class="activity-table"
         fixed-header
         hide-default-footer
     >
@@ -19,7 +19,7 @@
         Không có dữ liệu để hiển thị!
       </template>
       <template v-slot:top>
-        <v-card-title>Danh sách hoạt động</v-card-title>
+        <v-card-title>DANH SÁCH HOẠT ĐỘNG</v-card-title>
         <div class="toolbar mb-1" flat>
           <div class="toolbar-block">
             <div class="search-block d-flex">
@@ -74,6 +74,24 @@
                   <v-icon dark size="20">mdi-trash-can-outline</v-icon>
                   Xóa
                 </v-btn>
+              <v-btn
+                icon
+                width="160px"
+                class="tool-button"
+                @click="$router.push('/activity/create')"
+              >
+                <v-icon dark size="22">mdi-format-list-bulleted-square</v-icon>
+                Danh sách đăng ký
+              </v-btn>
+              <v-btn
+                icon
+                width="90px"
+                class="tool-button"
+                @click="showQR"
+              >
+                <v-icon dark size="22">mdi-qrcode</v-icon>
+                QR Code
+              </v-btn>
             </div>
           </div>
         </div>
@@ -118,18 +136,24 @@
           :content="dialogContent"
       ></confirm-dialog>
     </v-dialog>
+    <v-dialog v-model="QRCodeDialog" width="340px">
+      <QRCodeDialog :data="qrData"/>
+    </v-dialog>
   </div>
 </template>
 
 <script>
 import {mapGetters, mapMutations, mapActions} from 'vuex';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import QRCodeDialog from "@/views/Activity/QRCodeDialog";
 import MESSAGE from '@/utils/message';
+import jwt from 'jsonwebtoken';
 
 export default {
   name: 'activity-list',
   components: {
     ConfirmDialog,
+    QRCodeDialog,
   },
   props: {
     page: {
@@ -157,6 +181,7 @@ export default {
       loading: false,
       dialog: false,
       formDialog: false,
+      QRCodeDialog: false,
       totalNumberOfItems: 0,
       listSize: [10, 50, 70, 100],
       selectedSize: 10,
@@ -190,6 +215,8 @@ export default {
       dialogTitle: null,
       dialogContent: null,
       query: {},
+      action: '',
+      qrData: null,
     };
   },
   computed: {
@@ -199,8 +226,10 @@ export default {
   },
   methods: {
     ...mapActions({
-      fetchGetActivityList: 'fetchGetActivityList',
+      fetchGetAllActivity: 'fetchGetAllActivity',
       fetchDeleteActivities: 'fetchDeleteActivities',
+      fetchOpenActivityRegistration: 'fetchOpenActivityRegistration',
+      fetchCloseActivityRegistration: 'fetchCloseActivityRegistration'
     }),
     ...mapMutations({
       setActivityPage: 'setActivityPage',
@@ -209,14 +238,18 @@ export default {
     }),
     async handleConfirm(command) {
       if (command === 'Ok') {
-        const activityIds = this.selected.map((activity) => activity.id);
-        let deleteResult = await this.fetchDeleteActivities({activityIds: activityIds});
-        if (deleteResult) {
+        if (this.action === 'Delete') {
+          const activityIds = this.selected.map((activity) => activity.id);
+          let deleteResult = await this.fetchDeleteActivities({activityIds: activityIds});
+          if (deleteResult) {
+            this.selected = [];
+            this.setQuery();
+            await this.fetchGetAllActivity(this.query);
+          }
           this.selected = [];
-          this.setQuery();
-          await this.fetchGetActivityList(this.query);
+          this.dialog = false;
+          return;
         }
-        this.dialog = false;
       }
       if (command === 'Cancel') {
         this.dialog = false;
@@ -227,9 +260,10 @@ export default {
       this.$router.push({
         name: 'activity-list',
         query: this.query,
-      }).catch(() => {});
+      }).catch(() => {
+      });
       this.loading = true;
-      await this.fetchGetActivityList(this.query);
+      await this.fetchGetAllActivity(this.query);
       this.loading = false;
     },
     async changePageSize() {
@@ -237,9 +271,10 @@ export default {
       this.$router.push({
         name: 'activity-list',
         query: this.query,
-      }).catch(() => {});
+      }).catch(() => {
+      });
       this.loading = true;
-      await this.fetchGetActivityList(this.query);
+      await this.fetchGetAllActivity(this.query);
       this.loading = false;
     },
     edit() {
@@ -262,6 +297,7 @@ export default {
         });
         return;
       }
+      this.action = 'Delete';
       this.dialogTitle = 'Xác nhận xóa';
       this.dialogContent = 'Bạn chắc chắn muốn xóa?';
       this.dialog = true;
@@ -278,8 +314,9 @@ export default {
       this.$router.push({
         name: 'activity-list',
         query: query,
-      }).catch(() => {});
-      await this.fetchGetActivityList(query);
+      }).catch(() => {
+      });
+      await this.fetchGetAllActivity(query);
     },
     setQuery() {
       this.searchOptions.forEach(option => {
@@ -292,6 +329,30 @@ export default {
       });
       this.query.page = this.currentPage;
       this.query.size = this.selectedSize;
+    },
+    async showQR() {
+      if (this.selected.length !== 1) {
+        this.setSnackbar({
+          type: 'info',
+          visible: true,
+          text: MESSAGE.CHOOSE_ONE_RECORD_FOR_EXCUTION,
+        });
+        return;
+      }
+      const payload = {
+        activityId: this.selected[0].id,
+        activityName: this.selected[0].name,
+      };
+      console.log(process.env.VUE_APP_QR_KEY);
+      const qrCode = await jwt.sign(payload, process.env.VUE_APP_QR_KEY, {
+        expiresIn: process.env.VUE_APP_TOKEN_TIMEOUT,
+      });
+      this.qrData = {
+        activityId: this.selected[0].id,
+        activityName: this.selected[0].name,
+        code: qrCode,
+      };
+      this.QRCodeDialog = true;
     }
   },
   async created() {
@@ -306,7 +367,7 @@ export default {
       }
     }
     this.setQuery();
-    await this.fetchGetActivityList(this.query);
+    await this.fetchGetAllActivity(this.query);
     this.loading = false;
   },
   beforeDestroy() {
@@ -319,11 +380,15 @@ export default {
 <style lang="scss">
 .activity-table {
   //overflow: auto;
+  height: 100vh;
   background-color: #FFFFFF !important;
-
+  padding: 20px 20px 20px 20px;
+  border-radius: 8px !important;
   .v-card__title {
     padding: 4px 0px 8px 0px !important;
-    font: normal 500 17px Roboto;
+    font: normal 700 18px Roboto;
+    text-shadow: rgb(0 0 0 / 12%) 0px 3px 6px, rgb(0 0 0 / 23%) 0px 3px 6px;
+    color: #0b8ee7;
   }
 
   .toolbar-block {

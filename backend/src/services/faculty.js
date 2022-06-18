@@ -4,19 +4,22 @@ const MESSAGE = require('../utils/message');
 const models = require('../models');
 const sequelizeUtils = require('../utils/sequelize');
 
-const create = async (name) => {
+const create = async (id, name) => {
   const option = { where: { name: name }};
   const oldFaculty = await facultyRepo.getOne(option);
   if (oldFaculty) {
     return { message: MESSAGE.EXISTED_DATA, result: false };
   }
   if (oldFaculty && oldFaculty.deleted_at) {
-    const condition = { where: { name: name }};
+    const condition = { where: { id: id }};
     const newFaculty = { deleted_at: null };
     await facultyRepo.update(condition, newFaculty);
     return { message: MESSAGE.CREATE_SUCCESS, result: true };
   }
-  const faculty = await facultyRepo.create({ name });
+  const faculty = await facultyRepo.create({
+    id,
+    name,
+    university_union_id: 2});
   if (faculty) {
     return {
       message: MESSAGE.CREATE_SUCCESS,

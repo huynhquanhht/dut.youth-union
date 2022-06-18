@@ -2,14 +2,23 @@ import activityApi from '@/api/activity';
 import cloudinaryApi from "@/api/cloudinary";
 import MESSAGE from '@/utils/message';
 const actions = {
-  fetchGetActivityList: async ({commit}, query) => {
+  fetchGetAllActivity: async ({commit}, query) => {
+    const res = await activityApi.getAll(query);
+    console.log('res -', res);
+    commit('setActivityList', res.data);
+  },
+  fetchGetActivityByOption: async ({commit}, query) => {
     const res = await activityApi.get(query);
     console.log('res -', res);
     commit('setActivityList', res.data);
   },
   fetchGetActivitiesByCurrentStudent: async ({commit}, query) => {
-    const res = await activityApi.get(query);
+    const res = await activityApi.getByCurrentStudent(query);
     commit('setMyActivities', res.data);
+  },
+  fetchGetPointListOfCurrentStudent: async ({commit}) => {
+    const res = await activityApi.getPointListOfCurrentStudent();
+    commit('setPointListOfCurrentStudent', res.data);
   },
   fetchCreateActivity: async ({commit}, payload) => {
     try {
@@ -31,7 +40,7 @@ const actions = {
       return false;
     }
   },
-  fetchGetById: async ({commit}, payload) => {
+  fetchGetActivityById: async ({commit}, payload) => {
     const res = await activityApi.getById(payload.id);
     commit('setActivity', res.data);
   },
@@ -90,6 +99,87 @@ const actions = {
       });
       return null;
     }
-  }
+  },
+  fetchOpenActivityRegistration: async ({ commit }, payload) => {
+    try {
+      const res = await activityApi.openActivityRegistration(payload.activityId);
+      console.log('res - ', res);
+      commit('setSnackbar', {
+        type: 'success',
+        visible: true,
+        text: res.data.message,
+      });
+      return true;
+    } catch (error) {
+      if (error.response.status === 403) {
+        commit('setSnackbar', {
+          type: 'error',
+          visible: true,
+          text: error.response.data.message,
+        });
+        return false;
+      }
+      commit('setSnackbar', {
+        type: 'error',
+        visible: true,
+        text: error.response.data.error.message,
+      });
+      return false;
+    }
+  },
+  fetchCloseActivityRegistration: async ({ commit }, payload) => {
+    try {
+      const res = await activityApi.closeActivityRegistration(payload.activityId);
+      commit('setSnackbar', {
+        type: 'success',
+        visible: true,
+        text: res.data.message,
+      });
+      return true;
+    } catch (error) {
+      commit('setSnackbar', {
+        type: 'error',
+        visible: true,
+        text: error.response.data.error.message,
+      });
+      return false;
+    }
+  },
+  fetchRegister: async ({commit}, payload) => {
+    try {
+      const res = await activityApi.register(payload.activityId);
+      commit('setSnackbar', {
+        type: 'success',
+        visible: true,
+        text: res.data.message,
+      });
+      return true;
+    } catch (error) {
+      commit('setSnackbar', {
+        type: 'error',
+        visible: true,
+        text: error.response.data.error.message,
+      });
+      return false;
+    }
+  },
+  fetchAttend: async ({commit}, payload) => {
+    try {
+      const res = await activityApi.attend(payload.activityId);
+      commit('setSnackbar', {
+        type: 'success',
+        visible: true,
+        text: res.data.message,
+      });
+      return true;
+    } catch (error) {
+      commit('setSnackbar', {
+        type: 'error',
+        visible: true,
+        text: error.response.data.error.message,
+      });
+      return false;
+    }
+  },
 };
 export default actions;

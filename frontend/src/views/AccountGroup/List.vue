@@ -10,7 +10,7 @@
       show-select
       :loading="loading"
       loading-text="Đang tải dữ liệu... Vui lòng chờ"
-      class="abu-table pl-3 pr-3 pb-3"
+      class="abu-table"
       fixed-header
       hide-default-footer
     >
@@ -27,7 +27,7 @@
         <span> {{ formatTime(item.updated_at) }}</span>
       </template>
       <template v-slot:top>
-        <v-card-title>Danh sách nhóm tài khoản</v-card-title>
+        <v-card-title>DANH SÁCH NHÓM TÀI KHOẢN</v-card-title>
         <div class="toolbar mb-1" flat>
           <div class="toolbar-block d-flex justify-end">
             <div class="tool-block d-flex align-center">
@@ -142,12 +142,15 @@ export default {
 
 <style lang="scss">
 .abu-table {
-  //overflow: auto;
+  height: 100vh;
   background-color: #FFFFFF !important;
-
+  padding: 20px 20px 20px 20px;
+  border-radius: 8px !important;
   .v-card__title {
     padding: 4px 0px 8px 0px !important;
-    font: normal 500 17px Roboto;
+    font: normal 700 18px Roboto;
+    text-shadow: rgb(0 0 0 / 12%) 0px 3px 6px, rgb(0 0 0 / 23%) 0px 3px 6px;
+    color: #0b8ee7;
   }
 
   .toolbar-block {

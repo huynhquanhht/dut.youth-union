@@ -6,6 +6,11 @@ const create = (newActivityClass) => {
   return activityClassModel.create(newActivityClass);
 };
 
+const createMany = async (activityClasses, transaction) => {
+  return activityClassModel.bulkCreate(activityClasses, transaction);
+};
+
+
 const getByPk = (id) => {
   return activityClassModel.findByPk(id);
 };
@@ -37,6 +42,7 @@ const del = (option) => {
 
 module.exports = {
   create,
+  createMany,
   get,
   countAll,
   getByPk,

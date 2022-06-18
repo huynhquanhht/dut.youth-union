@@ -5,8 +5,12 @@ const actions = {
     const res = await unionFeeApi.get(query);
     commit('setUnionFees', res.data);
   },
-  fetchGetUnionFeeOfStudents: async ({commit}, query) => {
-    const res = await unionFeeApi.getOfStudent(query);
+  fetchGetUnionFeeOfStudent: async ({commit}) => {
+    const res = await unionFeeApi.getOfStudent();
+    commit('setUnionFeeOfStudent', res.data);
+  },
+  fetchGetUnionFeeOfStudents: async ({commit}) => {
+    const res = await unionFeeApi.getOfStudents();
     commit('setUnionFeeOfStudents', res.data);
   },
   fetchSubmitUnionFee: async ({commit}, payload) => {
@@ -29,7 +33,6 @@ const actions = {
   },
   fetchConfirmSubmissionUnionFee: async ({commit}, payload) => {
     try {
-      console.log(payload);
       const res = await unionFeeApi.confirmSubmission(payload.unionFeeIds);
       commit('setSnackbar', {
         type: 'success',
@@ -45,8 +48,13 @@ const actions = {
       });
       return false;
     }
+  },
+  fetchGetInvoice: async ({commit}, payload) => {
+    console.log('payload - ', payload);
+    const res = await unionFeeApi.getInvoice(payload.studentId, payload.unionFeeId);
+    console.log('res - ', res);
+    commit('setInvoice', res.data);
   }
-
 };
 
 export default actions;

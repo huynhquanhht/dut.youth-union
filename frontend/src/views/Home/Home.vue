@@ -1,5 +1,6 @@
 <template>
-  <div class="home-wrapper">
+  <v-app>
+    <div class="home-wrapper">
     <div class="home-block">
       <div class="header">
         <div class="logo">
@@ -18,21 +19,72 @@
             </v-tab>
           </v-tabs>
         </div>
-        <div class="btn-login-block">
-          <v-btn>Đăng nhập</v-btn>
+        <div class="user-block" v-if="currentUser">
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                text
+                class="acti-button mr-1"
+                icon
+                color="#075793"
+                width="36px"
+                height="36px"
+                v-bind="attrs"
+                v-on="on"
+                @click="$router.push('/')"
+              >
+                <v-icon dark size="20">mdi-page-next</v-icon>
+              </v-btn>
+            </template>
+            <span>Kênh hoạt động</span>
+          </v-tooltip>
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                text
+                class="bell-button mr-1"
+                icon
+                color="#075793"
+                width="36px"
+                height="36px"
+                v-bind="attrs"
+                v-on="on"
+              >
+                <v-icon dark size="20">mdi-bell</v-icon>
+              </v-btn>
+            </template>
+            <span>Thông báo</span>
+          </v-tooltip>
+          <profile-option :currentUser="currentUser"/>
+
+        </div>
+        <div class="btn-login-block" v-else>
+          <v-btn @click="$router.push('/login')">Đăng nhập</v-btn>
         </div>
       </div>
-      <div class="banner-news"></div>
-      <div class="slide-block">
-        <v-carousel show-arrows="true" cycle="true">
-          <v-carousel-item
-            v-for="(item,i) in slideItems"
-            :key="i"
-            :src="item.src"
-            reverse-transition="fade-transition"
-            transition="fade-transition"
-          ></v-carousel-item>
-        </v-carousel>
+      <div class="banner-news">
+        <marquee>
+          Vào ngày 12/06/2022, chương trình Định cư Con người Liên Hợp Quốc #UNHabitat phối hợp cùng Quỹ Nhi đồng Liên Hợp Quốc (UNICEF) sẽ tổ chức sự kiện Diễn đàn thanh niên đô thị 2030 Việt Nam tại thành phố Đà Nẵng. Đây là sự kiện nằm trong khuôn khổ dự án Thanh niên đô thị 2030 di UN-Habitat thực hiện tại 06 quốc
+          ✅Diễn đàn Thanh niên đô thị 2030 Việt Nam #youth2030cities mong muốn tạo ra nền tảng đối thoại giữa thanh niên với các bên liên quan tham gia vào quá trình đô thị hóa bền vững. Kết quả cụ thể của Diễn đàn sẽ là một tuyên bố thanh niên với đô thị hóa bền vững (DeclarACTION) và là đóng góp của thanh niên Việt Nam tại Diễn đàn Đô thị Thế giới lần thứ 11 #WUF11 sắp được tổ chức tại Ba Lan. Tuyên bố này sẽ đóng vai trò làm lộ trình thực hiện và kế hoạch hành động cho giới trẻ nhằm đạt được các Mục tiêu phát triển bền vững và các mục tiêu đề ra trong Chương trình Nghị sự đô thị mới.
+          🏢Vì vậy, Đoàn Thanh niên Trường Đại học Bách Khoa - ĐHĐN kêu gọi các bạn sinh viên, thanh niên tham gia sự kiện lần này. Dự án lần này do UN-Habitat tổ chức với mong muốn tăng cường tiếng nói, sự tham gia của các thanh niên trong việc phát triển đô thị bền vững.
+        </marquee>
+      </div>
+      <div class="event-block">
+        <div class="slide-block">
+          <v-carousel :show-arrows="true" :cycle="true">
+            <v-carousel-item
+              v-for="(item,i) in slideItems"
+              :key="i"
+              :src="item.src"
+              reverse-transition="fade-transition"
+              transition="fade-transition"
+            ></v-carousel-item>
+          </v-carousel>
+        </div>
+        <div class="image-block">
+          <img src="../../assets/image/282094376_1978610139006451_5596072089181779361_n.jpg" alt="">
+          <img src="../../assets/image/283670943_5389268691119151_4683700183425758671_n.jpg" alt="">
+        </div>
       </div>
       <div class="content-block">
         <v-row>
@@ -43,16 +95,7 @@
                 <span>THÔNG BÁO</span>
               </div>
               <div class="content">
-                <v-tabs
-                  background-color="#ffffff"
-                >
-                  <v-tab>ĐOÀN TRƯỜNG</v-tab>
-                  <v-divider
-                    class="mx-4"
-                    vertical
-                  ></v-divider>
-                  <v-tab>LIÊN CHI ĐOÀN</v-tab>
-                </v-tabs>
+                <span class="tab">MỚI NHẤT</span>
                 <v-divider
                   class="mx-4"
                 ></v-divider>
@@ -88,20 +131,21 @@
                 <v-divider
                   class="mx-4"
                 ></v-divider>
-                <div class="news" v-for="(item, index) in [1,2,3,4,5,6,7,8,9,10]" :key="index">
+                <div class="news" v-for="(item, index) in newsList.rows" :key="index">
                   <div class="image">
-                    <img src="../../assets/image/slide7.jpg" alt="">
+                    <img :src="item.cover_url" alt="">
                   </div>
                   <div class="title-block">
                     <div class="title">
                       <p>
-                        <a href="">Tuyển sinh vào đại học hệ chính quy theo phương thức tuyển sinh riêng năm
-                          2022</a>
+                        <a href="">
+                          {{ item.title }}
+                        </a>
                       </p>
                     </div>
                     <div class="time">
                       <v-icon>mdi-calendar-month</v-icon>
-                      <span>30/04/2022 08:24</span>
+                      <span> {{ item.created_at }}</span>
                     </div>
                   </div>
                 </div>
@@ -145,50 +189,59 @@
       </div>
     </div>
   </div>
-
+  </v-app>
 </template>
 
 <script>
+import localStorageUtils from "@/utils/local_storage";
+import ProfileOption from '@/components/ProfileOption.vue';
+import {mapActions, mapGetters} from "vuex";
+
 export default {
+  name: 'Home',
+  components: { ProfileOption },
   data() {
     return {
       tab: null,
+      currentUser: null,
       tabItems: [
         {tab: 'Trang chủ', content: 'Tab 1 Content'},
         {tab: 'Giới thiệu', content: 'Tab 2 Content'},
-        {tab: 'Hoạt động', content: 'Tab 3 Content'},
+        {tab: 'Hoạt động', content: 'Tab 3 Content', route: '/'},
         {tab: 'Liên hệ', content: 'Tab 4 Content'},
       ],
       slideItems: [
         {
-          src: require('../../assets/image/slide7.jpg'),
-        },
-        {
-          src: require('../../assets/image/slide8.png'),
-        },
-        {
           src: require('../../assets/image/slide9.jpg'),
         },
         {
-          src: require('../../assets/image/slide6.png'),
+          src: require('../../assets/image/slide5.png'),
         },
         {
-          src: require('../../assets/image/slide1.jpg'),
+          src: require('../../assets/image/slide10.jpg'),
         },
-        {
-          src: require('../../assets/image/slide2.jpg'),
-        },
-        {
-          src: require('../../assets/image/slide3.jpg'),
-        },
-        {
-          src: require('../../assets/image/slide4.jpg'),
-        },
-
       ]
     }
   },
-  methods: {}
+  computed: {
+    ...mapGetters({
+      newsList: 'getNewsList',
+    }),
+  },
+  methods: {
+    ...mapActions({
+      fetchGetNewsList: 'fetchGetNewsList',
+    }),
+  },
+  async created() {
+    this.currentUser = localStorageUtils.getService().getCurrentUser();
+    const query = {
+      page: 1,
+      size: 10,
+    };
+    await this.fetchGetNewsList(query);
+    console.log('currentUser - ', this.currentUser);
+  }
 }
 </script>
 
@@ -256,45 +309,74 @@ export default {
     .banner-news {
       margin-top: 4px;
       background-color: #075794;
-      height: 24px;
+      height: 28px;
+      font: normal 300 13px Roboto;
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
     }
 
-    .slide-block {
-      border: 8px solid #FFFFFF;
-      box-shadow: rgb(50 50 93 / 25%) 0px 2px 5px -1px, rgb(0 0 0 / 30%) 0px 1px 3px -1px;
+    .event-block {
+      display: flex;
+      column-gap: 16px;
+      row-gap: 16px;
       margin-top: 8px;
+      .slide-block {
+        border: 2px solid #FFFFFF;
+        box-shadow: rgb(50 50 93 / 25%) 0px 2px 5px -1px, rgb(0 0 0 / 30%) 0px 1px 3px -1px;
+        display: flex;
+        width: 700px;
+        height: 400px;
 
-      .v-window__prev {
-        left: 0 !important;
+        .v-window__prev {
+          left: 0 !important;
+        }
+
+        .v-window__next {
+          right: 0 !important;
+        }
+
+        .v-carousel__controls {
+          height: 32px !important;
+        }
+
+        .v-window {
+          height: 395px !important;
+          width: 700px;
+        }
+
+        .v-window-item {
+          height: 400px;
+        }
+
+        .v-carousel__item {
+          height: 400px !important;
+        }
+
+        .v-image__image--cover {
+          background-size: contain;
+        }
+
+        //.v-item-group {
+        //  height: 350px !important;
+        //}
+        .v-responsive__content {
+          width: 1200px !important;
+        }
       }
-
-      .v-window__next {
-        right: 0 !important;
-      }
-
-      .v-carousel__controls {
-        height: 40px !important;
-      }
-
-      .v-window {
-        height: 350px;
-      }
-
-      .v-carousel__item {
-        height: 400px !important;
-      }
-
-      .v-image__image--cover {
-        background-size: contain;
-      }
-
-      //.v-item-group {
-      //  height: 350px !important;
-      //}
-      .v-responsive__content {
-        width: 1200px !important;
+      .image-block {
+        display: flex;
+        flex-direction: column;
+        row-gap: 16px;
+        img {
+          width: 484px;
+          height: 192px;
+          border: 2px solid #FFFFFF;
+          box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
+        }
       }
     }
+
 
     .content-block {
       margin-top: 16px;
@@ -320,6 +402,16 @@ export default {
         }
 
         .content {
+          .tab {
+            margin-top: 10px;
+            padding-bottom: 2px;
+            font: 700 normal 14px/18px Roboto;
+            color: #075794;
+            display: block;
+            display: flex;
+            align-items: center;
+          }
+
           .v-tabs {
             margin-bottom: 4px;
           }
@@ -358,6 +450,7 @@ export default {
             .post-time {
               box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
               border: 2px solid #FFFFFF;
+
               .date {
                 display: block;
                 width: 66px;
@@ -438,7 +531,7 @@ export default {
 
         .content {
           .tab {
-            height: 36px;
+            margin-top: 10px;
             padding-bottom: 2px;
             font: 700 normal 14px/18px Roboto;
             color: #075794;
@@ -516,7 +609,7 @@ export default {
 
         .content {
           .tab {
-            height: 36px;
+            margin-top: 10px;
             padding-bottom: 2px;
             font: 700 normal 14px/18px Roboto;
             color: #075794;
@@ -529,15 +622,18 @@ export default {
             column-gap: 8px;
             margin-bottom: 16px;
             margin-top: 8px;
-              .avatar {
-                .v-avatar {
-                  box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
-                }
-                .name {
-                  color: #FFFFFF !important;
-                  font: 500 normal 15px Roboto;
-                }
+
+            .avatar {
+              .v-avatar {
+                box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
               }
+
+              .name {
+                color: #FFFFFF !important;
+                font: 500 normal 15px Roboto;
+              }
+            }
+
             .title-block {
               .title {
                 p {

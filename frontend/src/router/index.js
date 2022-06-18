@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import localStorageUtils from "@/utils/local_storage";
+
 Vue.use(VueRouter);
 
 const routes = [
@@ -27,6 +28,8 @@ const routes = [
   },
   {
     path: '/',
+    name: 'main-page',
+    meta: { title: ''},
     component: () => import('@/views/MainPage/MainPage'),
     children: [
       {
@@ -42,8 +45,8 @@ const routes = [
         component: () => import('@/views/ActivityEvent/List'),
       },
       {
-        path: 'activity-event/1',
-        name: 'activity-event-1',
+        path: 'activity-event/:id',
+        name: 'activity-event',
         meta: { title: 'Chi tiết sự kiện' },
         component: () => import('@/views/ActivityEvent/Detail'),
       },
@@ -58,6 +61,12 @@ const routes = [
           page: !+route.query.page ? 1 : +route.query.page,
           size: !+route.query.size ? 10 : +route.query.size,
         }),
+      },
+      {
+        path: 'accumulated-point',
+        name: 'accumulated-point',
+        component: () => import('@/views/AccumulatedPoint/PersonalAccumulatedPoint'),
+        meta: { title: 'Điểm tích lũy'},
       },
       {
         path: 'activity/create',
@@ -76,6 +85,18 @@ const routes = [
         name: 'news-list',
         meta: { title: 'Quản lý tin tức'},
         component: () => import('@/views/News/List'),
+      },
+      {
+        path: 'news/create',
+        name: 'create-news',
+        meta: { title: 'Tạo mới tin tức'},
+        component: () => import('@/views/News/NewsForm')
+      },
+      {
+        path: 'news/:id',
+        name: 'news-detail',
+        meta: { title: 'Cập nhật tin tức'},
+        component: () => import('@/views/News/NewsForm')
       },
       {
         path: 'activity-class',
@@ -104,7 +125,7 @@ const routes = [
       },
       {
         path: 'profile/student/:id',
-        name: 'student/profile',
+        name: 'student-profile',
         meta: { title: 'Thông tin cá nhân'},
         component: () => import('@/views/Profile/Student'),
       },
@@ -143,20 +164,20 @@ const routes = [
         component: () => import('@/views/UnionTextbook/List'),
       },
       {
-        path: 'union-fee',
-        name: 'union-fee-list',
+        path: 'me/union-fee',
+        name: 'me/union-fee-period',
         props: (route) => ({
           page: !+route.query.page ? 1 : +route.query.page,
           size: !+route.query.size ? 10 : +route.query.size,
           name: !route.query.name ? null : route.query.name,
           className: !route.query.className ? null : route.query.className,
         }),
-        meta: { title: 'Quản lý đợt thu đoàn phí'},
-        component: () => import('@/views/UnionFee/List'),
+        meta: { title: 'Thông tin đoàn phí cá nhân'},
+        component: () => import('@/views/UnionFeeOfPersonal/List'),
       },
       {
-        path: 'union-fee-of-student',
-        name: 'union-fee-of-student-list',
+        path: 'union-fee',
+        name: 'union-fee',
         props: (route) => ({
           page: !+route.query.page ? 1 : +route.query.page,
           size: !+route.query.size ? 10 : +route.query.size,
@@ -164,8 +185,14 @@ const routes = [
           className: !route.query.className ? null : route.query.className,
         }),
         meta: { title: 'Quản lý đoàn phí'},
-        component: () => import('@/views/UnionFeeOfStudent/List'),
-      }
+        component: () => import('@/views/UnionFee/List'),
+      },
+      {
+        path: 'personal-union-fee',
+        name: 'personal-union-fee',
+        meta: { title: 'Thông tin đoàn phí cá nhân'},
+        component: () => import('@/views/UnionFeeOfPersonal/PersonalUnionMemberFee'),
+      },
       // {
       //   path: 'function',
       //   name: 'functions',
@@ -206,6 +233,18 @@ const routes = [
         name: 'internal-server',
         meta: { title: 'Error 500 - Internal Server Error' },
         component: () => import('../views/ErrorPage/ErrorInternalServer.vue'),
+      },
+    ],
+  },
+  {
+    path: '*',
+    component: () => import('@/views/ErrorPage/ErrorPage'),
+    children: [
+      {
+        path: '*',
+        name: 'not-found',
+        component: () => import('@/views/ErrorPage/ErrorNotFound'),
+        meta: { title: 'Error 404 - Not found' },
       },
     ],
   },

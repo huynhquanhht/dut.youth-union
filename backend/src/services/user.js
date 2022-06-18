@@ -19,7 +19,7 @@ const authorize = async (payload, functionId) => {
         required: false,
         include: [
           {
-            model: models.group_function,
+            model: models.groupFunction,
             where: { deleted_at: null },
             required: false,
           }
@@ -30,13 +30,15 @@ const authorize = async (payload, functionId) => {
   // option.attributes =  {exclude: ['password']};
   option.where = { id: payload.userId, deleted_at: null };
   let user = await userRepo.get(option);
+  console.log('user - ', user.rows[0].roles[0].fucntions);
   if (user.rows[0].roles[0].functions[0].id == functionId) {
     return user;
   }
   return null;
 };
 
-const get = async () => {
+const get = async (query) => {
+  console.log('query - ', query);
   const option = {};
   option.include = [
     {
@@ -46,7 +48,9 @@ const get = async () => {
     }
   ];
   option.where = { deleted_at: null};
+  console.log('option - ', option);
   let users = await userRepo.get(option);
+  console.log('users - ', users);
   return users;
 };
 
@@ -91,5 +95,24 @@ const login = async (username, password) => {
   return loginResult;
 };
 
+const getUserProfile = async (userId) => {
+  console.log('userId - ', userId);
+  const option = {};
+  option.include = [
+    {
+      model: models.student,
+      include: [{
+        model: models.activityClass,
+        include: [{
+          model: models.faculty
+        }]
+      }]
+    }];
+  option.where = { id: userId};
+  let student =  await userRepo.getOne(option);
+  student = JSON.parse(JSON.stringify(student));
+  delete student.password;
+  return student;
+};
 
-module.exports = { get, authorize, login, getById };
+module.exports = { get, authorize, login, getById, getUserProfile };

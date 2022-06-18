@@ -10,7 +10,7 @@ module.exports = (sequelize, Datatypes) => {
         autoIncrement: true,
       },
       school_year: {
-        type: Datatypes.STRING(9),
+        type: Datatypes.STRING(12),
         allowNull: false,
       },
       amount_of_money: {

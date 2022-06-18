@@ -18,9 +18,8 @@ export default {
   props: {
     activity: {
       type: Object,
-      default: null,
     }
-  }
+  },
 }
 </script>
 

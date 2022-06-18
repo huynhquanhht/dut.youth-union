@@ -2,8 +2,8 @@
 const models = require('../models');
 const unionFeeModel = models.unionFee;
 
-const create = (newUnionTextbook) => {
-  return unionFeeModel.create(newUnionTextbook);
+const create = (newUnionTextbook, transaction) => {
+  return unionFeeModel.create(newUnionTextbook, transaction);
 };
 
 const getByPk = (id) => {

@@ -397,7 +397,6 @@ export default {
       this.point = this.activity.point;
       this.participantQuantity = this.activity.participant_quantity;
       this.editorData = this.activity.content;
-
     }
   }
 };

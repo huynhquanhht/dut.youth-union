@@ -4,8 +4,7 @@ module.exports = (sequelize, Datatypes) => {
     'function',
     {
       id: {
-        type: Datatypes.INTEGER,
-        autoIncrement: true,
+        type: Datatypes.STRING(10),
         primaryKey: true,
       },
       name: {
@@ -17,7 +16,7 @@ module.exports = (sequelize, Datatypes) => {
         allowNull: false,
       },
       group_function_id: {
-        type: Datatypes.INTEGER,
+        type: Datatypes.STRING(10),
         allowNull: false,
         references: {
           model: 'group_function',

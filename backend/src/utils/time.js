@@ -15,8 +15,17 @@ const formatTimeText = (time) => {
   let day = getDay(time);
   let date = getDate(time);
   let month = getMonth(time);
-  return `${day}, lúc ${clock} ngày ${date} tháng ${month}`
+  return `${day}, lúc ${clock} ngày ${date} tháng ${month}`;
 };
+
+const formatDateText = (time) => {
+  let day = getDay(time);
+  let date = getDate(time);
+  let month = getMonth(time);
+  let year = getYear(time)
+  return `${day}, ngày ${date} tháng ${month} năm ${year}`;
+}
+
 const formatClock = (time) => moment(time, 'hh:mm DD/MM/YYYY').format('hh:mm');
 const getDay = (time) => {
   const dayNum = moment(time).day();
@@ -57,6 +66,7 @@ module.exports = {
   formatTime,
   formatClock,
   formatTimeText,
+  formatDateText,
   getDay,
   getDate,
   getMonth,

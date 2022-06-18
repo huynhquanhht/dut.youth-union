@@ -15,11 +15,15 @@ const get = (query) => {
     queryString = queryString.slice(1, queryString.length);
     url += '?' + queryString;
   }
-  return axiosUtils.getRequest(url, 1);
+  return axiosUtils.getRequest(url, 'USR-01');
 };
 
 const getById = (userId) => {
   return axiosUtils.getRequest(`${BASE_URL}/${userId}`);
 };
 
-export default { login, get, getById };
+const getCurrentUserProfile = () => {
+  return axiosUtils.getRequest(`${BASE_URL}/current-user-profile`);
+}
+
+export default { login, get, getById, getCurrentUserProfile };

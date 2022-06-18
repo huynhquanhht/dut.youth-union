@@ -49,7 +49,7 @@ const getById = async (roleId) => {
       where: { deleted_at: null },
       require: false,
       include: [{
-        model: models.group_function,
+        model: models.groupFunction,
         where: {deleted_at: null},
         require: false,
         group: ['group_function_id'],
@@ -63,7 +63,7 @@ const getById = async (roleId) => {
     groupFunction.functions = [];
     for (let func of role.functions) {
       if (func.group_function_id == groupFunction.id) {
-        delete func.group_function;
+        delete func.groupFunction;
         groupFunction.functions.push(func);
       }
     }

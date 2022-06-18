@@ -6,6 +6,7 @@ const author = require('../middlewares/authorization');
 
 router.get('/', authen.authenticateToken, author.authorize, userController.get);
 router.post('/login', userController.login);
-router.get('/:id', userController.getById);
+router.get('/current-user-profile', authen.authenticateToken, userController.getCurrentUserProfile);
+router.get('/:id', authen.authenticateToken, userController.getById);
 
 module.exports = router;

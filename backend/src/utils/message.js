@@ -21,6 +21,14 @@ const MESSAGE = {
   CONFIRM_FAIL_UNION_TEXTBOOK: 'Xác nhận nộp sổ đoàn thất bại',
   CONFIRM_SUCCESS_UNION_FEE: 'Xác nhận nộp đoàn phí thành công',
   CONFIRM_FAIL_UNION_FEE: 'Xác nhận nộp đoàn phí thất bại',
+  OPEN_REGISTRATION_SUCESSFULLY: 'Mở đăng ký hoạt động thành công',
+  OPEN_REGISTRATION_FAIL: 'Mở đăng ký hoạt động thất bại',
+  CLOSE_REGISTRATION_SUCESSFULLY: 'Đóng đăng ký hoạt động thành công',
+  CLOSE_REGISTRATION_FAIL: 'Đóng đăng ký hoạt động thất bại',
+  REGISTER_SUCCESSFULLY: 'Đăng ký thành công',
+  REGISTER_FAIL: 'Đăng ký thất bại',
+  ATTEND_SUCCESSFULLY: 'Điểm danh thành công',
+  ATTEND_FAIL: 'Điểm danh thất bại',
 };
 
 module.exports = MESSAGE;
