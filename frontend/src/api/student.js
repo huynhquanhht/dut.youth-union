@@ -14,4 +14,9 @@ const get = (query) => {
   return axiosUtils.getRequest(url);
 };
 
-export default  { get };
+const createByCSV = (file) => {
+  const url = `${BASE_URL}/create-by-csv`;
+  return axiosUtils.postRequest(url, file);
+}
+
+export default  { get, createByCSV };

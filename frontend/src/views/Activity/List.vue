@@ -78,7 +78,7 @@
                 icon
                 width="160px"
                 class="tool-button"
-                @click="$router.push('/activity/create')"
+                @click="goToRegisteredList"
               >
                 <v-icon dark size="22">mdi-format-list-bulleted-square</v-icon>
                 Danh sách đăng ký
@@ -96,6 +96,36 @@
           </div>
         </div>
         <v-divider></v-divider>
+      </template>
+      <template v-slot:item.begin_at="{ item }">
+        <span>{{ formatTime(item.begin_at)}}</span>
+      </template>
+      <template v-slot:item.end_at="{ item }">
+        <span>{{ formatTime(item.end_at)}}</span>
+      </template>
+      <template v-slot:item.status="{ item }">
+        <v-chip
+          class="ma-2"
+          color="error"
+          v-if="timeUtils.formatTime(timeUtils.getCurrentTime()) < timeUtils.formatTime(item.begin_at)"
+        >
+          Sắp diễn ra
+        </v-chip>
+        <v-chip
+          v-if="timeUtils.formatTime(timeUtils.getCurrentTime()) >= timeUtils.formatTime(item.begin_at) &&
+      timeUtils.formatTime(timeUtils.getCurrentTime()) <= timeUtils.formatTime(item.end_at)"
+          class="ma-2"
+          color="orange"
+        >
+          Đang diễn ra
+        </v-chip>
+        <v-chip
+          v-if="timeUtils.formatTime(timeUtils.getCurrentTime()) > timeUtils.formatTime(item.end_at)"
+          class="ma-2"
+          color="success"
+        >
+          Kết thúc
+        </v-chip>
       </template>
       <template v-slot:footer>
         <div
@@ -148,6 +178,7 @@ import ConfirmDialog from '@/components/ConfirmDialog';
 import QRCodeDialog from "@/views/Activity/QRCodeDialog";
 import MESSAGE from '@/utils/message';
 import jwt from 'jsonwebtoken';
+import time from "@/utils/time";
 
 export default {
   name: 'activity-list',
@@ -217,6 +248,7 @@ export default {
       query: {},
       action: '',
       qrData: null,
+      timeUtils: time,
     };
   },
   computed: {
@@ -276,6 +308,9 @@ export default {
       this.loading = true;
       await this.fetchGetAllActivity(this.query);
       this.loading = false;
+    },
+    formatTime(time) {
+      return this.timeUtils.formatTime(time);
     },
     edit() {
       if (this.selected.length !== 1) {
@@ -353,6 +388,18 @@ export default {
         code: qrCode,
       };
       this.QRCodeDialog = true;
+    },
+    goToRegisteredList() {
+      if (this.selected.length !== 1) {
+        this.setSnackbar({
+          type: 'info',
+          visible: true,
+          text: MESSAGE.CHOOSE_ONE_RECORD_FOR_EXCUTION,
+        });
+        return;
+      }
+      const activityId = this.selected[0].id;
+      this.$router.push(`/registered-list/${activityId}`);
     }
   },
   async created() {
@@ -551,6 +598,19 @@ export default {
 
             &:nth-child(8) {
               min-width: 120px !important;
+              margin-top: 4px !important;
+              margin-bottom: 4px !important;
+              .v-chip.v-size--default {
+                height: 24px !important;
+              }
+              .v-chip {
+                .v-chip__content {
+                  font: normal 400 14px Roboto !important;
+                }
+                .v-chip.v-size--default {
+                  height: 24px !important;
+                }
+              }
             }
 
             &:nth-child(9) {

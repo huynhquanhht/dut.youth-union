@@ -29,6 +29,8 @@ const MESSAGE = {
   REGISTER_FAIL: 'Đăng ký thất bại',
   ATTEND_SUCCESSFULLY: 'Điểm danh thành công',
   ATTEND_FAIL: 'Điểm danh thất bại',
+  ADD_PARTICIPANT_SUCCESSFULLY: 'Thêm sinh viên tham gia thành công',
+  ADD_PARTICIPANT_FAIL: 'Thêm sinh viên tham gia thất bại',
 };
 
 module.exports = MESSAGE;

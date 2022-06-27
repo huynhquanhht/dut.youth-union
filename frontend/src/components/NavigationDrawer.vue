@@ -176,60 +176,71 @@ export default {
           name: 'Quản lý liên chi đoàn',
           icon: 'mdi-home-city',
           route: '/faculty',
+          active: false,
         },
         {
           name: 'Quản lý chi đoàn',
           icon: 'mdi-bank',
           route: '/activity-class',
+          active: false,
         },
         {
           name: 'Quản lý đoàn viên',
           icon: 'mdi-home-city',
           route: '/student',
+          active: false,
         },
         {
           name: 'Sổ tay đoàn viên',
           icon: 'mdi-notebook-multiple',
           route: '/union-textbook',
+          active: false,
         },
         {
           name: 'Đoàn phí',
           icon: 'mdi-cash-multiple',
-          route: '/union-fee-of-student',
+          route: '/union-fee',
+          active: false,
         },
         {
           name: 'Quản lý hoạt động',
           icon: 'mdi-flag-variant',
+          route: '/activity',
           active: false,
         }
       ];
       this.$router.push({ name: 'faculty'});
     }
-    if (this.user.roles[0].name === 'Bí thư liên chi') {
+    if (this.user.roles[0].name === 'Bí thư liên chi đoàn') {
       this.navLists = [
         {
           name: 'Quản lý chi đoàn',
           icon: 'mdi-bank',
           route: '/activity-class',
+          active: false,
         },
         {
           name: 'Quản lý đoàn viên',
           icon: 'mdi-account-group',
           route: '/student',
+          active: false,
         },
         {
           name: 'Sổ tay đoàn viên',
           icon: 'mdi-notebook-multiple',
           route: '/union-textbook',
+          active: false,
         },
         {
           name: 'Đoàn phí',
           icon: 'mdi-cash-multiple',
-          route: '/union-fee-of-student',
+          route: '/union-fee',
+          active: false,
         },
         {
           name: 'Quản lý hoạt động',
           icon: 'mdi-flag-variant',
+          route: '/activity',
           active: false,
         }
       ];
@@ -240,22 +251,31 @@ export default {
         {
           name: 'Quản lý đoàn viên',
           icon: 'mdi-account-group',
-          route: '/student'
+          route: '/student',
+          active: false,
         },
         {
-          name: 'Sổ tay đoàn viên',
+          name: 'Quản lý sổ tay đoàn viên',
           icon: 'mdi-notebook-multiple',
           route: '/union-textbook',
+          active: false,
         },
         {
-          name: 'Đoàn phí',
+          name: 'Quản lý đoàn phí',
           icon: 'mdi-cash-multiple',
           route: '/union-fee-of-student',
+          active: false,
+        },
+        {
+          name: 'Thông tin đoàn phí',
+          icon: 'mdi-cash-multiple',
+          route: '/union-fee-of-student',
+          active: false,
         },
         {
           name: 'Thông tin đoàn viên',
           icon: 'mdi-flag-variant',
-          route: '/profile/student',
+          route: '/profile-me',
           active: false,
         },
       ];
@@ -266,13 +286,13 @@ export default {
         {
           name: 'Thông tin đoàn viên',
           icon: 'mdi-account-box',
-          route: '/profile/student/:id',
+          route: '/profile-me',
           active: false,
         },
         {
           name: 'Đoàn phí',
           icon: 'mdi-cash-multiple',
-          route: 'me/union-fee',
+          route: 'personal-union-fee',
           active: false,
         },
         {

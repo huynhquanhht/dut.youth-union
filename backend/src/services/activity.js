@@ -202,6 +202,9 @@ const countAttendanceQuantity = async (activityId) => {
 
 const isCurrentUserRegistered = async (activityId, userId) => {
   const student = await studentRepo.getOne({ where: {user_id: userId}});
+  if (!student) {
+    return false;
+  }
   let option = {
     where: {
       student_id: student.id,
@@ -214,6 +217,9 @@ const isCurrentUserRegistered = async (activityId, userId) => {
 
 const isCurrentUserAttended = async (activityId, userId) => {
   const student = await studentRepo.getOne({ where: {user_id: userId}});
+  if (!student) {
+    return false;
+  }
   let option = {
     where: {
       student_id: student.id,
@@ -242,6 +248,7 @@ const create = async (newActivity, currentUserId) => {
     content: newActivity.content,
     cover_url: newActivity.coverUrl,
     created_by: currentUserId,
+    school_year: '2021 - 2022'
   }
   return await activityRepo.create(data);
 };
@@ -267,7 +274,9 @@ const update = async (activityId, newActivity) => {
 
 const deleteByIds = async (activityIds) => {
   const options = { where: { id: activityIds } };
-  const deletionResult = await activityRepo.deleteByIds(options);
+  console.log('options - ', options);
+  const deletionResult = await registerJoinRepo.deleteByIds(options);
+  console.log('delete - ', deletionResult);
   return deletionResult;
 };
 
@@ -316,6 +325,64 @@ const attend = async (activityId, userId) => {
     attended_at: timeUtils.getCurrentTime(),
   }
   return await registerJoinRepo.update(option, newAttendance);
+};
+
+const getRegisteredList = async (activityId) => {
+  let option = {
+    include: [{
+      model: models.student,
+      include: [{
+        model: models.activityClass,
+        include: [{
+          model: models.faculty,
+        }]
+      }]
+    }],
+    where: {
+      id: activityId
+    }
+  };
+  return await activityRepo.getById(option);
+};
+
+const addParticipant = async (activityId, studentId) => {
+  console.log('activityId - ', activityId);
+  console.log('studentId - ', studentId);
+  const newRegisterJoin = {
+    activity_id: activityId,
+    student_id: studentId,
+    registered_at: timeUtils.getCurrentTime(),
+  };
+  return await registerJoinRepo.create(newRegisterJoin);
+};
+
+const deleteParticipants = async (registrationIds) => {
+  let transaction;
+  try {
+    transaction = await models.sequelizeConfig.transaction();
+    const deletionResult = await registerJoinRepo.deleteByIds(options);
+    if (deletionResult.length === registrationIds.length) {
+      return deletionResult;
+    } else {
+      await transaction.commit();
+      return null;
+    }
+  } catch (error) {
+    if (transaction) {
+      await transaction.rollback();
+    }
+    return null;
+  }
+}
+
+const attendParticipants = async (registrationIds) => {
+  const newUpdate = { attended_at: timeUtils.getCurrentTime()};
+  const option = {
+    where: {
+      id: registrationIds,
+    }
+  };
+  return await registerJoinRepo.update(newUpdate, option);
 }
 
 module.exports = {
@@ -331,4 +398,8 @@ module.exports = {
   register,
   attend,
   getPointListOfCurrentStudent,
+  getRegisteredList,
+  addParticipant,
+  deleteParticipants,
+  attendParticipants
 };

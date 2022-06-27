@@ -16,6 +16,9 @@ const mutations = {
   },
   setPointListOfCurrentStudent(state, pointList) {
     state.pointList = pointList;
+  },
+  setRegisteredList(state, registeredList) {
+    state.registeredList = registeredList;
   }
 };
 export default mutations;

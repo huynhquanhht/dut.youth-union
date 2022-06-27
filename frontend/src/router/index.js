@@ -124,7 +124,7 @@ const routes = [
         component: () => import('@/views/Student/List'),
       },
       {
-        path: 'profile/student/:id',
+        path: 'profile-me',
         name: 'student-profile',
         meta: { title: 'Thông tin cá nhân'},
         component: () => import('@/views/Profile/Student'),
@@ -163,18 +163,18 @@ const routes = [
         meta: { title: 'Quản lý sổ đoàn'},
         component: () => import('@/views/UnionTextbook/List'),
       },
-      {
-        path: 'me/union-fee',
-        name: 'me/union-fee-period',
-        props: (route) => ({
-          page: !+route.query.page ? 1 : +route.query.page,
-          size: !+route.query.size ? 10 : +route.query.size,
-          name: !route.query.name ? null : route.query.name,
-          className: !route.query.className ? null : route.query.className,
-        }),
-        meta: { title: 'Thông tin đoàn phí cá nhân'},
-        component: () => import('@/views/UnionFeeOfPersonal/List'),
-      },
+      // {
+      //   path: 'me/union-fee',
+      //   name: 'me/union-fee-period',
+      //   props: (route) => ({
+      //     page: !+route.query.page ? 1 : +route.query.page,
+      //     size: !+route.query.size ? 10 : +route.query.size,
+      //     name: !route.query.name ? null : route.query.name,
+      //     className: !route.query.className ? null : route.query.className,
+      //   }),
+      //   meta: { title: 'Thông tin đoàn phí cá nhân'},
+      //   component: () => import('@/views/UnionFeeOfPersonal/List'),
+      // },
       {
         path: 'union-fee',
         name: 'union-fee',
@@ -193,6 +193,12 @@ const routes = [
         meta: { title: 'Thông tin đoàn phí cá nhân'},
         component: () => import('@/views/UnionFeeOfPersonal/PersonalUnionMemberFee'),
       },
+      {
+        path: '/registered-list/:id',
+        name: 'registered-list',
+        meta: { title: 'Danh sách đăng ký'},
+        component: () => import('@/views/RegisterJoin/List'),
+      }
       // {
       //   path: 'function',
       //   name: 'functions',

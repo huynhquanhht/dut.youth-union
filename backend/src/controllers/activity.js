@@ -61,6 +61,17 @@ const getById = async (req, res) => {
   }
 }
 
+const getRegisteredListById = async (req, res) => {
+  try {
+    const activityId = req.params.id;
+    const registeredList = await activityService.getRegisteredList(activityId);
+    res.status(200).send(registeredList);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ message: MESSAGE.SERVER_ERROR });
+  }
+}
+
 const create = async (req, res) => {
   console.log('abc');
   try {
@@ -87,6 +98,62 @@ const create = async (req, res) => {
       return;
     }
     res.status(400).send({ message: MESSAGE.CREATE_FAIL });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ message: MESSAGE.SERVER_ERROR });
+  }
+}
+
+const addParticipant = async (req, res) => {
+  try {
+    const activityId = req.body.activityId;
+    const studentId = req.body.studentId;
+    const isCreated = await activityService.addParticipant(activityId, studentId);
+    if (isCreated) {
+      res.status(200).send({ message: MESSAGE.ADD_PARTICIPANT_SUCCESSFULLY });
+      return;
+    }
+    res.status(400).send({ message: MESSAGE.ADD_PARTICIPANT_FAIL });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ message: MESSAGE.SERVER_ERROR });
+  }
+};
+
+const deleteParticipants = async (req, res) => {
+  try {
+    const registrationIds = req.body.registrationIds;
+    console.log('registrationIds - ', registrationIds);
+    if (!Array.isArray(registrationIds) || !registrationIds.length) {
+      console.log('abc');
+      res.status(400).send({ message: MESSAGE.INVALID_DATA });
+      return;
+    }
+    const deletionResult = await activityService.deleteByIds(registrationIds);
+    if (deletionResult) {
+      res.status(200).send({
+        message:
+          MESSAGE.DELETE_SUCCESS + ` (${deletionResult}/${registrationIds.length})`,
+      });
+      return;
+    }
+    res.status(400).send({ message: MESSAGE.DELETE_FAIL });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ message: MESSAGE.SERVER_ERROR });
+  }
+
+};
+
+const attendParticipants = (req, res) => {
+  try {
+    const registrationIds = req.body.registrationIds;
+    let isUpdated = activityService.attendParticipants(registrationIds);
+    if (isUpdated) {
+      res.status(200).send({ message: MESSAGE.ATTEND_SUCCESSFULLY});
+      return;
+    }
+    res.status(400).send({ message: MESSAGE.ATTEND_FAIL});
   } catch (error) {
     console.log(error);
     res.status(500).send({ message: MESSAGE.SERVER_ERROR });
@@ -224,6 +291,7 @@ module.exports = {
   get,
   getByCurrentStudent,
   getPointListOfCurrentStudent,
+  getRegisteredListById,
   getById,
   create,
   update,
@@ -232,4 +300,7 @@ module.exports = {
   closeRegistration,
   register,
   attend,
+  addParticipant,
+  deleteParticipants,
+  attendParticipants,
 };

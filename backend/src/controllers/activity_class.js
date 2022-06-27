@@ -28,7 +28,8 @@ const create = async (req, res) => {
 const get = async (req, res) => {
   try {
     let query = req.query;
-    let result = await activityClassService.get(query);
+    let userId = req.payload.userId;
+    let result = await activityClassService.get(query, userId);
     res.status(200).send(result);
   } catch (error) {
     console.log(error);

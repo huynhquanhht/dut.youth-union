@@ -159,7 +159,7 @@ export default {
         background: linear-gradient(
           180deg,
           rgba(6, 181, 230, 0.9) 0%,
-          rgba(7, 92, 218, 0.9) 100%
+          rgba(7, 92, 218, 0.5) 100%
         );
         width: 100vw;
         height: 100vh;
@@ -198,7 +198,7 @@ export default {
         .login-form-block {
           width: 320px;
           height: 410px;
-          background: rgba(255, 255, 255, 0.74);
+          background: rgba(255, 255, 255, 0.8);
           box-shadow: 2px 4px 4px 1px rgba(0, 0, 0, 0.25);
           border-radius: 8px;
           .logo-app {

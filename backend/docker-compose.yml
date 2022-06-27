@@ -1,0 +1,28 @@
+version: '3'
+services:
+  mssqlserver:
+    container_name: mssqlserver
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    user: root
+    hostname: localhost
+    # restart: always
+    environment:
+      ACCEPT_EULA: Y
+      SA_PASSWORD: Sqlserver@123
+      MSSQL_PID: Express
+      MSSQL_DATABASE: YUMS
+    ports:
+      - 1434:1433
+    volumes:
+      - E:/s-union/db:/var/opt/mssql/data
+  web:
+    container_name: node_web
+    build: .
+    # restart: always
+    command: "npm start"
+    ports:
+      - 3000:3000
+    volumes:
+      - "E:/s-union/code/s-union/backend"
+    links:
+      - mssqlserver

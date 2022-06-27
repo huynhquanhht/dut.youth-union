@@ -62,6 +62,7 @@ export default {
       this.uploadedFile = file;
     },
     btnOkHandler() {
+      this.fileInput = null;
       this.$emit('csv-dialog', { command: 'Ok', file: this.uploadedFile });
     },
     btnCancelHandler() {

@@ -90,7 +90,7 @@
         <v-row>
           <v-col>
             <div class="notification-block">
-              <div class="title">
+              <div class="title-text">
                 <v-icon> fa-bullhorn</v-icon>
                 <span>THÔNG BÁO</span>
               </div>
@@ -105,7 +105,7 @@
                     <span class="year">2022</span>
                   </div>
                   <div class="title-block">
-                    <div class="title">
+                    <div class="title-text">
                       <p>
                         <a href="">Tuyển sinh vào đại học hệ chính quy theo phương thức tuyển sinh riêng năm
                           2022</a>
@@ -122,7 +122,7 @@
           </v-col>
           <v-col>
             <div class="news-block">
-              <div class="title">
+              <div class="title-text">
                 <v-icon> fa-newspaper</v-icon>
                 <span>TIN TỨC</span>
               </div>
@@ -136,7 +136,7 @@
                     <img :src="item.cover_url" alt="">
                   </div>
                   <div class="title-block">
-                    <div class="title">
+                    <div class="title-text">
                       <p>
                         <a href="">
                           {{ item.title }}
@@ -154,7 +154,7 @@
           </v-col>
           <v-col>
             <div class="activity-block">
-              <div class="title">
+              <div class="title-text">
                 <v-icon> mdi-flag</v-icon>
                 <span>DUYỆT HOẠT ĐỘNG </span>
               </div>
@@ -171,7 +171,7 @@
                     ><span class="name">HQ</span></v-avatar>
                   </div>
                   <div class="title-block">
-                    <div class="title">
+                    <div class="title-text">
                       <p>
                         <a href="">102180126 - Nguyễn Trần Công Tân - 18TCLC_DT1</a>
                       </p>
@@ -382,7 +382,7 @@ export default {
       margin-top: 16px;
 
       .notification-block {
-        .title {
+        .title-text {
           display: flex;
           align-items: center;
 
@@ -477,7 +477,7 @@ export default {
             }
 
             .title-block {
-              .title {
+              .title-text {
                 p {
                   a {
                     color: #363636;
@@ -510,7 +510,7 @@ export default {
       }
 
       .news-block {
-        .title {
+        .title-text {
           display: flex;
           align-items: center;
 
@@ -556,7 +556,7 @@ export default {
             }
 
             .title-block {
-              .title {
+              .title-text {
                 p {
                   a {
                     color: #363636;
@@ -589,7 +589,7 @@ export default {
       }
 
       .activity-block {
-        .title {
+        .title-text {
           display: flex;
           align-items: center;
 
@@ -635,7 +635,7 @@ export default {
             }
 
             .title-block {
-              .title {
+              .title-text {
                 p {
                   a {
                     color: #363636;

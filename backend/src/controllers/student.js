@@ -10,9 +10,11 @@ const bcrypt = require("bcrypt");
 const get = async (req, res) => {
   try {
     let query = req.query;
-    const result = await studentService.get(query);
+    let userId = req.payload.userId;
+    const result = await studentService.get(query, userId);
     res.status(200).send(result);
   } catch (error) {
+    console.log(error);
     res.status(500).send({ message: MESSAGE.SERVER_ERROR});
   }
 };

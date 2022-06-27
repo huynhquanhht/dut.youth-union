@@ -79,11 +79,11 @@ export default {
       this.uploadedFile = file;
     },
     btnOkHandler() {
-      this.$emit('csv-dialog', { command: 'Ok', file: this.uploadedFile });
+      this.$emit('collection-dialog', { command: 'Ok', file: this.uploadedFile });
     },
     btnCancelHandler() {
       this.fileInput = null;
-      this.$emit('csv-dialog', { command: 'Cancel' });
+      this.$emit('collection-dialog', { command: 'Cancel' });
     }
   },
 }

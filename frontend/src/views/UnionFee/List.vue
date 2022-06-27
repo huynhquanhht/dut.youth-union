@@ -46,12 +46,12 @@
                 :disabled="!selectedOption"
               ></v-text-field>
             </div>
-            <div class="tool-block d-flex">
+            <div class="tool-block d-flex" v-if="currentUser.roles[0].name !== roleUtils.FACULTY_SECRETARY">
               <v-btn
                 text
                 width="124px"
                 class="tool-button"
-                @click="collectionPeriođialog = true"
+                @click="collectionPeriodDialog = true"
               >
                 <v-icon dark size="20" class="mr-1">mdi-hand-coin</v-icon>
                 Tạo đợt thu
@@ -145,10 +145,11 @@
         :loadingButton="loadingButton"
       ></confirm-dialog>
     </v-dialog>
-    <v-dialog v-model="collectionPeriođialog" width="400px">
+    <v-dialog v-model="collectionPeriodDialog" width="400px">
     <collection-period-dialog
       :title="dialogTitle"
       :content="dialogContent"
+      @collection-period-dialog="collectionPeriodDialogHandler"
     ></collection-period-dialog>
   </v-dialog>
   <div class="invoice">
@@ -161,6 +162,7 @@
 import {mapGetters, mapMutations, mapActions} from 'vuex';
 import ConfirmDialog from '@/components/ConfirmDialog';
 // import MESSAGE from '@/utils/message';
+import role from '@/utils/role';
 import timeUtils from "@/utils/time";
 import CollectionPeriodDialog from "@/views/UnionFee/CollectionPeriodDialog";
 import Invoice from '@/views/UnionFee/Invoice';
@@ -209,6 +211,7 @@ export default {
       changeUnionFee: new Map(),
       command: '',
       loadingButton: false,
+      roleUtils: role,
       searchOptions: [
         {
           name: 'Họ tên',
@@ -231,13 +234,14 @@ export default {
       dialogTitle: null,
       dialogContent: null,
       confirmDialogContent: null,
-      collectionPeriođialog: false,
+      collectionPeriodDialog: false,
     };
   },
   computed: {
     ...mapGetters({
       unionFeeOfStudents: 'getUnionFeeOfStudents',
       invoice: 'getInvoice',
+      currentUser: 'getUser',
     }),
   },
 
@@ -323,29 +327,38 @@ export default {
     async processConfirmDialog(command) {
       console.log(command);
       if (command === 'Ok') {
-        console.log('mmm');
-        console.log(this.command)
         if (this.command == 'Save') {
           const changeUnionFee = Array.from(this.changeUnionFee, ([key, value]) => {
             return { id: key, submitted: value };
           });
+          if (changeUnionFee.length === 0) {
+            this.setSnackbar({
+              type: 'info',
+              visible: true,
+              text: MESSAGE.NO_DATA_CHANGED,
+            });
+            this.confirmDialog = false;
+            this.selected = [];
+            return;
+          }
           console.log('changeUnionFee - ', changeUnionFee);
           this.loadingButton = true;
           let isSuccess = await this.fetchSubmitUnionFee({changeUnionFee});
           this.loadingButton = false;
           if (isSuccess) {
             this.confirmDialog = false;
+            this.selected = [];
             await this.fetchGetUnionFeeOfStudents(this.query);
           }
         }
         if (this.command == 'Confirm') {
-          console.log(this.selected);
           const unionFeeIds = this.selected.map(item => item.unionFee.submit_union_fee.id);
           this.loadingButton = true;
           let isSuccess = await this.fetchConfirmSubmissionUnionFee({unionFeeIds});
           this.loadingButton = false;
           if (isSuccess) {
             this.confirmDialog = false;
+            this.selected = [];
             await this.fetchGetUnionFeeOfStudents(this.query);
           }
         }
@@ -386,15 +399,9 @@ export default {
         visible: true,
         text: MESSAGE.GET_INVOICE_FAIL,
       });
-      // Get student by id, include activity class, faculty
-      // Get union fee
-      // Get date
-      // Get money Text
-      // await this.$htmlToPaper('invoice-wrapper', {
-      //   styles: [
-      //     './invoice.css'
-      //   ]
-      // });
+    },
+    collectionPeriodDialogHandler() {
+
     }
   },
   async created() {

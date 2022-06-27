@@ -20,6 +20,7 @@ const getOfStudent = () => {
 }
 
 const getOfStudents = () => {
+  console.log('abc');
   let url = `${BASE_URL}/students`;
   return axiosUtils.getRequest(url);
 }

@@ -90,6 +90,14 @@ const deleteByIds = async (req, res) => {
     console.log(error);
     res.status(500).send({ message: MESSAGE.SERVER_ERROR });
   }
+};
+
+const getNotifications = (req, res) => {
+
+};
+
+const getNews = (req, res) => {
+
 }
 
 module.exports = {

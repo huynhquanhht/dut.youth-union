@@ -3,7 +3,7 @@
     <v-data-table
       v-model="selected"
       :headers="headers"
-      :items="activityList ? activityList.rows : []"
+      :items="registeredList ? registeredList.students : []"
       :single-select="singleSelect"
       :items-per-page="selectedSize"
       scroll.sync="scrollSync"
@@ -15,11 +15,11 @@
       fixed-header
       hide-default-footer
     >
-      <template v-if="activityList && !activityList.count" v-slot:no-data>
+      <template v-if="registeredList && !registeredList.students" v-slot:no-data>
         Không có dữ liệu để hiển thị!
       </template>
       <template v-slot:top>
-        <v-card-title>DANH SÁCH HOẠT ĐỘNG</v-card-title>
+        <v-card-title>DANH SÁCH ĐĂNG KÝ HOẠT ĐỘNG {{ activity.name }}</v-card-title>
         <div class="toolbar mb-1" flat>
           <div class="toolbar-block">
             <div class="search-block d-flex">
@@ -51,51 +51,38 @@
                 icon
                 width="100px"
                 class="tool-button"
-                @click="$router.push('/activity/create')"
+                @click="registerDialog = true"
               >
                 <v-icon dark size="24">mdi-plus</v-icon>
                 Thêm mới
               </v-btn>
               <v-btn
                 text
-                width="100px"
-                class="tool-button"
-                @click="edit"
-              >
-                <v-icon dark size="20">mdi-square-edit-outline</v-icon>
-                Chỉnh sửa
-              </v-btn>
-              <v-btn
-                text
                 width="50px"
                 class="tool-button"
-                @click="deleteActivities"
+                @click="deleteParticipants"
               >
                 <v-icon dark size="20">mdi-trash-can-outline</v-icon>
                 Xóa
               </v-btn>
               <v-btn
                 icon
-                width="160px"
+                width="110px"
                 class="tool-button"
-                @click="$router.push('/activity/create')"
+                @click="attendParticipant"
               >
                 <v-icon dark size="22">mdi-format-list-bulleted-square</v-icon>
-                Danh sách đăng ký
-              </v-btn>
-              <v-btn
-                icon
-                width="90px"
-                class="tool-button"
-                @click="showQR"
-              >
-                <v-icon dark size="22">mdi-qrcode</v-icon>
-                QR Code
+                Điểm danh
               </v-btn>
             </div>
           </div>
         </div>
         <v-divider></v-divider>
+      </template>
+      <template v-slot:item.register_join.attended_at="{ item }">
+        <span>
+          {{item.register_join.attended_at ? item.register_join.attended_at : '-' }}
+        </span>
       </template>
       <template v-slot:footer>
         <div
@@ -129,15 +116,16 @@
         </div>
       </template>
     </v-data-table>
-    <v-dialog v-model="dialog" width="400px">
+    <v-dialog v-model="registerDialog" width="360px">
+      <register-form
+        @register-form="registerFormHandler"/>
+    </v-dialog>
+    <v-dialog v-model="confirmDialog" width="400px">
       <confirm-dialog
         @confirm-dialog="handleConfirm"
         :title="dialogTitle"
         :content="dialogContent"
       ></confirm-dialog>
-    </v-dialog>
-    <v-dialog v-model="QRCodeDialog" width="340px">
-      <QRCodeDialog :data="qrData"/>
     </v-dialog>
   </div>
 </template>
@@ -145,15 +133,15 @@
 <script>
 import {mapGetters, mapMutations, mapActions} from 'vuex';
 import ConfirmDialog from '@/components/ConfirmDialog';
-import QRCodeDialog from "@/views/Activity/QRCodeDialog";
 import MESSAGE from '@/utils/message';
 import jwt from 'jsonwebtoken';
+import RegisterForm from '@/views/RegisterJoin/Form';
 
 export default {
   name: 'activity-list',
   components: {
     ConfirmDialog,
-    QRCodeDialog,
+    RegisterForm
   },
   props: {
     page: {
@@ -200,36 +188,41 @@ export default {
         }],
       headers: [
         {
-          text: 'Mã số',
+          text: 'Mã sinh viên',
           align: 'start',
           sortable: false,
           value: 'id',
         },
-        {text: 'Tên hoạt động', value: 'name'},
-        {text: 'Đơn vị tổ chức', value: 'organization_unit'},
-        {text: 'Địa điểm', value: 'place'},
-        {text: 'Bắt đầu', value: 'begin_at'},
-        {text: 'Kết thúc', value: 'end_at'},
-        {text: 'Trạng thái', value: 'status'},
+        {text: 'Họ tên', value: 'name'},
+        {text: 'Lớp', value: 'activity_class.name'},
+        {text: 'Khoa', value: 'activity_class.faculty.name'},
+        {text: 'Điểm danh', value: 'register_join.attended_at'},
       ],
       dialogTitle: null,
       dialogContent: null,
       query: {},
       action: '',
       qrData: null,
+      registerDialog: false,
+      confirmDialog: false,
     };
   },
   computed: {
     ...mapGetters({
       activityList: 'getActivityList',
+      activity: 'getActivity',
+      registeredList: 'getRegisteredList',
     }),
   },
   methods: {
     ...mapActions({
       fetchGetAllActivity: 'fetchGetAllActivity',
       fetchDeleteActivities: 'fetchDeleteActivities',
-      fetchOpenActivityRegistration: 'fetchOpenActivityRegistration',
-      fetchCloseActivityRegistration: 'fetchCloseActivityRegistration'
+      fetchGetActivityById: 'fetchGetActivityById',
+      fetchGetRegisteredListById: 'fetchGetRegisteredListById',
+      fetchAddParticipant: 'fetchAddParticipant',
+      fetchAttendParticipants: 'fetchAttendParticipants',
+      fetchDeleteParticipants: 'fetchDeleteParticipants',
     }),
     ...mapMutations({
       setActivityPage: 'setActivityPage',
@@ -239,20 +232,71 @@ export default {
     async handleConfirm(command) {
       if (command === 'Ok') {
         if (this.action === 'Delete') {
-          const activityIds = this.selected.map((activity) => activity.id);
-          let deleteResult = await this.fetchDeleteActivities({activityIds: activityIds});
+          const registrationIds = this.selected.map((registration) => registration.register_join.id);
+          let deleteResult = await this.fetchDeleteParticipants({registrationIds: registrationIds});
           if (deleteResult) {
             this.selected = [];
             this.setQuery();
-            await this.fetchGetAllActivity(this.query);
+            await this.fetchGetRegisteredListById({
+              activityId: this.$route.params.id,
+              query: this.query,
+            });
           }
           this.selected = [];
-          this.dialog = false;
+          this.confirmDialog = false;
+          return;
+        }
+        if (this.action === 'Attend') {
+          let isAttended = await this.fetchAttendParticipants({
+            registrationIds: this.selected[0].register_join.id,
+          });
+          if (isAttended) {
+            await this.fetchGetRegisteredListById({
+              activityId: this.$route.params.id,
+              query: this.query,
+            });
+          }
+          this.selected = [];
+          this.confirmDialog = false;
           return;
         }
       }
       if (command === 'Cancel') {
-        this.dialog = false;
+        this.confirmDialog = false;
+      }
+    },
+    async attendParticipant() {
+      if (this.selected.length !== 1) {
+        this.setSnackbar({
+          type: 'info',
+          visible: true,
+          text: MESSAGE.CHOOSE_ONE_RECORD_FOR_EXCUTION,
+        });
+        return;
+      }
+      this.action = 'Attend';
+      this.dialogTitle = 'Điểm danh sinh viên';
+      this.dialogContent = 'Bạn chắc chắn muốn điểm danh sinh viên đã chọn?';
+      this.confirmDialog = true;
+    },
+    async registerFormHandler(data) {
+      if (data.command === 'save') {
+        const studentId = data.id;
+        const activityId = this.$route.params.id;
+        const isCreated = await this.fetchAddParticipant({
+          participantInfo: { studentId, activityId },
+        });
+        if (isCreated) {
+          await this.fetchGetAllActivity(this.query);
+          await this.fetchGetRegisteredListById({
+            activityId: activityId,
+            query: this.query,
+          });
+        }
+        this.registerDialog = false;
+      }
+      if (data.command === 'close') {
+        this.registerDialog = false;
       }
     },
     async handlePageChange() {
@@ -277,18 +321,7 @@ export default {
       await this.fetchGetAllActivity(this.query);
       this.loading = false;
     },
-    edit() {
-      if (this.selected.length !== 1) {
-        this.setSnackbar({
-          type: 'info',
-          visible: true,
-          text: MESSAGE.CHOOSE_ONE_RECORD_FOR_EDIT,
-        });
-        return;
-      }
-      this.$router.push(`activity/${this.selected[0].id}`);
-    },
-    async deleteActivities() {
+    async deleteParticipants() {
       if (this.selected.length === 0) {
         this.setSnackbar({
           type: 'info',
@@ -300,7 +333,7 @@ export default {
       this.action = 'Delete';
       this.dialogTitle = 'Xác nhận xóa';
       this.dialogContent = 'Bạn chắc chắn muốn xóa?';
-      this.dialog = true;
+      this.confirmDialog = true;
     },
     async search() {
       let query = {};
@@ -356,6 +389,9 @@ export default {
     }
   },
   async created() {
+    const id = this.$route.params.id;
+    await this.fetchGetActivityById({id: id});
+
     for (let props in this.$props) {
       if (props === 'id' && this[props]) {
         this.selectedOption = this.searchOptions.find(option => option.attribute === 'id').name;
@@ -368,6 +404,10 @@ export default {
     }
     this.setQuery();
     await this.fetchGetAllActivity(this.query);
+    await this.fetchGetRegisteredListById({
+      activityId: id,
+      query: this.query,
+    });
     this.loading = false;
   },
   beforeDestroy() {
@@ -389,6 +429,7 @@ export default {
     font: normal 700 18px Roboto;
     text-shadow: rgb(0 0 0 / 12%) 0px 3px 6px, rgb(0 0 0 / 23%) 0px 3px 6px;
     color: #0b8ee7;
+    text-transform: uppercase;
   }
 
   .toolbar-block {

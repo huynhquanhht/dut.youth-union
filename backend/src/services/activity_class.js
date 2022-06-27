@@ -4,6 +4,9 @@ const MESSAGE = require('../utils/message');
 const {Op} = require("sequelize");
 const models = require('../models');
 const sequelizeUtils = require('../utils/sequelize');
+const userRepo = require("../repositories/user");
+const lectureRepo = require("../repositories/lecture");
+const roleUtils = require("../utils/role");
 
 const create = async (name) => {
   const option = {where: {name: name}};
@@ -43,31 +46,60 @@ const createMany = async (activityClasses) => {
   }
 }
 
-const get = async (query) => {
+const get = async (query, userId) => {
   let option = {};
+  let optionCount = {};
   option.where = {deleted_at: null};
   option.limit = query.size ? +query.size : 10;
   option.offset = query.page ? (query.page - 1) * query.size : 1;
   query.facultyName = query.facultyName ? query.facultyName : '';
   query.facultyId = query.facultyId ? query.facultyId : '';
   query.courseName = query.courseName ? query.courseName : '';
-  option.include = [
-  {
-    model: models.course,
-    where: {name: {[Op.like]: `%${query.courseName}%`}, deleted_at: null},
-    required: true,
-  },
-  {
-    model: models.faculty,
-    where: {name: {[Op.like]: `%${query.facultyName}%`}, deleted_at: null},
-    required: true,
-  },
-  {
-    model: models.student,
-    where: {deleted_at: null},
-    required: false,
-  },
-];
+  const user = await getUserAndRole(userId);
+  console.log('user - ', roleUtils.FACULTY_SECRETARY);
+  if (user.roles[0].name === roleUtils.FACULTY_SECRETARY) {
+    const lecture = await lectureRepo.getOne({ where: {user_id: user.id}});
+    const facultyId = lecture.faculty_id;
+    console.log('facultyId - ', facultyId);
+    option.include = [
+      {
+        model: models.course,
+        where: {name: {[Op.like]: `%${query.courseName}%`}, deleted_at: null},
+        required: true,
+      },
+      {
+        model: models.faculty,
+        where: {id: facultyId},
+        required: true,
+      },
+      {
+        model: models.student,
+        where: {deleted_at: null},
+        required: false,
+      },
+    ];
+    optionCount = {where: {faculty_id: facultyId}};
+  } else {
+    option.include = [
+      {
+        model: models.course,
+        where: {name: {[Op.like]: `%${query.courseName}%`}, deleted_at: null},
+        required: true,
+      },
+      {
+        model: models.faculty,
+        where: {name: {[Op.like]: `%${query.facultyName}%`}, deleted_at: null},
+        required: true,
+      },
+      {
+        model: models.student,
+        where: {deleted_at: null},
+        required: false,
+      },
+    ];
+    optionCount = {};
+  }
+
   if (query) {
     delete query.page;
     delete query.size;
@@ -80,6 +112,7 @@ const get = async (query) => {
     }
   }
   let activityClassList = await activityClassRepo.get(option);
+  let count = await activityClassRepo.countAll(optionCount);
   activityClassList = sequelizeUtils.convertJsonToObject(activityClassList);
   for (let activityClass of activityClassList.rows) {
     activityClass.unionMemberQuantity = activityClass.students.filter(
@@ -88,7 +121,10 @@ const get = async (query) => {
       (student) => student.submitted_union_book_at !== null).length;
     activityClass.studentQuantity = activityClass.students.length;
   }
-  return activityClassList;
+  return {
+    count: count,
+    rows: activityClassList.rows,
+  };
 };
 
 const getAll = async () => {
@@ -134,6 +170,15 @@ const del = async (activityClassId) => {
     return {message: MESSAGE.DELETE_SUCCESS, result: true};
   }
   return {message: MESSAGE.DELETE_FAIL, result: false};
+}
+
+const getUserAndRole = async (currentUserId) => {
+  let option = {};
+  option.include = [{ model: models.role, deleted_at: null,}];
+  option.where = { id: currentUserId, deleted_at: null };
+  let user = await userRepo.getOne(option);
+  user = JSON.parse(JSON.stringify(user));
+  return user;
 }
 
 module.exports = {

@@ -19,7 +19,7 @@
         Không có dữ liệu để hiển thị!
       </template>
       <template v-slot:top>
-        <v-card-title>QUẢN LÝ ĐOÀN PHÍ</v-card-title>
+        <v-card-title>QUẢN LÝ SỔ TAY ĐOÀN VIÊN</v-card-title>
         <div class="toolbar mb-1" flat>
           <div class="toolbar-block">
             <div class="search-block d-flex">
@@ -46,7 +46,7 @@
                 :disabled="!selectedOption"
               ></v-text-field>
             </div>
-            <div class="tool-block d-flex">
+            <div class="tool-block d-flex" v-if="currentUser.roles[0].name !== roleUtils.FACULTY_SECRETARY">
               <v-btn
                 text
                 width="50px"
@@ -80,6 +80,7 @@
           v-model="item.union_textbook.submitted"
           @click="checkSubmission(item)"
           :key="item.id"
+          :readonly="item.union_textbook.school_confirmed !== null"
         ></v-simple-checkbox>
       </template>
       <template v-slot:item.union_textbook.submitted_at="{ item }">
@@ -135,6 +136,8 @@ import {mapGetters, mapMutations, mapActions} from 'vuex';
 import ConfirmDialog from '@/components/ConfirmDialog';
 // import MESSAGE from '@/utils/message';
 import timeUtils from "@/utils/time";
+import role from '@/utils/role';
+import MESSAGE from "@/utils/message";
 
 export default {
   name: 'union-textbook-list',
@@ -178,6 +181,7 @@ export default {
       changedUnionTextbook: new Map(),
       command: '',
       loadingButton: false,
+      roleUtils: role,
       searchOptions: [
         {
           name: 'Họ tên',
@@ -205,6 +209,7 @@ export default {
   computed: {
     ...mapGetters({
       unionTextbooks: 'getUnionTextbooks',
+      currentUser: 'getUser'
     }),
   },
 
@@ -295,6 +300,16 @@ export default {
           const changedUnionTextbook = Array.from(this.changedUnionTextbook, ([key, value]) => {
             return { id: key, submitted: value };
           });
+          if (changedUnionTextbook.length === 0) {
+            this.setSnackbar({
+              type: 'info',
+              visible: true,
+              text: MESSAGE.NO_DATA_CHANGED,
+            });
+            this.confirmDialog = false;
+            this.selected = [];
+            return;
+          }
           this.loadingButton = true;
           let isSuccess = await this.fetchUpdateUnionTextbooks({changedUnionTextbook});
           this.loadingButton = false;

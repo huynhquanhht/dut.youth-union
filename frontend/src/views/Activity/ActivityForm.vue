@@ -261,7 +261,7 @@ export default {
     }),
     ...mapActions({
       fetchCreateActivity: 'fetchCreateActivity',
-      fetchGetById: 'fetchGetById',
+      fetchGetActivityById: 'fetchGetActivityById',
       fetchUpdateActivity: 'fetchUpdateActivity',
       fetchUploadActivityCover: 'uploadActivityCover',
       fetchGetActivityList: 'fetchGetActivityList',
@@ -385,7 +385,7 @@ export default {
     if (this.$route.params.id) {
       this.title = 'Chỉnh sửa hoạt động';
       this.type = 'Edit';
-      await this.fetchGetById({id: id});
+      await this.fetchGetActivityById({id: id});
       this.activityCoverUrl = this.activity.cover_url;
       this.activityName = this.activity.name;
       this.organizationUnit = this.activity.organization_unit;
@@ -394,8 +394,8 @@ export default {
       this.endAt = this.activity.end_at;
       this.beginRegistrationAt = this.activity.begin_registration_at;
       this.endRegistrationAt = this.activity.end_registration_at;
-      this.point = this.activity.point;
-      this.participantQuantity = this.activity.participant_quantity;
+      this.point = this.activity.point + '';
+      this.participantQuantity = this.activity.participant_quantity + '';
       this.editorData = this.activity.content;
     }
   }

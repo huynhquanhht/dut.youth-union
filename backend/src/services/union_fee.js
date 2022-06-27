@@ -2,7 +2,6 @@
 const {Op} = require('sequelize');
 const models = require('../models');
 const sequelizeUtils = require('../utils/sequelize');
-const commonService = require("./common");
 const roleUtils = require("../utils/role");
 const userRepo = require("../repositories/user");
 const studentRepo = require("../repositories/student");
@@ -11,6 +10,16 @@ const submitUnionFeeRepo = require('../repositories/submit_union_fee');
 const timeUtils = require("../utils/time");
 const unionTextbookRepo = require("../repositories/union_textbook");
 const moneyUtils = require("../utils/money");
+const lectureRepo = require("../repositories/lecture");
+
+const getUserAndRole = async (currentUserId) => {
+  let option = {};
+  option.include = [{ model: models.role, deleted_at: null,}];
+  option.where = { id: currentUserId, deleted_at: null };
+  let user = await userRepo.getOne(option);
+  user = JSON.parse(JSON.stringify(user));
+  return user;
+}
 
 const get = async (currentUserId, query) => {
   let option = {};
@@ -33,30 +42,49 @@ const get = async (currentUserId, query) => {
 };
 
 const getOfStudents = async (currentUserId, query) => {
+  const user = await getUserAndRole(currentUserId);
   let option = {};
-  option.include = [{
-    model: models.student,
-    where: {deleted_at: null},
-  }];
-  let user = await userRepo.getOne(option);
-  option = {};
-  option.include = [{
-    model: models.unionFee,
-    where: {id: 5},
-    require: true,
-  }, {
-    model: models.activityClass,
-    where: {id: user.student.activity_class_id}
-  }];
-  option.where = {activity_class_id: user.student.activity_class_id};
-  let unionFeeOfStudents = await studentRepo.getOne(option);
-  console.log('unionFeeOfStudents - ', unionFeeOfStudents);
+  if (user.roles[0].name === roleUtils.FACULTY_SECRETARY) {
+    const lecture = await lectureRepo.getOne({where: {user_id: user.id}});
+    const facultyId = lecture.faculty_id;
+
+    option.limit = query.size ? +query.size : 10;
+    option.offset = query.page ? (query.page - 1) * query.size : 1;
+    option.include = [{
+      model: models.unionFee,
+      where: {id: 23},
+      require: false,
+    }, {
+      model: models.activityClass,
+      include: [{
+        model: models.faculty,
+        where: {id: facultyId}
+      }]
+      // where: {id: user.student.activity_class_id}
+    }];
+    // option.where = {activity_class_id: user.student.activity_class_id};
+  } else {
+    option.limit = query.size ? +query.size : 10;
+    option.offset = query.page ? (query.page - 1) * query.size : 1;
+    option.include = [{
+      model: models.unionFee,
+      where: {id: 23},
+      require: false,
+    }, {
+      model: models.activityClass,
+    }];
+  }
+  let unionFeeOfStudents = await studentRepo.get(option);
+  unionFeeOfStudents = JSON.parse(JSON.stringify(unionFeeOfStudents));
+  unionFeeOfStudents.rows.forEach(item => {
+    item.unionFee = item.union_fees[0];
+  })
   unionFeeOfStudents = sequelizeUtils.convertJsonToObject(unionFeeOfStudents);
   return unionFeeOfStudents;
-}
+};
 
 const getOfStudent = async (currentUserId, query) => {
-  let userRole = await commonService.getUserAndRole(currentUserId);
+  let userRole = await getUserAndRole(currentUserId);
   let student = await studentRepo.getOne({where: {user_id: currentUserId}});
   student = JSON.parse(JSON.stringify(student));
   console.log('student - ', student);
@@ -112,7 +140,7 @@ const submit = async (unionFees) => {
 
 const confirmSubmission = async (currentUserId, submitUnionFeeIds) => {
   let option = {};
-  let userRole = await commonService.getUserAndRole(currentUserId);
+  let userRole = await getUserAndRole(currentUserId);
   userRole = JSON.parse(JSON.stringify(userRole));
   const transaction = await models.sequelizeConfig.transaction();
   try {
@@ -122,6 +150,7 @@ const confirmSubmission = async (currentUserId, submitUnionFeeIds) => {
       }, submitUnionFeeIds, transaction);
     } else {
       await submitUnionFeeRepo.update({
+        submitted: true,
         school_confirmed: timeUtils.getCurrentTime()
       }, submitUnionFeeIds, transaction);
     }
@@ -195,6 +224,6 @@ const getInvoice = async (studentId, unionFeeId) => {
     moneyText: moneyTextReader.doc(unionFee.amount_of_money),
   }
   return invoice;
-}
+};
 
 module.exports = { get, getOfStudent, getOfStudents, submit, confirmSubmission, create, getInvoice };

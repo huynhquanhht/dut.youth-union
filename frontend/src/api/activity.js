@@ -18,6 +18,19 @@ const get = (query) => {
   return axiosUtils.getRequest(url);
 };
 
+const getRegisteredListById = (activityId, query) => {
+  let url = `${BASE_URL}/registered-list/${activityId}`;
+  let queryString = '';
+  for (let attribute in query) {
+    queryString += `&${attribute}=${query[attribute]}`;
+  }
+  if (queryString) {
+    queryString = queryString.slice(1, queryString.length);
+    url += '?' + queryString;
+  }
+  return axiosUtils.getRequest(url);
+};
+
 const getByCurrentStudent = (query) => {
   let url = `${BASE_URL}/student`;
   let queryString = '';
@@ -69,6 +82,18 @@ const attend = (activityId) => {
   return axiosUtils.putRequest(`${BASE_URL}/attend/${activityId}`);
 }
 
+const addParticipant = (participantInfo) => {
+  return axiosUtils.postRequest(`${BASE_URL}/add-participant`, participantInfo);
+};
+
+const attendParticipants = (registrationIds) => {
+  return axiosUtils.putRequest(`${BASE_URL}/attend-participants`, {registrationIds});
+};
+
+const deleteParticipants = (registrationIds) => {
+  return axiosUtils.deleteRequest(`${BASE_URL}/delete-participants`, {registrationIds});
+}
+
 export default {
   getAll,
   create,
@@ -81,5 +106,9 @@ export default {
   closeActivityRegistration,
   getPointListOfCurrentStudent,
   register,
-  attend
+  attend,
+  getRegisteredListById,
+  addParticipant,
+  attendParticipants,
+  deleteParticipants
 };

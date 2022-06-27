@@ -25,7 +25,7 @@ const create = (newRegisterJoin) => {
   return registerJoinModel.create(newRegisterJoin);
 };
 
-const updateById = (updatedRegisterJoin, condition) => {
+const update = (updatedRegisterJoin, condition) => {
   return registerJoinModel.update(updatedRegisterJoin, condition);
 };
 
@@ -39,7 +39,7 @@ module.exports = {
   getQuantity,
   getOne,
   create,
-  updateById,
+  update,
   deleteByIds,
   count,
 }

@@ -14,22 +14,35 @@ const csv = require('csvtojson')
 const MESSAGE = require("../utils/message");
 const activityClassService = require("./activity_class");
 const facultyRepo = require("../repositories/faculty");
+const roleUtils = require("../utils/role");
+const lectureRepo = require("../repositories/lecture");
 
 
-const get = async (query) => {
+const get = async (query, userId) => {
   let option = {};
   option.where = {deleted_at: null};
   option.limit = query.size ? +query.size : 10;
   option.offset = query.page ? (query.page - 1) * query.size : 1;
   query.activityClassId = query.activityClassId ? query.activityClassId : '';
   query.className = query.className ? query.className : '';
-  option.include = [
-    {
-      model: models.activityClass,
-      where: {name: {[Op.like]: `%${query.className}%`}, deleted_at: null},
-      required: true,
-    }
-  ];
+  const user = await getUserAndRole(userId);
+  if (user.roles[0].name === roleUtils.FACULTY_SECRETARY) {
+    const lecture = await lectureRepo.getOne({where: {user_id: user.id}});
+    const facultyId = lecture.faculty_id;
+    option.include = [
+      {
+        model: models.activityClass,
+        where: {name: {[Op.like]: `%${query.className}%`}, faculty_id: facultyId},
+        required: true,
+      }];
+  } else {
+    option.include = [
+      {
+        model: models.activityClass,
+        where: {name: {[Op.like]: `%${query.className}%`}, deleted_at: null},
+        required: true,
+      }];
+  }
   if (query) {
     delete query.page;
     delete query.size;
@@ -86,11 +99,12 @@ const createMany = async (file) => {
     let newUsers = await userRepo.createMany(users, transaction);
     newUsers = JSON.parse(JSON.stringify(newUsers));
     if (newUsers.length !== users.length) {
+      console.log('a');
       await transaction.rollback();
       return false;
     }
     for (let index = 0; index < newUsers.length; ++index) {
-      const roleOfUser = {user_id: newUsers[index].id, role_id: 6};
+      const roleOfUser = {user_id: newUsers[index].id, role_id: csvData[index].isClassSecretary === 'Y' ? 5 : 6};
       const student = {
         id: csvData[index].id,
         name: csvData[index].name,
@@ -105,12 +119,14 @@ const createMany = async (file) => {
     // Create role of user
     const newRoleOfUsers = await roleOfUserRepo.createMany(roleOfUsers, transaction);
     if (newRoleOfUsers.length !== newUsers.length) {
+      console.log('b');
       await transaction.rollback();
       return false;
     }
     // Create students
     let newStudents = await studentRepo.createMany(students, transaction);
     if (newStudents.length !== students.length) {
+      console.log('c');
       await transaction.rollback();
       return false;
     }
@@ -125,6 +141,7 @@ const createMany = async (file) => {
     const unionTextbook = await unionTextbookRepo.createMany(unionTextbooks, transaction);
     console.log('unionTextbook - ', unionTextbook);
     if (unionTextbook.length !== unionTextbooks.length) {
+      console.log('d');
       await transaction.rollback();
       return false;
     }
@@ -145,6 +162,15 @@ const deleteStudent = async (studentId) => {
   const result = await studentRepo.del(option);
   return result ? true : false;
 };
+
+const getUserAndRole = async (currentUserId) => {
+  let option = {};
+  option.include = [{ model: models.role, deleted_at: null,}];
+  option.where = { id: currentUserId, deleted_at: null };
+  let user = await userRepo.getOne(option);
+  user = JSON.parse(JSON.stringify(user));
+  return user;
+}
 
 module.exports = {
   get,

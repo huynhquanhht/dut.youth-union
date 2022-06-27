@@ -41,6 +41,7 @@ const getOfStudents = async (req, res) => {
     const result = await unionFeeService.getOfStudents(currentUserId, query);
     res.status(200).send(result);
   } catch (error) {
+    console.log(error);
     res.status(500).send({ message: MESSAGE.SERVER_ERROR });
   }
 }

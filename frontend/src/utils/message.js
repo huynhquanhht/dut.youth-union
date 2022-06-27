@@ -13,5 +13,6 @@ const MESSAGE = {
   GET_INVOICE_FAIL: 'Lấy thông tin hóa đơn thất bại!',
   FEATURE_DEVELOP: 'Tính năng này đăng phát triển, vui lòng thử lại sau',
   CHOOSE_ONE_RECORD_FOR_EXCUTION: 'Vui lòng chọn một dữ liệu để thực hiện thao tác',
+  NO_DATA_CHANGED: 'Không có dữ liệu thay đổi!',
 };
 export default MESSAGE;

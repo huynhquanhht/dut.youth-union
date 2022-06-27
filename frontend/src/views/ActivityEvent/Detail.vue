@@ -111,7 +111,11 @@
       height="400px"
       persistent
     >
-      <QRCodeReaderDialog @qr-code-reader-dialog="qrCodeReaderDialogHandler"/>
+      <QRCodeReaderDialog
+        :isAttending="isAttending"
+        :success="success"
+        :fail="fail"
+        @qr-code-reader-dialog="qrCodeReaderDialogHandler"/>
     </v-dialog>
   </div>
 </template>
@@ -120,6 +124,7 @@
 import { mapGetters, mapActions} from "vuex";
 import QRCodeReaderDialog from "@/views/ActivityEvent/QRCodeReaderDialog";
 import ConfirmDialog from "@/components/ConfirmDialog";
+import jwt from 'jsonwebtoken';
 import timeUtils from '@/utils/time';
 
 export default {
@@ -163,20 +168,50 @@ export default {
       dialogTitle: '',
       dialogContent: '',
       action: '',
+      success: false,
+      fail: false,
+      isAttending: false,
     }
   },
   methods: {
     ...mapActions({
       fetchGetActivityById: 'fetchGetActivityById',
       fetchRegister: 'fetchRegister',
+      fetchAttend: 'fetchAttend',
     }),
-    qrCodeReaderDialogHandler(data) {
+    async qrCodeReaderDialogHandler(data) {
       if (data.command === 'Cancel') {
+        this.isAttending = false;
+        this.success = false;
+        this.fail = false;
         this.QRCodeReaderDialog = false;
       }
       if (data.command === 'Ok') {
-        alert(data.code);
-        console.log('code - ', data.code);
+        console.log('a');
+        this.isAttending = true;
+        await jwt.verify(data.code, process.env.VUE_APP_QR_KEY, async (error, payload) => {
+          if (error) {
+            console.log('b');
+          this.isAttending = false;
+            this.fail = true;
+            return;
+          }
+          const activityId = this.$route.params.id;
+          if (payload.activityId !== activityId) {
+            this.isAttending = false;
+            this.fail = true;
+          }
+          const isAttended = await this.fetchAttend({ activityId: activityId });
+          if (isAttended) {
+            console.log('c');
+            this.isAttending = false;
+            this.success = true;
+            await this.fetchGetActivityById({ id: activityId });
+          } else {
+            this.isAttending = false;
+            this.fail = false;
+          }
+        });
       }
     },
     register() {

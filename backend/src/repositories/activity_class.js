@@ -16,7 +16,6 @@ const getByPk = (id) => {
 };
 
 const get = (option) => {
-  console.log(activityClassModel);
   return activityClassModel.findAndCountAll(option);
 };
 

@@ -46,7 +46,7 @@
                   :disabled="!selectedOption"
               ></v-text-field>
             </div>
-            <div class="tool-block d-flex">
+            <div class="tool-block d-flex" v-if="currentUser && currentUser.roles[0].name !== roleUtils.FACULTY_SECRETARY">
               <v-btn
                 text
                 width="100px"
@@ -67,19 +67,8 @@
               </v-btn>
               <v-btn
                   text
-                  width="100px"
-                  class="tool-button"
-                  @click="update"
-              >
-                <v-icon dark size="20">mdi-square-edit-outline</v-icon>
-                Chỉnh sửa
-              </v-btn>
-              <v-btn
-                  text
                   width="50px"
                   class="tool-button"
-                  v-bind="attrs"
-                  v-on="on"
               >
                 <v-icon dark size="20">mdi-trash-can-outline</v-icon>
                 Xóa
@@ -153,6 +142,7 @@ import {mapGetters, mapMutations, mapActions} from 'vuex';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import CsvPopup from '@/components/CSVPopup';
 import MESSAGE from "@/utils/message";
+import role from '@/utils/role';
 
 export default {
   name: 'activity-list',
@@ -194,6 +184,7 @@ export default {
       searchText: '',
       selectedOption: {},
       query: {},
+      roleUtils: role,
       searchOptions: [
         {
           name: 'Họ tên',
@@ -220,12 +211,14 @@ export default {
   computed: {
     ...mapGetters({
       students: 'getStudents',
+      currentUser: 'getUser',
     }),
   },
 
   methods: {
     ...mapActions({
       fetchGetStudents: 'fetchGetStudents',
+      fetchCreateStudentByCSV: 'fetchCreateStudentByCSV',
     }),
     ...mapMutations({
       setSnackbar: 'setSnackbar',
@@ -250,7 +243,7 @@ export default {
       await this.fetchGetStudents(this.query);
       this.loading = false;
     },
-    processDialog(payload) {
+    handleConfirm(payload) {
       if (payload.command === 'Cancel') {
         this.formDialog = false;
       }
@@ -293,7 +286,10 @@ export default {
         this.btnOkLoading = true;
         let activityClassFormData = new FormData();
         activityClassFormData.append('file', data.file);
-        await this.fetchUploadActivityClassCSV({ file: activityClassFormData });
+        let isCreated = await this.fetchCreateStudentByCSV({ file: activityClassFormData });
+        if (isCreated) {
+          await this.fetchGetStudents(this.query);
+        }
         this.btnOkLoading = false;
         this.csvDialog = false;
       }

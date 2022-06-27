@@ -12,6 +12,12 @@ const actions = {
     console.log('res -', res);
     commit('setActivityList', res.data);
   },
+  fetchGetRegisteredListById: async ({commit}, payload) => {
+    const activityId = payload.activityId;
+    const query = payload.query;
+    const res = await activityApi.getRegisteredListById(activityId, query);
+    commit('setRegisteredList', res.data);
+  },
   fetchGetActivitiesByCurrentStudent: async ({commit}, query) => {
     const res = await activityApi.getByCurrentStudent(query);
     commit('setMyActivities', res.data);
@@ -181,5 +187,59 @@ const actions = {
       return false;
     }
   },
+  fetchAddParticipant: async ({commit}, payload) => {
+    try {
+      const res = await activityApi.addParticipant(payload.participantInfo);
+      commit('setSnackbar', {
+        type: 'success',
+        visible: true,
+        text: res.data.message,
+      });
+      return true;
+    } catch (error) {
+      commit('setSnackbar', {
+        type: 'error',
+        visible: true,
+        text: error.response.data.error.message,
+      });
+      return false;
+    }
+  },
+  fetchAttendParticipants: async ({commit}, payload) => {
+    try {
+      const res = await activityApi.attendParticipants(payload.registrationIds);
+      commit('setSnackbar', {
+        type: 'success',
+        visible: true,
+        text: res.data.message,
+      });
+      return true;
+    } catch (error) {
+      commit('setSnackbar', {
+        type: 'error',
+        visible: true,
+        text: error.response.data.error.message,
+      });
+      return false;
+    }
+  },
+  fetchDeleteParticipants: async ({commit}, payload) => {
+    try {
+      const res = await activityApi.deleteParticipants(payload.registrationIds);
+      commit('setSnackbar', {
+        type: 'success',
+        visible: true,
+        text: res.data.message,
+      });
+      return true;
+    } catch (error) {
+      commit('setSnackbar', {
+        type: 'error',
+        visible: true,
+        text: error.response.data.error.message,
+      });
+      return false;
+    }
+  }
 };
 export default actions;

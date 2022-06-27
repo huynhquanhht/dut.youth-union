@@ -47,7 +47,7 @@
                 :disabled="!selectedOption"
               ></v-text-field>
             </div>
-            <div class="tool-block d-flex">
+            <div class="tool-block d-flex" v-if="currentUser.roles[0].name !== roleUtils.FACULTY_SECRETARY">
               <v-btn
                 text
                 width="100px"
@@ -142,6 +142,7 @@ import {mapGetters, mapActions, mapMutations} from 'vuex';
 import CsvPopup from '@/components/CSVPopup';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import MESSAGE from "@/utils/message";
+import role from '@/utils/role';
 export default {
   name: 'activity-class-list',
   components: { CsvPopup, ConfirmDialog, },
@@ -183,6 +184,7 @@ export default {
       searchText: '',
       selectedOption: {},
       query: {},
+      roleUtils: role,
       searchOptions: [
         {
           name: 'Tên chi đoàn',
@@ -221,6 +223,7 @@ export default {
   computed: {
     ...mapGetters({
       activityClassList: 'getActivityClassList',
+      currentUser: 'getUser',
     }),
   },
   methods: {

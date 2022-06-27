@@ -20,6 +20,7 @@ html {
 }
 .v-application p {
   margin-bottom: 0px !important;
+  line-height: 0px !important;
 }
 .fade-enter-active {
   transition: opacity 0.5s;

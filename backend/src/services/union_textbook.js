@@ -114,6 +114,7 @@ const confirmSubmission = async (currentUserId, unionTextbookIds) => {
       }, unionTextbookIds, transaction);
     } else {
       await unionTextbookRepo.update({
+        submitted: true,
         school_confirmed: timeUtils.getCurrentTime()
       }, unionTextbookIds, transaction);
     }

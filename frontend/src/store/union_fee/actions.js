@@ -10,6 +10,7 @@ const actions = {
     commit('setUnionFeeOfStudent', res.data);
   },
   fetchGetUnionFeeOfStudents: async ({commit}) => {
+    console.log('mpq');
     const res = await unionFeeApi.getOfStudents();
     commit('setUnionFeeOfStudents', res.data);
   },
