@@ -3,7 +3,7 @@
     <v-data-table
         v-model="selected"
         :headers="headers"
-        :items="activityList ? activityList.data : []"
+        :items="activityList ? activityList.rows : []"
         :single-select="singleSelect"
         :items-per-page="selectedSize"
         scroll.sync="scrollSync"
@@ -11,15 +11,15 @@
         show-select
         loading-text="Đang tải dữ liệu... Vui lòng chờ"
         :loading="loading"
-        class="activity-table pl-3 pr-3 pb-3"
+        class="activity-table"
         fixed-header
         hide-default-footer
     >
-      <template v-if="activityList && !activityList.data.length" v-slot:no-data>
+      <template v-if="activityList && !activityList.count" v-slot:no-data>
         Không có dữ liệu để hiển thị!
       </template>
       <template v-slot:top>
-        <v-card-title>Danh sách hoạt động</v-card-title>
+        <v-card-title>DANH SÁCH HOẠT ĐỘNG</v-card-title>
         <div class="toolbar mb-1" flat>
           <div class="toolbar-block">
             <div class="search-block d-flex">
@@ -51,7 +51,7 @@
                     icon
                     width="100px"
                     class="tool-button"
-                    @click="$router.push('/admin/activity/create')"
+                    @click="$router.push('/activity/create')"
                 >
                   <v-icon dark size="24">mdi-plus</v-icon>
                   Thêm mới
@@ -74,10 +74,58 @@
                   <v-icon dark size="20">mdi-trash-can-outline</v-icon>
                   Xóa
                 </v-btn>
+              <v-btn
+                icon
+                width="160px"
+                class="tool-button"
+                @click="goToRegisteredList"
+              >
+                <v-icon dark size="22">mdi-format-list-bulleted-square</v-icon>
+                Danh sách đăng ký
+              </v-btn>
+              <v-btn
+                icon
+                width="90px"
+                class="tool-button"
+                @click="showQR"
+              >
+                <v-icon dark size="22">mdi-qrcode</v-icon>
+                QR Code
+              </v-btn>
             </div>
           </div>
         </div>
         <v-divider></v-divider>
+      </template>
+      <template v-slot:item.begin_at="{ item }">
+        <span>{{ formatTime(item.begin_at)}}</span>
+      </template>
+      <template v-slot:item.end_at="{ item }">
+        <span>{{ formatTime(item.end_at)}}</span>
+      </template>
+      <template v-slot:item.status="{ item }">
+        <v-chip
+          class="ma-2"
+          color="error"
+          v-if="timeUtils.formatTime(timeUtils.getCurrentTime()) < timeUtils.formatTime(item.begin_at)"
+        >
+          Sắp diễn ra
+        </v-chip>
+        <v-chip
+          v-if="timeUtils.formatTime(timeUtils.getCurrentTime()) >= timeUtils.formatTime(item.begin_at) &&
+      timeUtils.formatTime(timeUtils.getCurrentTime()) <= timeUtils.formatTime(item.end_at)"
+          class="ma-2"
+          color="orange"
+        >
+          Đang diễn ra
+        </v-chip>
+        <v-chip
+          v-if="timeUtils.formatTime(timeUtils.getCurrentTime()) > timeUtils.formatTime(item.end_at)"
+          class="ma-2"
+          color="success"
+        >
+          Kết thúc
+        </v-chip>
       </template>
       <template v-slot:footer>
         <div
@@ -100,13 +148,13 @@
             ></v-select>
           </div>
           <v-pagination
+            v-if="activityList.count > selectedSize"
               v-model="currentPage"
               :length="
-               activityList ? Math.ceil(activityList.quantity / selectedSize) : 0
+               activityList ? Math.ceil(activityList.count / selectedSize) : 0
             "
               :totalVisible="totalVisible"
               @input="handlePageChange"
-
           ></v-pagination>
         </div>
       </template>
@@ -118,18 +166,25 @@
           :content="dialogContent"
       ></confirm-dialog>
     </v-dialog>
+    <v-dialog v-model="QRCodeDialog" width="340px">
+      <QRCodeDialog :data="qrData"/>
+    </v-dialog>
   </div>
 </template>
 
 <script>
 import {mapGetters, mapMutations, mapActions} from 'vuex';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import QRCodeDialog from "@/views/Activity/QRCodeDialog";
 import MESSAGE from '@/utils/message';
+import jwt from 'jsonwebtoken';
+import time from "@/utils/time";
 
 export default {
   name: 'activity-list',
   components: {
     ConfirmDialog,
+    QRCodeDialog,
   },
   props: {
     page: {
@@ -157,6 +212,7 @@ export default {
       loading: false,
       dialog: false,
       formDialog: false,
+      QRCodeDialog: false,
       totalNumberOfItems: 0,
       listSize: [10, 50, 70, 100],
       selectedSize: 10,
@@ -181,16 +237,18 @@ export default {
           value: 'id',
         },
         {text: 'Tên hoạt động', value: 'name'},
-        {text: 'Cấp tổ chức', value: 'organization_level'},
-        {text: 'Bắt đầu', value: 'start_time'},
-        {text: 'Kết thúc', value: 'end_time'},
+        {text: 'Đơn vị tổ chức', value: 'organization_unit'},
         {text: 'Địa điểm', value: 'place'},
-        {text: 'Mở', value: 'join_quantity'},
-        {text: 'Điểm', value: 'point'},
+        {text: 'Bắt đầu', value: 'begin_at'},
+        {text: 'Kết thúc', value: 'end_at'},
+        {text: 'Trạng thái', value: 'status'},
       ],
       dialogTitle: null,
       dialogContent: null,
       query: {},
+      action: '',
+      qrData: null,
+      timeUtils: time,
     };
   },
   computed: {
@@ -200,24 +258,44 @@ export default {
   },
   methods: {
     ...mapActions({
-      fetchGetActivityList: 'fetchGetActivityList',
+      fetchGetAllActivity: 'fetchGetAllActivity',
       fetchDeleteActivities: 'fetchDeleteActivities',
+      fetchOpenActivityRegistration: 'fetchOpenActivityRegistration',
+      fetchCloseActivityRegistration: 'fetchCloseActivityRegistration'
     }),
     ...mapMutations({
       setActivityPage: 'setActivityPage',
       setActivitySize: 'setActivitySize',
       setSnackbar: 'setSnackbar',
     }),
-    handleConfirm() {
+    async handleConfirm(command) {
+      if (command === 'Ok') {
+        if (this.action === 'Delete') {
+          const activityIds = this.selected.map((activity) => activity.id);
+          let deleteResult = await this.fetchDeleteActivities({activityIds: activityIds});
+          if (deleteResult) {
+            this.selected = [];
+            this.setQuery();
+            await this.fetchGetAllActivity(this.query);
+          }
+          this.selected = [];
+          this.dialog = false;
+          return;
+        }
+      }
+      if (command === 'Cancel') {
+        this.dialog = false;
+      }
     },
     async handlePageChange() {
       this.setQuery();
       this.$router.push({
         name: 'activity-list',
         query: this.query,
-      }).catch(() => {});
+      }).catch(() => {
+      });
       this.loading = true;
-      await this.fetchGetActivityList(this.query);
+      await this.fetchGetAllActivity(this.query);
       this.loading = false;
     },
     async changePageSize() {
@@ -225,25 +303,21 @@ export default {
       this.$router.push({
         name: 'activity-list',
         query: this.query,
-      }).catch(() => {});
+      }).catch(() => {
+      });
       this.loading = true;
-      await this.fetchGetActivityList(this.query);
+      await this.fetchGetAllActivity(this.query);
       this.loading = false;
     },
-    processDialog(payload) {
-      if (payload.command === 'Cancel') {
-        this.formDialog = false;
-      }
-      if (payload.command === 'Save') {
-        this.formDialog = false;
-      }
+    formatTime(time) {
+      return this.timeUtils.formatTime(time);
     },
     edit() {
       if (this.selected.length !== 1) {
         this.setSnackbar({
           type: 'info',
           visible: true,
-          text: MESSAGE.CHOOSE_ONE_RECORD,
+          text: MESSAGE.CHOOSE_ONE_RECORD_FOR_EDIT,
         });
         return;
       }
@@ -254,16 +328,14 @@ export default {
         this.setSnackbar({
           type: 'info',
           visible: true,
-          text: MESSAGE.CHOOSE_RECORD,
+          text: MESSAGE.CHOOSE_RECORD_FOR_DELETE,
         });
+        return;
       }
-      const activityIds = this.selected.map((activity) => activity.id);
-      let deleteResult = await this.fetchDeleteActivities({activityIds: activityIds});
-      if (deleteResult) {
-        this.selected = [];
-        this.setQuery();
-        await this.fetchGetActivityList(this.query);
-      }
+      this.action = 'Delete';
+      this.dialogTitle = 'Xác nhận xóa';
+      this.dialogContent = 'Bạn chắc chắn muốn xóa?';
+      this.dialog = true;
     },
     async search() {
       let query = {};
@@ -277,8 +349,9 @@ export default {
       this.$router.push({
         name: 'activity-list',
         query: query,
-      }).catch(() => {});
-      await this.fetchGetActivityList(query);
+      }).catch(() => {
+      });
+      await this.fetchGetAllActivity(query);
     },
     setQuery() {
       this.searchOptions.forEach(option => {
@@ -291,6 +364,42 @@ export default {
       });
       this.query.page = this.currentPage;
       this.query.size = this.selectedSize;
+    },
+    async showQR() {
+      if (this.selected.length !== 1) {
+        this.setSnackbar({
+          type: 'info',
+          visible: true,
+          text: MESSAGE.CHOOSE_ONE_RECORD_FOR_EXCUTION,
+        });
+        return;
+      }
+      const payload = {
+        activityId: this.selected[0].id,
+        activityName: this.selected[0].name,
+      };
+      console.log(process.env.VUE_APP_QR_KEY);
+      const qrCode = await jwt.sign(payload, process.env.VUE_APP_QR_KEY, {
+        expiresIn: process.env.VUE_APP_TOKEN_TIMEOUT,
+      });
+      this.qrData = {
+        activityId: this.selected[0].id,
+        activityName: this.selected[0].name,
+        code: qrCode,
+      };
+      this.QRCodeDialog = true;
+    },
+    goToRegisteredList() {
+      if (this.selected.length !== 1) {
+        this.setSnackbar({
+          type: 'info',
+          visible: true,
+          text: MESSAGE.CHOOSE_ONE_RECORD_FOR_EXCUTION,
+        });
+        return;
+      }
+      const activityId = this.selected[0].id;
+      this.$router.push(`/registered-list/${activityId}`);
     }
   },
   async created() {
@@ -305,7 +414,7 @@ export default {
       }
     }
     this.setQuery();
-    await this.fetchGetActivityList(this.query);
+    await this.fetchGetAllActivity(this.query);
     this.loading = false;
   },
   beforeDestroy() {
@@ -318,11 +427,15 @@ export default {
 <style lang="scss">
 .activity-table {
   //overflow: auto;
+  height: 100vh;
   background-color: #FFFFFF !important;
-
+  padding: 20px 20px 20px 20px;
+  border-radius: 8px !important;
   .v-card__title {
     padding: 4px 0px 8px 0px !important;
-    font: normal 500 17px Roboto;
+    font: normal 700 18px Roboto;
+    text-shadow: rgb(0 0 0 / 12%) 0px 3px 6px, rgb(0 0 0 / 23%) 0px 3px 6px;
+    color: #0b8ee7;
   }
 
   .toolbar-block {
@@ -460,19 +573,19 @@ export default {
             }
 
             &:nth-child(2) {
-              min-width: 86px !important;
+              min-width: 80px !important;
             }
 
             &:nth-child(3) {
-              min-width: 386px !important;
+              min-width: 200px !important;
             }
 
             &:nth-child(4) {
-              min-width: 130px !important;
+              min-width: 200px !important;
             }
 
             &:nth-child(5) {
-              min-width: 100px !important;
+              min-width: 200px !important;
             }
 
             &:nth-child(6) {
@@ -480,11 +593,24 @@ export default {
             }
 
             &:nth-child(7) {
-              min-width: 300px !important;
+              min-width: 100px !important;
             }
 
             &:nth-child(8) {
-              min-width: 80px !important;
+              min-width: 120px !important;
+              margin-top: 4px !important;
+              margin-bottom: 4px !important;
+              .v-chip.v-size--default {
+                height: 24px !important;
+              }
+              .v-chip {
+                .v-chip__content {
+                  font: normal 400 14px Roboto !important;
+                }
+                .v-chip.v-size--default {
+                  height: 24px !important;
+                }
+              }
             }
 
             &:nth-child(9) {

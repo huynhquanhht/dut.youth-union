@@ -1,5 +1,60 @@
 paths:
   /activity-class:
+    get:
+      summary: Lấy danh sách lớp sinh hoạt
+      tags: [ActivityClass]
+      parameters:
+        - in: query
+          description: Id của lớp sinh hoạt muốn lấy
+          name: id
+          type: number
+        - in: query
+          description: Tên của lớp sinh hoạt muốn lấy
+          name: name
+          type: string
+      responses:
+        200:
+          description: Lấy tất cả lớp sinh hoạt thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: number
+                  count:
+                    type: number
+                  rows:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: number
+                        name:
+                          type: string
+                        faculty:
+                          type: object
+                          properties:
+                            id:
+                              type: number
+                        course:
+                          type
+                        created_at:
+                          type: string
+                          format: date-time
+                          example: "2022-01-01T00:00:00.000Z"
+                        updated_at:
+                          type: string
+                          format: date-time
+                          example: "2022-01-01T00:00:00.000Z"
+                        deleted_at:
+                          type: string
+                          nullable: true
+                          format: date-time
+                          example: "2022-01-01T00:00:00.000Z"
+        500:
+          description: Lỗi khi có exception
     post:
       summary: Tạo mới lớp sinh hoạt
       tags: [ ActivityClass ]
@@ -19,7 +74,7 @@ paths:
         500:
           description: Lỗi khi có exception
     put:
-      summary: Cập nhật khóa
+      summary: Cập nhật lớp sinh hoạt
       tags: [ ActivityClass ]
       requestBody:
         content:
@@ -43,11 +98,11 @@ paths:
           description: Lỗi khi có exception
   /ActivityClass/all:
     get:
-      summary: Lấy tất cả khóa
+      summary: Lấy tất cả lớp sinh hoạt
       tags: [ ActivityClass ]
       responses:
         200:
-          description: Lấy tất cả khóa thành công
+          description: Lấy tất cả lớp sinh hoạt thành công
           content:
             application/json:
               schema:
@@ -81,16 +136,16 @@ paths:
           description: Lỗi khi có exception
   /ActivityClass/{id}:
     get:
-      summary: Lấy khóa theo id
+      summary: Lấy lớp sinh hoạt theo id
       tags: [ ActivityClass ]
       parameters:
         - in: path
-          description: Id của khóa muốn lấy
+          description: Id của lớp sinh hoạt muốn lấy
           name: id
           type: number
       responses:
         200:
-          description: Lấy khóa theo id thành công
+          description: Lấy lớp sinh hoạt theo id thành công
           content:
             application/json:
               schema:
@@ -118,16 +173,16 @@ paths:
         500:
           description: Lỗi khi có exception
     delete:
-      summary: Xóa khóa theo id
+      summary: Xóa lớp sinh hoạt theo id
       tags: [ ActivityClass ]
       parameters:
         - in: path
-          description: Id của khóa muốn xóa
+          description: Id của lớp sinh hoạt muốn xóa
           name: id
           type: number
       responses:
         200:
-          description: Xóa khóa thành công
+          description: Xóa lớp sinh hoạt thành công
         400:
           description: Dữ liệu không hợp lệ
         500:

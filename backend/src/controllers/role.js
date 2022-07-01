@@ -39,6 +39,7 @@ const getById = async (req, res) => {
     const result = await roleService.getById(roleId);
     res.status(200).send(result);
   } catch (error) {
+    console.log(error);
     res.status(500).send({ message: MESSAGE.SERVER_ERROR});
   }
 }

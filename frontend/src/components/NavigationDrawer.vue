@@ -1,6 +1,6 @@
 <template>
   <div class="navigation-drawer-wrapper">
-    <div class="logo-block">
+    <div class="logo-block" @click="$router.push('/home')">
       <img src="../assets/logo/logo-white-app.svg" alt="logo-app">
     </div>
     <v-list nav dense>
@@ -14,12 +14,12 @@
         :class="{'active': navList.active}"
       >
         <template v-slot:activator>
-          <v-list-item-content active-class="primary" @click="changePage(navList.route, index)">
-            <v-list-item-title active-class="deep-white--text text--accent-4">{{ navList.name }}</v-list-item-title>
+          <v-list-item-content active-class="deep-white--text text--accent-4" @click="changePage(navList.route, index)">
+            <v-list-item-title class="white--text" active-class="deep-white--text text--accent-4">{{ navList.name }}</v-list-item-title>
           </v-list-item-content>
         </template>
         <v-list-item-group class="white--text" active-class="deep-white--text text--accent-4">
-          <v-list-item v-for="list in navList.lists" :key="list.name" :to="list.route" @click="clickListItem">
+          <v-list-item v-for="list in navList.lists" :key="list.name" :to="list.route">
             <v-list-item-icon class="pl-4">
               <v-icon v-text="list.icon"></v-icon>
             </v-list-item-icon>
@@ -34,63 +34,30 @@
 </template>
 
 <script>
+import { mapGetters, mapActions } from 'vuex';
+import localStorageUtils from '@/utils/local_storage';
+import jwtDecode from 'jwt-decode';
 export default {
   name: 'navigation-drawer',
   data() {
     return {
-      navLists: [
-        {
-          name: 'Quản lý đoàn cơ sở',
-          icon: 'mdi-atlassian',
-          active: null,
-          lists: [
-            {
-              name: 'Quản lý liên chi đoàn',
-              icon: 'mdi-manjaro',
-              route: '/admin/association-union-branch',
-            },
-            {
-              name: 'Quản lý chi đoàn',
-              icon: 'mdi-bank',
-              route: '/admin/union-branch'
-            },
-            {
-              name: 'Quản lý sinh viên',
-              icon: 'mdi-account-group',
-              route: '/admin/union-member'
-            },
-          ],
-        },
-        {
-          name: 'Quản lý hoạt động',
-          icon: 'mdi-flag-variant',
-          route: '/admin/activity',
-          active: false,
-        },
-        {
-          name: 'Quản lý thông báo',
-          icon: 'mdi-bullhorn ',
-          active: false,
-        },
-        {
-          name: 'Quản lý người dùng',
-          icon: 'mdi-account-cog',
-          active: false,
-        },
-        {
-          name: 'Quản lý hệ thống',
-          icon: 'mdi-cogs',
-          active: false,
-        },
-      ],
+      navLists: [],
     };
   },
+  computed: {
+    ...mapGetters({
+      user: 'getUser',
+    }),
+  },
   methods: {
+    ...mapActions({
+      fetchGetUserById: 'fetchGetUserById',
+    }),
     changePage(link, index) {
       if (link) {
         this.navLists.forEach((item) => {
           item.active = false;
-        })
+        });
         this.navLists[index].active = true;
         this.$router.push(link);
       }
@@ -98,9 +65,252 @@ export default {
     clickListItem() {
       this.navLists.forEach((item) => {
         item.active = false;
-      })
+      });
     }
   },
+  async created() {
+    this.currentUser = jwtDecode(localStorageUtils.getToken());
+    await this.fetchGetUserById({ userId: this.currentUser.userId });
+    if (this.user.roles[0].name === 'Quản trị viên') {
+      this.navLists = [
+        {
+          name: 'Quản lý liên chi đoàn',
+          icon: 'mdi-home-city',
+          route: '/faculty',
+          active: true,
+        },
+        {
+          name: 'Quản lý chi đoàn',
+          icon: 'mdi-bank',
+          route: '/activity-class',
+          active: false,
+        },
+        {
+          name: 'Quản lý đoàn viên',
+          icon: 'mdi-account-group',
+          route: '/student',
+          active: false,
+        },
+        {
+          name: 'Quản lý hoạt động',
+          icon: 'mdi-flag-variant',
+          route: '/activity',
+          active: false,
+        },
+        {
+          name: 'Quản lý tin tức',
+          icon: 'mdi-bullhorn ',
+          route: '/news',
+          active: false,
+        },
+        {
+          name: 'Quản lý người dùng',
+          icon: 'mdi-account-cog',
+          route: '/user',
+          active: false,
+        },
+        {
+          name: 'Quản lý hệ thống',
+          icon: 'mdi-cogs',
+          active: false,
+          lists: [
+            {
+              name: 'Phân quyền',
+              icon: 'mdi-lock-open',
+              route: '/author',
+              active: false,
+            },
+            {
+              name: 'Nhóm tài khoản',
+              icon: 'mdi-account-group',
+              route: '/account-group',
+              active: false,
+            }]
+        }]
+      this.$router.push({ name: 'faculty'});
+    }
+    if (this.user.roles[0].name === 'Chuyên viên') {
+      this.navLists = [
+        {
+          name: 'Quản lý liên chi đoàn',
+          icon: 'mdi-home-city',
+          route: '/faculty',
+          active: false,
+        },
+        {
+          name: 'Quản lý chi đoàn',
+          icon: 'mdi-bank',
+          route: '/activity-class',
+          active: false,
+        },
+        {
+          name: 'Quản lý đoàn viên',
+          icon: 'mdi-account-group',
+          route: '/student',
+          active: false,
+        },
+        {
+          name: 'Sổ tay đoàn viên',
+          icon: 'mdi-notebook-multiple',
+          route: '/union-textbook',
+          active: false,
+        },
+        {
+          name: 'Đoàn phí',
+          icon: 'mdi-cash-multiple',
+          route: '/union-fee',
+          active: false,
+        },
+        {
+          name: 'Quản lý hoạt động',
+          icon: 'mdi-flag-variant',
+          route: '/activity',
+          active: false,
+        }
+      ];
+      this.$router.push({ name: 'faculty'});
+    }
+    if (this.user.roles[0].name === 'Bí thư đoàn trường') {
+      this.navLists = [
+        {
+          name: 'Quản lý liên chi đoàn',
+          icon: 'mdi-home-city',
+          route: '/faculty',
+          active: false,
+        },
+        {
+          name: 'Quản lý chi đoàn',
+          icon: 'mdi-bank',
+          route: '/activity-class',
+          active: false,
+        },
+        {
+          name: 'Quản lý đoàn viên',
+          icon: 'mdi-home-city',
+          route: '/student',
+          active: false,
+        },
+        {
+          name: 'Sổ tay đoàn viên',
+          icon: 'mdi-notebook-multiple',
+          route: '/union-textbook',
+          active: false,
+        },
+        {
+          name: 'Đoàn phí',
+          icon: 'mdi-cash-multiple',
+          route: '/union-fee',
+          active: false,
+        },
+        {
+          name: 'Quản lý hoạt động',
+          icon: 'mdi-flag-variant',
+          route: '/activity',
+          active: false,
+        }
+      ];
+      this.$router.push({ name: 'faculty'});
+    }
+    if (this.user.roles[0].name === 'Bí thư liên chi đoàn') {
+      this.navLists = [
+        {
+          name: 'Quản lý chi đoàn',
+          icon: 'mdi-bank',
+          route: '/activity-class',
+          active: false,
+        },
+        {
+          name: 'Quản lý đoàn viên',
+          icon: 'mdi-account-group',
+          route: '/student',
+          active: false,
+        },
+        {
+          name: 'Sổ tay đoàn viên',
+          icon: 'mdi-notebook-multiple',
+          route: '/union-textbook',
+          active: false,
+        },
+        {
+          name: 'Đoàn phí',
+          icon: 'mdi-cash-multiple',
+          route: '/union-fee',
+          active: false,
+        },
+        {
+          name: 'Quản lý hoạt động',
+          icon: 'mdi-flag-variant',
+          route: '/activity',
+          active: false,
+        }
+      ];
+      this.$router.push({ name: 'activity-class-list'});
+    }
+    if (this.user.roles[0].name === 'Bí thư chi đoàn') {
+      this.navLists = [
+        {
+          name: 'Quản lý đoàn viên',
+          icon: 'mdi-account-group',
+          route: '/student',
+          active: false,
+        },
+        {
+          name: 'Quản lý sổ tay đoàn viên',
+          icon: 'mdi-notebook-multiple',
+          route: '/union-textbook',
+          active: false,
+        },
+        {
+          name: 'Quản lý đoàn phí',
+          icon: 'mdi-cash-multiple',
+          route: '/union-fee-of-student',
+          active: false,
+        },
+        {
+          name: 'Thông tin đoàn phí',
+          icon: 'mdi-cash-multiple',
+          route: '/union-fee-of-student',
+          active: false,
+        },
+        {
+          name: 'Thông tin đoàn viên',
+          icon: 'mdi-flag-variant',
+          route: '/profile-me',
+          active: false,
+        },
+      ];
+      this.$router.push({ name: 'student-list'});
+    }
+    if (this.user.roles[0].name === 'Sinh viên') {
+      this.navLists = [
+        {
+          name: 'Thông tin đoàn viên',
+          icon: 'mdi-account-box',
+          route: '/profile-me',
+          active: false,
+        },
+        {
+          name: 'Đoàn phí',
+          icon: 'mdi-cash-multiple',
+          route: 'personal-union-fee',
+          active: false,
+        },
+        {
+          name: 'Hoạt động - Sự kiện',
+          icon: 'mdi-flag-variant',
+          route: '/activity-event',
+          active: false,
+        },
+        {
+          name: 'Điểm tích lũy',
+          icon: 'mdi-clipboard-list-outline',
+          route: '/accumulated-point',
+          active: false,
+        }
+      ]
+      this.$router.push({ name: 'student-profile'});
+    }
+  }
 };
 </script>
 
@@ -116,6 +326,9 @@ export default {
     box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.25);
     img {
       height: 38px;
+    }
+    &:hover {
+      cursor: pointer;
     }
   }
   .v-list-item__icon:first-child {
@@ -134,6 +347,7 @@ export default {
   .active {
     background-color: #42BAEC;
     border-radius: 4px;
+    color: #FFFFFF !important;
   }
 }
 </style>

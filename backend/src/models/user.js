@@ -12,27 +12,6 @@ module.exports = (sequelize, Datatypes) => {
         type: Datatypes.STRING(255),
         allowNull: false,
       },
-      birthday: {
-        type: Datatypes.DATE,
-        allowNull: false,
-      },
-      gender: {
-        type: Datatypes.BOOLEAN,
-        allowNull: false,
-      },
-      phone: {
-        type: Datatypes.STRING(255),
-        allowNull: false,
-      },
-      email: {
-        type: Datatypes.STRING(255),
-        allowNull: false,
-        unique:true,
-      },
-      address: {
-        type: Datatypes.STRING(255),
-        allowNull: false,
-      },
       username: {
         type: Datatypes.STRING(255),
         allowNull: false,
@@ -42,7 +21,7 @@ module.exports = (sequelize, Datatypes) => {
         type: Datatypes.TEXT,
         allowNull: false,
       },
-      isActive: {
+      is_active: {
         type: Datatypes.BOOLEAN,
         allowNull: false,
         default: false,
@@ -56,7 +35,16 @@ module.exports = (sequelize, Datatypes) => {
       updatedAt: 'updated_at',
       deletedAt: 'deleted_at',
       tableName: 'user',
-    }
+    },
   );
+  user.associate = (models) => {
+    user.belongsToMany(models.role, {
+      through: models.roleOfUser,
+      foreignKey: 'user_id',
+    });
+    user.hasOne(models.student, {
+      foreignKey: 'user_id',
+    });
+  };
   return user;
 };

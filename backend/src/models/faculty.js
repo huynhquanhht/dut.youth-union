@@ -4,14 +4,21 @@ module.exports = (sequelize, Datatypes) => {
     'faculty',
     {
       id: {
-        type: Datatypes.INTEGER,
-        autoIncrement: true,
+        type: Datatypes.STRING(3),
         primaryKey: true,
       },
       name: {
         type: Datatypes.STRING(255),
         allowNull: false,
         unique: true,
+      },
+      university_union_id: {
+        type: Datatypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'university_union',
+          key: 'id',
+        }
       },
     },
     {
@@ -24,5 +31,10 @@ module.exports = (sequelize, Datatypes) => {
       tableName: 'faculty',
     }
   );
+  faculty.associate = (models) => {
+    faculty.hasMany(models.activityClass, {foreignKey: 'faculty_id'});
+    faculty.hasMany(models.lecture, {foreignKey: 'faculty_id'});
+    faculty.belongsTo(models.universityUnion, {foreignKey: 'university_union_id'});
+  }
   return faculty;
 };

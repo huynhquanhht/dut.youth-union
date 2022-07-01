@@ -4,28 +4,19 @@ module.exports = (sequelize, Datatypes) => {
     'function',
     {
       id: {
-        type: Datatypes.INTEGER,
-        autoIncrement: true,
+        type: Datatypes.STRING(10),
         primaryKey: true,
       },
       name: {
         type: Datatypes.STRING(255),
         allowNull: false,
       },
-      type: {
-        type: Datatypes.INTEGER,
-        allowNull: false,
-      },
       controller_name: {
         type: Datatypes.STRING(255),
         allowNull: false,
       },
-      action_name: {
-        type: Datatypes.STRING(255),
-        allowNull: false,
-      },
       group_function_id: {
-        type: Datatypes.INTEGER,
+        type: Datatypes.STRING(10),
         allowNull: false,
         references: {
           model: 'group_function',
@@ -43,5 +34,14 @@ module.exports = (sequelize, Datatypes) => {
       tableName: 'function',
     }
   );
+  func.associate = (models) => {
+    func.belongsToMany(models.role, {
+      through: models.permission,
+      foreignKey: 'function_id',
+    });
+    func.belongsTo(models.groupFunction, {
+      foreignKey: 'group_function_id',
+    });
+  };
   return func;
 };

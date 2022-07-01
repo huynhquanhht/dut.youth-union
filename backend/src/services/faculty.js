@@ -1,20 +1,25 @@
 'use strict'
 const facultyRepo = require('../repositories/faculty');
 const MESSAGE = require('../utils/message');
+const models = require('../models');
+const sequelizeUtils = require('../utils/sequelize');
 
-const create = async (name) => {
+const create = async (id, name) => {
   const option = { where: { name: name }};
   const oldFaculty = await facultyRepo.getOne(option);
   if (oldFaculty) {
     return { message: MESSAGE.EXISTED_DATA, result: false };
   }
   if (oldFaculty && oldFaculty.deleted_at) {
-    const condition = { where: { name: name }};
+    const condition = { where: { id: id }};
     const newFaculty = { deleted_at: null };
     await facultyRepo.update(condition, newFaculty);
     return { message: MESSAGE.CREATE_SUCCESS, result: true };
   }
-  const faculty = await facultyRepo.create({ name });
+  const faculty = await facultyRepo.create({
+    id,
+    name,
+    university_union_id: 2});
   if (faculty) {
     return {
       message: MESSAGE.CREATE_SUCCESS,
@@ -25,9 +30,22 @@ const create = async (name) => {
   return { message: MESSAGE.CREATE_FAIL, result: false };
 };
 
-const getAll = async () => {
-  const option = { where: { deleted_at: null }};
-  return facultyRepo.getAll(option);
+const get = async () => {
+  const option = {};
+  option.include = [
+    {
+      model: models.activityClass,
+      where: {deleted_at: null},
+      required: false,
+    },
+  ];
+  option.where = {deleted_at: null};
+  let faculties = await facultyRepo.get(option);
+  faculties = sequelizeUtils.convertJsonToObject(faculties);
+  for (let faculty of faculties.rows) {
+    faculty.classQuantity = faculty.activity_classes.length;
+  }
+  return faculties;
 };
 
 const getById = async (facultyId) => {
@@ -72,7 +90,7 @@ const del = async (facultyId) => {
 
 module.exports = {
   create,
-  getAll,
+  get,
   getById,
   update,
   del,

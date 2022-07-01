@@ -14,8 +14,8 @@ const getOne = (option) => {
   return roleModel.findOne(option);
 };
 
-const getAll = () => {
-  return roleModel.findAndCountAll();
+const getAll = (options) => {
+  return roleModel.findAndCountAll(options);
 };
 
 const update = (condition, newRole) => {

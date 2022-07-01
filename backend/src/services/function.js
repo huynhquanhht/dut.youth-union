@@ -1,6 +1,8 @@
 'use strict'
 const functionRepo = require('../repositories/function');
 const MESSAGE = require('../utils/message');
+const models = require('../models');
+const sequelizeUtils = require('../utils/sequelize');
 
 const create = async (func) => {
   const option = {where: {name: func.name}};
@@ -32,7 +34,12 @@ const create = async (func) => {
 };
 
 const getAll = async () => {
-  const option = {where: {deleted_at: null}};
+  const option = {};
+  option.include = {
+    model: models.groupFunction,
+    where: { deleted_at: null},
+  };
+  option.where = { deleted_at: null };
   return functionRepo.getAll(option);
 };
 

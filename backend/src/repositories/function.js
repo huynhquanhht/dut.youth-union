@@ -14,8 +14,8 @@ const getOne = (option) => {
   return functionModel.findOne(option);
 };
 
-const getAll = () => {
-  return functionModel.findAndCountAll();
+const getAll = (option) => {
+  return functionModel.findAndCountAll(option);
 };
 
 const update = (condition, newFunction) => {

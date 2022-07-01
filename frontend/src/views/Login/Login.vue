@@ -50,6 +50,7 @@
                     v-model="username"
                     hide-details="false"
                     @keyup.enter="login"
+                    @keydown="changeUsername"
                     solo
                     dense
                   ></v-text-field>
@@ -62,6 +63,7 @@
                     :type="showPassword ? 'text' : 'password'"
                     @click:append="showPassword = !showPassword"
                     @keyup.enter="login"
+                    @keydown="changePassword"
                     solo
                     dense
                   ></v-text-field>
@@ -111,33 +113,30 @@ export default {
       fetchLogin: 'fetchLogin',
     }),
     async login() {
-      // navigator.geolocation.getCurrentPosition(
-      //   position => {
-      //     console.log(position.coords.latitude);
-      //     console.log(position.coords.longitude);
-      //   },
-      //   error  row error;}
-      // )
       if (!this.username || !this.password) {
         this.incorrectPassword = true;
         return;
       } 
-      await this.fetchLogin({
+      let isLogined = await this.fetchLogin({
         username: this.username,
         password: this.password,
       });
-      console.log('loginResult - ', this.loginResult);
-      if (this.loginResult.Code === 200) {
-        console.log(this.loginResult);
-        localStorageUtils.getService().setToken(this.loginResult.Data.Token);
+      if (isLogined) {
+        localStorageUtils.getService().setToken(this.loginResult.accessToken);
         localStorageUtils
           .getService()
           .setCurrentUser(this.loginResult.currentUser);
-        this.$router.push('/admin/activity');
+        this.$router.push('/');
       } else {
         this.incorrectPassword = true;
       }
     },
+    changeUsername() {
+      this.incorrectPassword = false;
+    },
+    changePassword() {
+      this.incorrectPassword = false;
+    }
   },
 };
 </script>
@@ -160,7 +159,7 @@ export default {
         background: linear-gradient(
           180deg,
           rgba(6, 181, 230, 0.9) 0%,
-          rgba(7, 92, 218, 0.9) 100%
+          rgba(7, 92, 218, 0.5) 100%
         );
         width: 100vw;
         height: 100vh;
@@ -198,8 +197,8 @@ export default {
         height: 50%;
         .login-form-block {
           width: 320px;
-          height: 400px;
-          background: rgba(255, 255, 255, 0.74);
+          height: 410px;
+          background: rgba(255, 255, 255, 0.8);
           box-shadow: 2px 4px 4px 1px rgba(0, 0, 0, 0.25);
           border-radius: 8px;
           .logo-app {

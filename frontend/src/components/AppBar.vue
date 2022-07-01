@@ -12,7 +12,7 @@
 
 <script>
 import ProfileOption from './ProfileOption.vue';
-// import localStorageUtils from '@/utils/local_storage';
+import localStorageUtils from '@/utils/local_storage';
 export default {
   components: { ProfileOption },
   name: 'AppBar',
@@ -27,7 +27,7 @@ export default {
     },
   },
   created() {
-    // this.currentUser = localStorageUtils.getService().getCurrentUser();
+    this.currentUser = localStorageUtils.getService().getCurrentUser();
   },
 };
 </script>

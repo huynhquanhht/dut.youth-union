@@ -13,28 +13,12 @@ module.exports = (sequelize, Datatypes) => {
         allowNull: false,
         unique: true,
       },
-      gender: {
-        type: Datatypes.BOOLEAN,
-        allowNull: false,
-      },
-      birthday: {
-        type: Datatypes.DATE,
-        allowNull: false,
-      },
-      address: {
-        type: Datatypes.STRING(255),
-        allowNull: false,
-      },
-      email: {
-        type: Datatypes.STRING(255),
-        allowNull: false,
-      },
       phone: {
         type: Datatypes.STRING(255),
         allowNull: false,
       },
       faculty_id: {
-        type: Datatypes.INTEGER,
+        type: Datatypes.STRING(3),
         allowNull: false,
         references: {
           model: 'faculty',
@@ -60,5 +44,8 @@ module.exports = (sequelize, Datatypes) => {
       tableName: 'lecture',
     }
   );
+  lecture.associate = (models) => {
+    lecture.belongsTo(models.faculty, {foreignKey: 'faculty_id'})
+  }
   return lecture;
 };

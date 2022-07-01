@@ -4,30 +4,33 @@ const MESSAGE = require('../utils/message');
 
 // [POST]: /faculty
 const create = async (req, res) => {
+  const id = req.body.id;
   const name = req.body.name;
-  if (!name) {
+  if (!name || !id) {
     res.status(400).send({ message: MESSAGE.CREATE_FAIL });
     return;
   }
   try {
-    const creation = await facultyService.create(name);
+    const creation = await facultyService.create(id, name);
     if (!creation.result) {
       res.status(400).send({ message: creation.message });
       return;
     }
     res.status(200).send({ message: creation.message });
   } catch (error) {
+    console.log(error);
     res.status(500).send({ message: MESSAGE.SERVER_ERROR});
   }
 }
 
-// [GET]: /faculty/all
-const getAll = async (req, res) => {
+// [GET]: /faculty
+const get = async (req, res) => {
   try {
-    const result = await facultyService.getAll();
-    console.log('result - ', JSON.parse(JSON.stringify(result)));
+    let query = req.query;
+    const result = await facultyService.get(query);
     res.status(200).send(result);
   } catch (error) {
+    console.log(error);
     res.status(500).send({ message: MESSAGE.SERVER_ERROR});
   }
 }
@@ -37,6 +40,7 @@ const getById = async (req, res) => {
   try {
     const facultyId = req.params.id;
     const result = await facultyService.getById(facultyId);
+    console.log(JSON.parse(JSON.stringify(result)));
     res.status(200).send(result);
   } catch (error) {
     res.status(500).send({ message: MESSAGE.SERVER_ERROR});
@@ -59,6 +63,7 @@ const update = async (req, res) => {
     res.status(400).send({ message: update.message });
     return;
   } catch (error) {
+    console.log(error);
     res.status(500).send({ message: MESSAGE.SERVER_ERROR});
   }
 };
@@ -84,7 +89,7 @@ const del = async (req, res) => {
 
 module.exports = {
   create,
-  getAll,
+  get,
   getById,
   update,
   del

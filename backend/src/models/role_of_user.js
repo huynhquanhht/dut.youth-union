@@ -15,15 +15,15 @@ module.exports = (sequelize, Datatypes) => {
           model: 'user',
           key: 'id',
         },
-        unique: true,
       },
       role_id: {
         type: Datatypes.INTEGER,
+        primaryKey: false,
+        unique: false,
         references: {
           model: 'role',
           key: 'id',
         },
-        unique: true,
       },
     },
     {
@@ -36,5 +36,6 @@ module.exports = (sequelize, Datatypes) => {
       tableName: 'role_of_user',
     }
   );
+  roleOfUser.associate = (models) => {};
   return roleOfUser;
 };
