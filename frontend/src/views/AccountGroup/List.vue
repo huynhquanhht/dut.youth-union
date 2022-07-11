@@ -35,6 +35,7 @@
                 text
                 width="100px"
                 class="tool-button"
+                @click="create"
               >
                 <v-icon dark size="24">mdi-plus</v-icon>
                 Thêm mới
@@ -43,6 +44,7 @@
                 text
                 width="100px"
                 class="tool-button"
+                @click="update"
               >
                 <v-icon dark size="20">mdi-square-edit-outline</v-icon>
                 Chỉnh sửa
@@ -51,6 +53,7 @@
                 text
                 width="50px"
                 class="tool-button"
+                @click="remove"
               >
                 <v-icon dark size="20">mdi-trash-can-outline</v-icon>
                 Xóa
@@ -64,8 +67,9 @@
 </template>
 
 <script>
-import {mapGetters, mapActions} from 'vuex';
+import {mapGetters, mapActions, mapMutations} from 'vuex';
 import timeUtils from "@/utils/time";
+import MESSAGE from "@/utils/message";
 
 export default {
   name: 'roles',
@@ -120,6 +124,9 @@ export default {
     ...mapActions({
       fetchGetAllRoles: 'fetchGetAllRoles',
     }),
+    ...mapMutations({
+      setSnackbar: 'setSnackbar',
+    }),
     deleteItems() {
       this.dialogTitle = 'Xóa dữ liệu';
       this.dialogContent = 'Bạn chắc chắn muốn xóa dữ liệu đã chọn?';
@@ -130,6 +137,27 @@ export default {
     },
     formatTime(time) {
       return timeUtils.convertDateTimeToDate(time);
+    },
+    create() {
+      this.setSnackbar({
+        type: 'info',
+        visible: true,
+        text: MESSAGE.FEATURE_DEVELOP,
+      });
+    },
+    update() {
+      this.setSnackbar({
+        type: 'info',
+        visible: true,
+        text: MESSAGE.FEATURE_DEVELOP,
+      });
+    },
+    remove() {
+      this.setSnackbar({
+        type: 'info',
+        visible: true,
+        text: MESSAGE.FEATURE_DEVELOP,
+      });
     }
   },
   async created() {

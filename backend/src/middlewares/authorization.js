@@ -9,9 +9,9 @@ const authorize = async (req, res, next) => {
       res.status(403).send({ message: MESSAGE.NO_PERMISSION });
       return;
     }
-    const user = await userService.authorize(req.payload, functionId);
-    console.log('author - ', user);
-    if (user) {
+    let user = await userService.authorize(req.payload, functionId);
+    user = JSON.parse(JSON.stringify(user));
+    if (!!user && user.rows[0].roles[0].functions[0].permission.is_access) {
       req.currentUser = user;
       next();
     } else {

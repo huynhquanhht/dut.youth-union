@@ -47,7 +47,14 @@
               <span class="require">(*)</span>
             </span>
             <div class="time-start">
-              <date-picker class="input-date-time" v-model="beginAt" :timezone="timeZone" mode="dateTime" is24hr>
+              <date-picker
+                class="input-date-time"
+                v-model="beginAt"
+                mode="dateTime"
+                :masks="masks"
+                is24hr
+                :max-date="endAt"
+              >
                 <template v-slot="{ inputValue, inputEvents }">
                   <input
                     class="px-2 py-1 border rounded focus:outline-none focus:border-blue-300"
@@ -64,7 +71,13 @@
               <span class="require">(*)</span>
             </span>
             <div class="time-end">
-              <date-picker class="input-date-time" v-model="endAt" :timezone="timeZone" mode="dateTime" is24hr>
+              <date-picker
+                class="input-date-time"
+                v-model="endAt"
+                mode="dateTime"
+                :masks="masks" is24hr
+                :min-date="beginAt"
+              >
                 <template v-slot="{ inputValue, inputEvents }">
                   <input
                     class="px-2 py-1 border rounded focus:outline-none focus:border-blue-300"
@@ -83,7 +96,12 @@
               <span class="require">(*)</span>
             </span>
             <div class="time-start">
-              <date-picker class="input-date-time" v-model="beginRegistrationAt" :timezone="timeZone" mode="dateTime" is24hr>
+              <date-picker
+                class="input-date-time"
+                v-model="beginRegistrationAt"
+                mode="dateTime"
+                :max-date="endRegistrationAt"
+                :masks="masks" is24hr>
                 <template v-slot="{ inputValue, inputEvents }">
                   <input
                     class="px-2 py-1 border rounded focus:outline-none focus:border-blue-300"
@@ -100,7 +118,13 @@
               <span class="require">(*)</span>
             </span>
             <div class="time-end">
-              <date-picker class="input-date-time" v-model="endRegistrationAt" :timezone="timeZone" mode="dateTime" is24hr>
+              <date-picker
+                class="input-date-time"
+                v-model="endRegistrationAt"
+                mode="dateTime"
+                :min-date="beginRegistrationAt"
+                :masks="masks"
+                is24hr>
                 <template v-slot="{ inputValue, inputEvents }">
                   <input
                     class="px-2 py-1 border rounded focus:outline-none focus:border-blue-300"
@@ -156,6 +180,10 @@
               filled
               solo
               dense
+              type="number"
+              step="any"
+              min="0"
+              ref="input"
             ></v-text-field>
           </div>
           <div class="input-point">
@@ -171,6 +199,10 @@
               filled
               solo
               dense
+              type="number"
+              step="any"
+              min="0"
+              ref="input"
             ></v-text-field>
           </div>
         </div>
@@ -206,7 +238,7 @@ import {mapGetters, mapMutations, mapActions} from 'vuex';
 import DecoupledEditor from '@ckeditor/ckeditor5-build-decoupled-document';
 import {DatePicker} from 'v-calendar'
 import MESSAGE from '@/utils/message';
-import timeUtils from "@/utils/time";
+// import timeUtils from "@/utils/time";
 import ConfirmDialog from "@/components/ConfirmDialog";
 
 export default {
@@ -245,6 +277,9 @@ export default {
       confirmDialog: false,
       dialogTitle: '',
       dialogContent: '',
+      masks: {
+        input: 'YYYY-MM-DD hh:mm'
+      }
     };
   },
   computed: {
@@ -289,10 +324,10 @@ export default {
       const data = {
         activityName: this.activityName,
         organizationUnit: this.organizationUnit,
-        beginAt: timeUtils.formatTime(this.beginAt),
-        endAt: timeUtils.formatTime(this.endAt),
-        beginRegistrationAt: timeUtils.formatTime(this.beginRegistrationAt),
-        endRegistrationAt: timeUtils.formatTime(this.endRegistrationAt),
+        beginAt: this.beginAt,
+        endAt: this.beginAt,
+        beginRegistrationAt: this.beginRegistrationAt,
+        endRegistrationAt: this.beginRegistrationAt,
         place: this.place,
         participantQuantity: this.participantQuantity,
         point: this.point,
@@ -320,7 +355,7 @@ export default {
       let data = this.getData();
       console.log('data - ', data);
       if (this.type === 'Create') {
-        let createResult = await this.fetchCreateActivity({activity: data});
+        const createResult = await this.fetchCreateActivity({activity: data});
         if (createResult) {
           this.$router.push({name: 'activity-list'});
         }

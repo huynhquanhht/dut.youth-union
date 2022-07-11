@@ -44,8 +44,8 @@ const getByCurrentStudent = (query) => {
   return axiosUtils.getRequest(url);
 };
 
-const getPointListOfCurrentStudent = () => {
-  let url = `${BASE_URL}/student/point-list`;
+const getPointListOfCurrentStudent = (schoolYear) => {
+  let url = `${BASE_URL}/student/point-list?schoolYear=${schoolYear}`;
   return axiosUtils.getRequest(url);
 };
 

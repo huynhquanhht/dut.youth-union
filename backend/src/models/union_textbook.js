@@ -25,6 +25,10 @@ module.exports = (sequelize, Datatypes) => {
         type: Datatypes.DATE,
         allowNull: true,
       },
+      join_union_at: {
+        type: Datatypes.BOOLEAN,
+        allowNull: true,
+      },
       student_id: {
         type: Datatypes.STRING(9),
         references: {

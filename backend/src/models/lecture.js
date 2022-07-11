@@ -17,6 +17,14 @@ module.exports = (sequelize, Datatypes) => {
         type: Datatypes.STRING(255),
         allowNull: false,
       },
+      email: {
+        type: Datatypes.STRING(255),
+        allowNull: false,
+      },
+      is_faculty_secretary: {
+        type: Datatypes.BOOLEAN,
+        allowNull: false,
+      },
       faculty_id: {
         type: Datatypes.STRING(3),
         allowNull: false,

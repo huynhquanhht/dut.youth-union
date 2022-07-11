@@ -18,7 +18,7 @@
       Không có dữ liệu để hiển thị!
     </template>
     <template v-slot:top>
-      <v-card-title>THÔNG TIN ĐOÀN PHÍ CÁ NHÂN</v-card-title>
+      <v-card-title>THÔNG TIN NỘP ĐOÀN PHÍ CÁ NHÂN</v-card-title>
     </template>
     <template v-slot:item.amount_of_money="{ item }">
       <span>{{ formatMoney(item.amount_of_money)}}</span>
@@ -138,6 +138,7 @@ export default {
   padding: 20px 10px;
   height: 100vh;
   background-color: #FFFFFF !important;
+  border-radius: 8px;
   .v-card__title {
     padding: 4px 0px 8px 0px !important;
     font: normal 700 18px Roboto;

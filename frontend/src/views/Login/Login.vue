@@ -13,7 +13,7 @@
             </div>
             <div class="color-background"></div>
           </div>
-          <div class="login-content d-flex align-center">
+          <div class="login-content">
             <div
               class="left-content d-flex flex-column justify-center align-center"
             >
@@ -40,7 +40,7 @@
             <div class="right-content d-flex align-center justify-center">
               <div class="login-form-block">
                 <div class="logo-app">
-                  <img src="../../assets/logo/logo-color-app-text.svg" alt="">
+                  <img src="../../assets/logo/Asset4.svg" alt="">
                 </div>
                 <form class="login-form pa-7">
                   <v-text-field
@@ -67,7 +67,7 @@
                     solo
                     dense
                   ></v-text-field>
-                  <p class="login-fail-text mt-1 ml-3" v-if="incorrectPassword">
+                  <p class="login-fail-text mt-4 ml-3" v-if="incorrectPassword">
                     {{ loginFailText }}
                   </p>
                   <v-btn
@@ -111,6 +111,7 @@ export default {
   methods: {
     ...mapActions({
       fetchLogin: 'fetchLogin',
+      fetchGetUserById: 'fetchGetUserById',
     }),
     async login() {
       if (!this.username || !this.password) {
@@ -125,8 +126,8 @@ export default {
         localStorageUtils.getService().setToken(this.loginResult.accessToken);
         localStorageUtils
           .getService()
-          .setCurrentUser(this.loginResult.currentUser);
-        this.$router.push('/');
+          .setCurrentUser(this.loginResult.currentUser)
+        this.$router.push('/home');
       } else {
         this.incorrectPassword = true;
       }
@@ -169,6 +170,8 @@ export default {
       width: 100vw;
       height: 100vh;
       position: absolute;
+      display: flex;
+      align-items: center;
       .left-content {
         width: 50%;
         height: 50%;
@@ -218,6 +221,7 @@ export default {
             .login-fail-text {
               font: normal 400 13px Roboto;
               color: red;
+              margin-top: 10px;
             }
             .v-btn {
               background: linear-gradient(180deg, #06b5e6 0%, #075cda 100%);
@@ -239,4 +243,7 @@ export default {
     }
   }
 }
+</style>
+<style src="@/assets/styles/login.css" scoped>
+
 </style>

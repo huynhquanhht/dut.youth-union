@@ -4,8 +4,8 @@ const MESSAGE = require('../utils/message.js');
 
 const getAll = async (req, res) => {
   try {
-    const {page, size} = req.query;
-    const activityList = await activityService.getAll(page, size);
+    const query = req.query;
+    const activityList = await activityService.getAll(query);
     res.status(200).send(activityList);
   } catch (error) {
     console.log(error);
@@ -15,10 +15,12 @@ const getAll = async (req, res) => {
 
 const get = async (req, res) => {
   try {
-    const option = req.query.option;
-    const activityList = await activityService.get(option);
+    const query = req.query;
+    console.log('query - ', query);
+    const activityList = await activityService.get(query.option);
     res.status(200).send(activityList);
   } catch (error) {
+    console.log(error);
     res.status(500).send({ message: MESSAGE.SERVER_ERROR });
   }
 };
@@ -38,8 +40,9 @@ const getByCurrentStudent = async (req, res) => {
 
 const getPointListOfCurrentStudent = async (req, res) => {
   try {
+    const schoolYear = req.query.schoolYear;
     const currentUserId = req.payload.userId;
-    const pointList = await activityService.getPointListOfCurrentStudent(currentUserId);
+    const pointList = await activityService.getPointListOfCurrentStudent(currentUserId, schoolYear);
     console.log('pointList -', pointList);
     res.status(200).send(pointList);
   } catch (error) {
@@ -93,6 +96,7 @@ const create = async (req, res) => {
     }
     console.log('newActivity - ', newActivity);
     const isCreated = await activityService.create(newActivity, currentUserId);
+    console.log('isCreated - ', isCreated);
     if (isCreated) {
       res.status(200).send({ message: MESSAGE.CREATE_SUCCESS });
       return;
@@ -129,7 +133,7 @@ const deleteParticipants = async (req, res) => {
       res.status(400).send({ message: MESSAGE.INVALID_DATA });
       return;
     }
-    const deletionResult = await activityService.deleteByIds(registrationIds);
+    const deletionResult = await activityService.deleteParticipants(registrationIds);
     if (deletionResult) {
       res.status(200).send({
         message:
@@ -284,7 +288,7 @@ const attend = async (req, res) => {
   } catch (error) {
     res.status(500).send({ message: MESSAGE.SERVER_ERROR });
   }
-}
+};
 
 module.exports = {
   getAll,

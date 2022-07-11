@@ -4,14 +4,13 @@ const MESSAGE = require('../utils/message');
 
 // [POST]: /faculty
 const create = async (req, res) => {
-  const id = req.body.id;
-  const name = req.body.name;
-  if (!name || !id) {
+  const { id, name, address, email, phone } = req.body;
+  if (!name || !id || !address || !email || !phone) {
     res.status(400).send({ message: MESSAGE.CREATE_FAIL });
     return;
   }
   try {
-    const creation = await facultyService.create(id, name);
+    const creation = await facultyService.create({ id, name, address, email, phone });
     if (!creation.result) {
       res.status(400).send({ message: creation.message });
       return;
@@ -51,7 +50,8 @@ const getById = async (req, res) => {
 const update = async (req, res) => {
   try {
     const faculty = req.body.faculty;
-    if (!faculty.id || !faculty.name) {
+    console.log('faculty - ', faculty);
+    if (!faculty.id || !faculty.name || !faculty.address || !faculty.email || !faculty.phone) {
       res.status(400).send({ message: MESSAGE.UPDATE_FAIL });
       return;
     }

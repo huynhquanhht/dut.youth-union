@@ -4,6 +4,7 @@ const MESSAGE = require('../utils/message');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const models = require('../models');
+const timeUtils = require('../utils/time');
 
 const authorize = async (payload, functionId) => {
   const option = {};
@@ -96,7 +97,6 @@ const login = async (username, password) => {
 };
 
 const getUserProfile = async (userId) => {
-  console.log('userId - ', userId);
   const option = {};
   option.include = [
     {
@@ -106,11 +106,15 @@ const getUserProfile = async (userId) => {
         include: [{
           model: models.faculty
         }]
+      },
+      {
+        model: models.unionTextbook,
       }]
     }];
   option.where = { id: userId};
   let student =  await userRepo.getOne(option);
   student = JSON.parse(JSON.stringify(student));
+  student.student.birthday = timeUtils.convertDateTimeToDate(student.student.birthday);
   delete student.password;
   return student;
 };

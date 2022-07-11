@@ -79,9 +79,14 @@
         </div>
         <v-divider></v-divider>
       </template>
+      <template v-slot:item.register_join.registered_at="{ item }">
+        <span>
+          {{item.register_join.registered_at ? timeUtils.formatTime(item.register_join.registered_at) : '-' }}
+        </span>
+      </template>
       <template v-slot:item.register_join.attended_at="{ item }">
         <span>
-          {{item.register_join.attended_at ? item.register_join.attended_at : '-' }}
+          {{item.register_join.attended_at ? timeUtils.formatTime(item.register_join.attended_at) : '-' }}
         </span>
       </template>
       <template v-slot:footer>
@@ -136,6 +141,7 @@ import ConfirmDialog from '@/components/ConfirmDialog';
 import MESSAGE from '@/utils/message';
 import jwt from 'jsonwebtoken';
 import RegisterForm from '@/views/RegisterJoin/Form';
+import time from '@/utils/time';
 
 export default {
   name: 'activity-list',
@@ -196,6 +202,7 @@ export default {
         {text: 'Họ tên', value: 'name'},
         {text: 'Lớp', value: 'activity_class.name'},
         {text: 'Khoa', value: 'activity_class.faculty.name'},
+        {text: 'Đăng ký lúc', value: 'register_join.registered_at'},
         {text: 'Điểm danh', value: 'register_join.attended_at'},
       ],
       dialogTitle: null,
@@ -205,6 +212,7 @@ export default {
       qrData: null,
       registerDialog: false,
       confirmDialog: false,
+      timeUtils: time,
     };
   },
   computed: {

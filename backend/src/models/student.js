@@ -11,6 +11,22 @@ module.exports = (sequelize, Datatypes) => {
         type: Datatypes.STRING(255),
         allowNull: false,
       },
+      gender: {
+        type: Datatypes.BOOLEAN,
+        allowNull: true,
+      },
+      birthday: {
+        type: Datatypes.DATEONLY,
+        allowNull: true,
+      },
+      email: {
+        type: Datatypes.STRING(255),
+        allowNull: true,
+      },
+      phone: {
+        type: Datatypes.STRING(10),
+        allowNull: true,
+      },
       activity_class_id: {
         type: Datatypes.STRING(255),
         allowNull: false,

@@ -47,7 +47,6 @@ const getOfStudents = async (currentUserId, query) => {
   if (user.roles[0].name === roleUtils.FACULTY_SECRETARY) {
     const lecture = await lectureRepo.getOne({where: {user_id: user.id}});
     const facultyId = lecture.faculty_id;
-
     option.limit = query.size ? +query.size : 10;
     option.offset = query.page ? (query.page - 1) * query.size : 1;
     option.include = [{
@@ -60,19 +59,31 @@ const getOfStudents = async (currentUserId, query) => {
         model: models.faculty,
         where: {id: facultyId}
       }]
-      // where: {id: user.student.activity_class_id}
     }];
-    // option.where = {activity_class_id: user.student.activity_class_id};
+    if (query.studentId !== null) {
+      option.where = {id: query.studentId};
+    }
+    if (query.className !== null) {
+      option.include[1].where = { id: query.className };
+    }
   } else {
     option.limit = query.size ? +query.size : 10;
     option.offset = query.page ? (query.page - 1) * query.size : 1;
     option.include = [{
       model: models.unionFee,
       where: {id: 23},
-      require: false,
+      require: true,
     }, {
       model: models.activityClass,
     }];
+    if (query.studentId) {
+      console.log('a');
+      option.where = {id: query.studentId};
+    }
+    if (query.className) {
+      console.log('b');
+      option.include[1].where = { id: query.className };
+    }
   }
   let unionFeeOfStudents = await studentRepo.get(option);
   unionFeeOfStudents = JSON.parse(JSON.stringify(unionFeeOfStudents));
@@ -80,6 +91,7 @@ const getOfStudents = async (currentUserId, query) => {
     item.unionFee = item.union_fees[0];
   })
   unionFeeOfStudents = sequelizeUtils.convertJsonToObject(unionFeeOfStudents);
+  console.log('history');
   return unionFeeOfStudents;
 };
 

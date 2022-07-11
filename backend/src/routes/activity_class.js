@@ -5,7 +5,6 @@ const authen = require('../middlewares/authentication');
 const fileUtils = require('../utils/file');
 const multer = require('multer');
 const upload = multer({ storage: fileUtils.fileStorageEngine})
-
 router.post('/', authen.authenticateToken, activityClassController.create);
 router.post('/create-by-csv', authen.authenticateToken, upload.single('file'), activityClassController.createByCSV)
 router.get('/', authen.authenticateToken, activityClassController.get);

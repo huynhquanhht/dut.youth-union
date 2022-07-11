@@ -42,7 +42,7 @@
                   @click="editFaculty"
               >
                 <v-icon dark size="20">mdi-square-edit-outline</v-icon>
-                Chỉnh sửa
+                Cập nhật
               </v-btn>
 <!--              <v-btn-->
 <!--                  text-->
@@ -57,13 +57,23 @@
         </div>
       </template>
     </v-data-table>
-    <v-dialog v-model="formDialog" width="360px">
+    <v-dialog
+      v-model="formDialog"
+      width="360px"
+      fullscreen
+      hide-overlay
+      transition="dialog-bottom-transition"
+      scrollable
+    >
       <faculty-form
         :faculty="faculty"
         :formType="formType"
         @faculty-form="facultyFormHandler"/>
     </v-dialog>
-    <v-dialog v-model="dialog" width="200px">
+    <v-dialog
+      v-model="dialog"
+      width="200px"
+    >
       <confirm-dialog
         @confirm-dialog="handleConfirm"
         :title="dialogTitle"
@@ -114,13 +124,23 @@ export default {
           value: 'id',
         },
         {text: 'Liên chi đoàn khoa', value: 'name'},
-        {text: 'Số chi đoàn', value: 'classQuantity'},
+        {
+          text: 'Email',
+          value: 'email',
+        },
+        {
+          text: 'Điện thoại',
+          value: 'phone'
+        },
+        { text: 'Số chi đoàn', value: 'classQuantity'},
+        { text: 'Bí thư', value: 'secretary.name'},
+        { text: 'Email', value: 'secretary.email'},
+        { text: 'Điện thoại', value: 'secretary.phone'}
       ],
       dialogTitle: null,
       dialogContent: null,
       formType: '',
-  }
-    ;
+    };
   },
   computed: {
     ...mapGetters({
@@ -173,14 +193,15 @@ export default {
     },
     async facultyFormHandler(data) {
       if (data.command === 'close') {
+        this.selected = [];
         this.formDialog = false;
       }
       if (data.command === 'Create') {
-        console.log(data.faculty);
         const isCreated = await this.fetchCreateFaculty({faculty: data.faculty});
         if (isCreated) {
           await this.fetchGetFaculties();
         }
+        this.selected = [];
         this.formDialog = false;
       }
       if (data.command === 'Update') {
@@ -189,12 +210,13 @@ export default {
         if (isUpdated) {
           await this.fetchGetFaculties();
         }
+        this.selected = [];
         this.formDialog = false;
       }
     },
     clickFaculty(e) {
       this.$router.push({ name: 'activity-class-list', query: {facultyId: e.id}})
-    }
+    },
   },
   async created() {
     this.loading = true;
@@ -208,9 +230,10 @@ export default {
 
 <style lang="scss">
 .faculty-wrapper {
-  height: 100vh;
+  //height: 100vh;
   background-color: #FFFFFF !important;
   border-radius: 8px;
+  max-width: 1100px;
   .v-data-table {
     border-radius: 20px !important;
   }
@@ -358,8 +381,8 @@ export default {
               }
 
               &:nth-child(2) {
-                min-width: 60px !important;
-                max-width: 60px !important;
+                min-width: 70px !important;
+                max-width: 70px !important;
               }
 
               &:nth-child(3) {
@@ -368,6 +391,15 @@ export default {
 
               &:nth-child(4) {
                 min-width: 100px !important;
+              }
+
+              &:nth-child(6) {
+                min-width: 120px !important;
+                max-width: 120px !important;
+              }
+              &:nth-child(7) {
+                min-width: 180px !important;
+                max-width: 180px !important;
               }
             }
 

@@ -12,31 +12,14 @@
               class="search-select mr-2"
               hide-details="false"
               item-text="name"
+              item-value="roleId"
               solo
               dense
+              :items="selectOptions"
+              v-model="selectedOption"
+              @change="getFunctionListByRole"
             ></v-select>
           </div>
-          <div class="func-search d-flex align-center" >
-            <span class="text-content mr-1">Nhóm chức năng: </span>
-            <v-text-field
-              solo
-              dense
-              filled
-              prepend-inner-icon="mdi-magnify"
-              hide-details="false"
-              class="input-search"
-            ></v-text-field>
-          </div>
-        </div>
-        <div class="tool-button-block d-flex align-center">
-          <v-btn
-            text
-            width="50px"
-            class="tool-button"
-          >
-            <v-icon dark size="22">fa-save</v-icon>
-            <span class="ml-1">Lưu</span>
-          </v-btn>
         </div>
       </div>
     </div>
@@ -56,31 +39,122 @@
             <v-simple-checkbox
               color="info"
               v-model="func.permission.is_access"
+              @click="changePermission(func, func.permission.is_access)"
             ></v-simple-checkbox>
             <span class="text-content">{{ func.name }}</span>
           </v-col>
         </div>
       </v-row>
     </div>
-
+    <v-dialog v-model="confirmDialog" width="400px" persistent>
+    <confirm-dialog
+      @confirm-dialog="handleConfirm"
+      :title="dialogTitle"
+      :content="dialogContent"
+    ></confirm-dialog>
+  </v-dialog>
   </div>
 </template>
 
 <script>
 import { mapGetters, mapActions } from "vuex";
+import ConfirmDialog from '@/components/ConfirmDialog';
 
 export default {
   name: "List",
+  components: {
+    ConfirmDialog,
+  },
   computed: {
     ...mapGetters({
       role: 'getRole',
     })
   },
+  data() {
+    return {
+      selectedOption: 1,
+      confirmDialog: false,
+      dialogTitle: '',
+      dialogContent: '',
+      roleId: 1,
+      func: null,
+      action: '',
+      isAccess: null,
+      selectOptions: [
+        {
+          name: 'Quản trị viên',
+          roleId: 1,
+        },
+        {
+          name: 'Chuyên viên',
+          roleId: 2,
+        },
+        {
+          name: 'Ban thường vụ',
+          roleId: 3,
+        },
+        {
+          name: 'Bí thư liên chi đoàn',
+          roleId: 4,
+        },
+        {
+          name: 'Bí thư chi đoàn',
+          roleId: 5,
+        },
+        {
+          name: 'Sinh viên',
+          roleId: 6,
+        },
+      ]
+    }
+  },
   methods: {
     ...mapActions({
       fetchGetRoleById: 'fetchGetRoleById',
+      fetchUpdatePermission: 'fetchUpdatePermission',
     }),
-
+    getFunctionListByRole(roleId) {
+      console.log(this.selectedOption);
+      this.roleId = roleId;
+      this.fetchGetRoleById({id: this.roleId});
+    },
+    changePermission(func, isAccess) {
+      let roleName = '';
+      if (isAccess) {
+        console.log('selectedOption - ', this.selectedOption);
+        roleName = this.selectOptions.filter(item => item.roleId === this.selectedOption)[0].name;
+        this.dialogTitle = 'Xác nhận cấp quyền';
+        this.dialogContent = `Bạn chắc chắn muốn cấp quyền sử dụng tính năng ${func.name} cho vai trò ${roleName}`;
+      } else {
+        roleName = this.selectOptions.filter(item => item.roleId === this.selectedOption)[0].name;
+        this.dialogTitle = 'Xác nhận dừng cấp quyền';
+        this.dialogContent = `Bạn chắc chắn muốn dừng cấp quyền sử dụng tính năng ${func.name} cho vai trò ${roleName}?`;
+      }
+      this.action = 'Update'
+      this.isAccess = isAccess;
+      console.log('func - ', func);
+      this.func = func;
+      this.confirmDialog = true;
+    },
+    async handleConfirm(command) {
+      if (command === 'Ok') {
+        if (this.action === 'Update') {
+          await this.fetchUpdatePermission({
+            permission: {
+              id: this.func.permission.id,
+              isAccess: this.isAccess,
+            }
+          });
+          this.confirmDialog = false;
+          await this.fetchGetRoleById({id: this.roleId});
+          return;
+        }
+      }
+      if (command === 'Cancel') {
+        await this.fetchGetRoleById({id: this.roleId});
+        this.confirmDialog = false;
+      }
+    },
   },
   created() {
     this.fetchGetRoleById({id: 1});

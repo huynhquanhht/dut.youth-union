@@ -102,15 +102,12 @@ export default {
 
   .v-main__wrap {
     background-color: #F6F6F6;
+    max-width: unset !important;
   }
 
-  .container {
-    //height: 100vh;
-    // display: flex;
-    // justify-content: center;
-  }
+  .v-list-item__content {
+    display: flex !important;
 
-  .main-content {
   }
 }
 </style>

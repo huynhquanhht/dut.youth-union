@@ -9,9 +9,9 @@ const actions = {
     const res = await unionFeeApi.getOfStudent();
     commit('setUnionFeeOfStudent', res.data);
   },
-  fetchGetUnionFeeOfStudents: async ({commit}) => {
+  fetchGetUnionFeeOfStudents: async ({commit}, payload) => {
     console.log('mpq');
-    const res = await unionFeeApi.getOfStudents();
+    const res = await unionFeeApi.getOfStudents(payload.query);
     commit('setUnionFeeOfStudents', res.data);
   },
   fetchSubmitUnionFee: async ({commit}, payload) => {

@@ -156,6 +156,44 @@ const createMany = async (file) => {
   return true;
 };
 
+const getById = async (studentId) => {
+  let options = {};
+  options.where = {id: studentId};
+  options.include = [{ model: models.activityClass }];
+  return await studentRepo.getOne(options);
+}
+const create = async (student) => {
+  return await studentRepo.create({
+    id: student.id,
+    name: student.name,
+    gender: student.gender,
+    birthday: student.birthday,
+    email: student.email,
+    phone: student.phone,
+    activity_class_id: student.activityClassId,
+    is_class_secretary: student.isClassSecretary,
+    is_union_member: student.isUnionMember,
+  });
+};
+
+const update = async (student) => {
+  let condition = {
+     where: { id: student.id },
+  };
+  let newStudent = {
+    name: student.name,
+    gender: student.gender,
+    birthday: student.birthday,
+    email: student.email,
+    phone: student.phone,
+    activity_class_id:student.activity_class_id,
+  }
+  const isUpdated = await studentRepo.update(condition, newStudent);
+  return isUpdated[0] ? true : false;
+};
+
+
+
 const deleteStudent = async (studentId) => {
   let option = {};
   option.where = { id: studentId };
@@ -176,4 +214,6 @@ module.exports = {
   get,
   createMany,
   deleteStudent,
+  getById,
+  create, update
 };

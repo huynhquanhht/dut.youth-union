@@ -22,8 +22,8 @@ const actions = {
     const res = await activityApi.getByCurrentStudent(query);
     commit('setMyActivities', res.data);
   },
-  fetchGetPointListOfCurrentStudent: async ({commit}) => {
-    const res = await activityApi.getPointListOfCurrentStudent();
+  fetchGetPointListOfCurrentStudent: async ({commit}, payload) => {
+    const res = await activityApi.getPointListOfCurrentStudent(payload.schoolYear);
     commit('setPointListOfCurrentStudent', res.data);
   },
   fetchCreateActivity: async ({commit}, payload) => {

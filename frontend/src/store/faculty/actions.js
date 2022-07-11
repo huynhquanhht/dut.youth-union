@@ -38,6 +38,7 @@ const actions = {
       });
       return true;
     } catch (error) {
+      console.log(error);
       commit('setSnackbar', {
         type: 'error',
         visible: true,

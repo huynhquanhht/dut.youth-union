@@ -17,6 +17,18 @@ const get = (query) => {
 const createByCSV = (file) => {
   const url = `${BASE_URL}/create-by-csv`;
   return axiosUtils.postRequest(url, file);
+};
+
+const getById = (id) => {
+  return axiosUtils.getRequest(`${BASE_URL}/${id}`);
+};
+
+const create = (student) => {
+  return axiosUtils.postRequest(`${BASE_URL}`, {student});
 }
 
-export default  { get, createByCSV };
+const update = (student) => {
+  return axiosUtils.putRequest(`${BASE_URL}`, {student});
+}
+
+export default  { get, createByCSV, getById, create, update };
