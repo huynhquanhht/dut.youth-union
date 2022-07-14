@@ -14,6 +14,7 @@ const unionTextbook = require('./union_textbook');
 const unionFee = require('./union_fee');
 const activity = require('./activity');
 const news = require('./news');
+const permission = require('./permission');
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 const routes = (app) => {
@@ -30,6 +31,7 @@ const routes = (app) => {
   app.use('/union-fee', unionFee);
   app.use('/activity', activity);
   app.use('/news', news);
+  app.use('/permission', permission);
 };
 
 module.exports = routes;

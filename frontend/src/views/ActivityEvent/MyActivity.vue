@@ -35,6 +35,11 @@
           ></v-skeleton-loader>
         </v-col>
       </v-row>
+      <v-row v-if="myActivities.length === 0">
+        <div class="no-data">
+          <span>Không có dữ liệu để hiển thị</span>
+        </div>
+      </v-row>
     </div>
   </div>
 </template>
@@ -151,6 +156,17 @@ export default {
         }
       }
     }
+  }
+  .no-data {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    height: 100px;
+    font: normal 400 17px Roboto;
+    color: #888888;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 }
 </style>

@@ -1,33 +1,36 @@
 <template>
   <div class="navigation-drawer-wrapper">
     <div class="logo-block" @click="$router.push('/home')">
-      <img src="../assets/logo/logo-white-app.svg" alt="logo-app">
+<!--      <img src="../assets/logo/logo-white-app.svg" alt="logo-app">-->
+      <img src="../assets/logo/Asset2.png" alt="logo-app">
+      <span>DutUnion</span>
     </div>
     <v-list nav dense>
       <v-list-group
         v-for="(navList, index) in navLists"
         :key="navList.name"
-        :prepend-icon="navList.icon"
         no-action
         :append-icon="navList.lists ? 'mdi-menu-down' : ''"
         active-class="deep-white--text text--accent-4"
         :class="{'active': navList.active}"
       >
         <template v-slot:activator>
-          <v-list-item-content active-class="deep-white--text text--accent-4" @click="changePage(navList.route, index)">
-            <v-list-item-title class="white--text" active-class="deep-white--text text--accent-4">{{ navList.name }}</v-list-item-title>
-          </v-list-item-content>
-        </template>
-        <v-list-item-group class="white--text" active-class="deep-white--text text--accent-4">
-          <v-list-item v-for="list in navList.lists" :key="list.name" :to="list.route">
-            <v-list-item-icon class="pl-4">
-              <v-icon v-text="list.icon"></v-icon>
-            </v-list-item-icon>
-            <v-list-item-content>
-              <v-list-item-title>{{ list.name }}</v-list-item-title>
-            </v-list-item-content>
+          <v-list-item active-class="deep-white--text text--accent-4" @click="changePage(navList.route, index)">
+            <div class="item-group">
+              <v-icon v-text="navList.icon"></v-icon>
+              <span> {{ navList.name }}</span>
+            </div>
+
           </v-list-item>
-        </v-list-item-group>
+        </template>
+<!--        <v-list-item-group class="white&#45;&#45;text" active-class="deep-white&#45;&#45;text text&#45;&#45;accent-4">-->
+<!--          <v-list-item v-for="list in navList.lists" :key="list.name" :to="list.route">-->
+<!--            <v-list-item-content>-->
+
+<!--              <v-list-item-title>{{ list.name }}</v-list-item-title>-->
+<!--            </v-list-item-content>-->
+<!--          </v-list-item>-->
+<!--        </v-list-item-group>-->
       </v-list-group>
     </v-list>
   </div>
@@ -110,24 +113,19 @@ export default {
           active: false,
         },
         {
-          name: 'Quản lý hệ thống',
-          icon: 'mdi-cogs',
+          name: 'Phân quyền',
+          icon: 'mdi-lock-open',
+          route: '/author',
           active: false,
-          lists: [
-            {
-              name: 'Phân quyền',
-              icon: 'mdi-lock-open',
-              route: '/author',
-              active: false,
-            },
-            {
-              name: 'Nhóm tài khoản',
-              icon: 'mdi-account-group',
-              route: '/account-group',
-              active: false,
-            }]
-        }]
-      this.$router.push({ name: 'faculty'});
+        },
+        {
+          name: 'Nhóm tài khoản',
+          icon: 'mdi-account-group',
+          route: '/account-group',
+          active: false,
+        }
+      ]
+      // this.$router.push({ name: 'faculty'});
     }
     if (this.user.roles[0].name === 'Chuyên viên') {
       this.navLists = [
@@ -135,7 +133,7 @@ export default {
           name: 'Quản lý liên chi đoàn',
           icon: 'mdi-home-city',
           route: '/faculty',
-          active: false,
+          active: true,
         },
         {
           name: 'Quản lý chi đoàn',
@@ -168,15 +166,15 @@ export default {
           active: false,
         }
       ];
-      this.$router.push({ name: 'faculty'});
+      // this.$router.push({ name: 'faculty'});
     }
-    if (this.user.roles[0].name === 'Bí thư đoàn trường') {
+    if (this.user.roles[0].name === 'Ban thường vụ') {
       this.navLists = [
         {
           name: 'Quản lý liên chi đoàn',
           icon: 'mdi-home-city',
           route: '/faculty',
-          active: false,
+          active: true,
         },
         {
           name: 'Quản lý chi đoàn',
@@ -209,7 +207,7 @@ export default {
           active: false,
         }
       ];
-      this.$router.push({ name: 'faculty'});
+      // this.$router.push({ name: 'faculty'});
     }
     if (this.user.roles[0].name === 'Bí thư liên chi đoàn') {
       this.navLists = [
@@ -217,7 +215,7 @@ export default {
           name: 'Quản lý chi đoàn',
           icon: 'mdi-bank',
           route: '/activity-class',
-          active: false,
+          active: true,
         },
         {
           name: 'Quản lý đoàn viên',
@@ -244,7 +242,7 @@ export default {
           active: false,
         }
       ];
-      this.$router.push({ name: 'activity-class-list'});
+      // this.$router.push({ name: 'activity-class-list'});
     }
     if (this.user.roles[0].name === 'Bí thư chi đoàn') {
       this.navLists = [
@@ -252,7 +250,7 @@ export default {
           name: 'Quản lý đoàn viên',
           icon: 'mdi-account-group',
           route: '/student',
-          active: false,
+          active: true,
         },
         {
           name: 'Quản lý sổ tay đoàn viên',
@@ -273,21 +271,21 @@ export default {
           active: false,
         },
         {
-          name: 'Thông tin đoàn viên',
+          name: 'Thông tin cá nhân',
           icon: 'mdi-flag-variant',
           route: '/profile-me',
           active: false,
         },
       ];
-      this.$router.push({ name: 'student-list'});
+      // this.$router.push({ name: 'student-list'});
     }
     if (this.user.roles[0].name === 'Sinh viên') {
       this.navLists = [
         {
-          name: 'Thông tin đoàn viên',
+          name: 'Thông tin cá nhân',
           icon: 'mdi-account-box',
           route: '/profile-me',
-          active: false,
+          active: true,
         },
         {
           name: 'Đoàn phí',
@@ -308,7 +306,7 @@ export default {
           active: false,
         }
       ]
-      this.$router.push({ name: 'student-profile'});
+      // this.$router.push({ name: 'student-profile'});
     }
   }
 };
@@ -316,20 +314,42 @@ export default {
 
 <style lang="scss">
 .navigation-drawer-wrapper {
+  .v-icon {
+    color: #FFFFFF !important;
+  }
+  .item-group {
+    margin-left: 16px;
+    display: flex;
+    column-gap: 12px;
+    align-items: center;
+    span {
+      font: normal 400 15px/15px Roboto;
+      margin-top: 3px;
+    }
+  }
   .logo-block {
     width: 100%;
     height: 48px;
     display: flex;
     justify-content: center;
     align-items: center;
+    column-gap: 8px;
     background-color: #06b5e6;
     box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.25);
+    color: #FFFFFF;
+    font: normal 500 21px Roboto;
     img {
-      height: 38px;
+      height: 36px;
+    }
+    span {
+      margin-right:20px;
     }
     &:hover {
       cursor: pointer;
     }
+  }
+  .v-list-item {
+    padding: 0px !important;
   }
   .v-list-item__icon:first-child {
     margin-right: 8px !important;

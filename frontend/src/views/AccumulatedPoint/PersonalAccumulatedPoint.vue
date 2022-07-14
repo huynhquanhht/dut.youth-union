@@ -1,6 +1,22 @@
 <template>
   <div class="accumulated-point-wrapper">
     <div class="top-title"><span>ĐIỂM TÍCH LŨY</span></div>
+    <div class="search-block pagi-info d-flex align-center">
+      <span>Năm học</span>
+      <v-select
+        filled
+        solo
+        dense
+        hide-details="false"
+        v-model="selectedOption"
+        class="search-select"
+        :items="options"
+        item-text="schoolYear"
+        @change="selectOption"
+        return-object
+        single-line
+      ></v-select>
+    </div>
     <div v-for="(activityList, index) in pointList" :key="index">
       <v-data-table
         v-model="selected"
@@ -20,7 +36,7 @@
           Không có dữ liệu để hiển thị!
         </template>
         <template v-slot:top>
-          <v-card-title>{{ `DANH SÁCH HOẠT ĐỘNG ĐÃ ĐĂNG KÝ VÀ ĐIỂM TÍCH LŨY NĂM HỌC ${activityList.schoolYear}`}}</v-card-title>
+          <v-card-title>{{ `DANH SÁCH HOẠT ĐỘNG ĐÃ THAM GIA VÀ ĐIỂM TÍCH LŨY NĂM HỌC ${activityList.schoolYear}`}}</v-card-title>
         </template>
         <template v-slot:item.begin_at="{ item }">
           <span>{{ item.begin_at ? formatTime(item.begin_at) : '-' }}</span>
@@ -70,7 +86,7 @@ export default {
   data() {
     return {
       singleSelect: false,
-      selected: [],
+      selected: '2022-2023',
       loading: false,
       confirmDialog: false,
       formDialog: false,
@@ -80,21 +96,19 @@ export default {
       currentPage: this.page,
       totalVisible: 5,
       searchText: '',
-      selectedOption: {},
       query: {},
       changedUnionTextbook: new Map(),
       command: '',
       loadingButton: false,
-      searchOptions: [
+      options: [
         {
-          name: 'Họ tên',
-          attribute: 'name'
+          schoolYear: '2022 - 2023',
         },
         {
-          name: 'Lớp sinh hoạt',
-          attribute: 'className',
+          schoolYear: 'Tất cả',
         },
       ],
+      selectedOption: '2022 - 2023',
       headers: [
         {text: 'Mã số', value: 'id',},
         {text: 'Tên hoạt động', value: 'name'},
@@ -132,11 +146,18 @@ export default {
     },
     formatMoney(money) {
       return moneyUtils.formatVND(money);
+    },
+    async selectOption() {
+      console.log('selectedOption - ', this.selectedOption.schoolYear.trim());
+      this.loading = true;
+      await this.fetchGetPointListOfCurrentStudent({schoolYear: this.selectedOption.schoolYear.trim()});
+      this.loading = false;
     }
   },
   async created() {
+    this.selectedOption = '2022 - 2023';
     this.loading = true;
-    await this.fetchGetPointListOfCurrentStudent();
+    await this.fetchGetPointListOfCurrentStudent({schoolYear: '2022 - 2023'});
     this.loading = false;
   },
 };
@@ -194,13 +215,17 @@ export default {
   }
 
   .search-block {
+    margin: 20px 0px 20px 0px;
     .search-select {
       width: 160px !important;
       height: 28px !important;
       font: normal 400 15px Roboto !important;
+      margin-left: 8px !important;
     }
 
     .v-input__slot {
+      width: 200px !important;
+      margin-right: 20px;
       min-height: 32px !important;
       padding: 0px 0px 0px 8px !important;
       box-shadow: none !important;
@@ -219,6 +244,7 @@ export default {
     .v-text-field__slot {
       font: normal 400 14px Roboto !important;
       margin-top: 1px;
+      width: 200px !important;
     }
 
     .v-icon {
@@ -453,7 +479,7 @@ export default {
         margin-right: 36px;
       }
       &:last-child {
-        margin-right: 80px;
+        margin-right: 59px;
       }
     }
   }

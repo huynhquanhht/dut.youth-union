@@ -59,12 +59,14 @@ const getById = async (roleId) => {
   let groupFunctions = await groupFunctionRepo.getAll();
   role = JSON.parse(JSON.stringify(role));
   groupFunctions = JSON.parse(JSON.stringify(groupFunctions));
-  for (let groupFunction of groupFunctions.rows) {
-    groupFunction.functions = [];
-    for (let func of role.functions) {
-      if (func.group_function_id == groupFunction.id) {
-        delete func.groupFunction;
-        groupFunction.functions.push(func);
+  if (role) {
+    for (let groupFunction of groupFunctions.rows) {
+      groupFunction.functions = [];
+      for (let func of role.functions) {
+        if (func.group_function_id == groupFunction.id) {
+          delete func.groupFunction;
+          groupFunction.functions.push(func);
+        }
       }
     }
   }

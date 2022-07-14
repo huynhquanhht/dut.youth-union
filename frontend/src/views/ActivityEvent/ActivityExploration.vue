@@ -10,12 +10,12 @@
         tile
         group
       >
-        <v-btn class="btn"> Chung </v-btn>
-        <v-btn class="btn"> Tuần này </v-btn>
-        <v-btn class="btn"> Tháng này </v-btn>
-        <v-btn class="btn"> Sắp diễn ra </v-btn>
-        <v-btn class="btn"> Đang diễn ra </v-btn>
-        <v-btn class="btn"> Khoa của bạn </v-btn>
+        <v-btn class="btn" @click="getActivity('common')"> Chung </v-btn>
+        <v-btn class="btn" @click="getActivity('this-week')"> Tuần này </v-btn>
+        <v-btn class="btn" @click="getActivity('upcoming')"> Sắp diễn ra </v-btn>
+        <v-btn class="btn" @click="getActivity('occurring')"> Đang diễn ra </v-btn>
+        <v-btn class="btn" @click="getActivity('end')"> Đã kết thúc </v-btn>
+
       </v-btn-toggle>
     </div>
     <div class="activity-cards">
@@ -49,6 +49,11 @@
           ></v-skeleton-loader>
         </v-col>
       </v-row>
+      <v-row v-if="activityList.rows.length === 0">
+        <div class="no-data">
+          <span>Không có dữ liệu để hiển thị</span>
+        </div>
+      </v-row>
     </div>
   </div>
 </template>
@@ -75,11 +80,16 @@ export default {
     }),
     clickActivityCard(id) {
       this.$router.push(`activity-event/${id}`);
-    }
+    },
+    async getActivity(option) {
+      this.loading = true;
+      await this.fetchGetActivityByOption({option});
+      this.loading = false;
+    },
   },
   async created() {
     this.loading = true;
-    await this.fetchGetActivityByOption({option: 'Common'});
+    await this.fetchGetActivityByOption({option: 'common'});
     this.loading = false;
     console.log(this.activityList);
   }
@@ -90,6 +100,7 @@ export default {
 .activity-exploration-wrapper {
   border-radius: 12px;
   //border: 1px solid #CED0D4;
+  min-height: 500px;
   padding: 16px;
   .top-block {
     margin-bottom: 2px;
@@ -167,6 +178,15 @@ export default {
         }
       }
     }
+  }
+  .no-data {
+    display: flex;
+    height: 100px;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    font: normal 400 17px Roboto;
+    color: #888888;
   }
 }
 </style>

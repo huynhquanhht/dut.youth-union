@@ -31,6 +31,7 @@
                 :items="searchOptions"
                 item-text="name"
                 v-model="selectedOption"
+                return-object
                 solo
                 dense
               ></v-select>
@@ -108,6 +109,12 @@
       </template>
       <template v-slot:item.unionFee.submit_union_fee.school_confirmed="{ item }">
         <span>{{ formatTime(item.unionFee.submit_union_fee.school_confirmed)}}</span>
+      </template>
+      <template v-slot:item.unionFee.submit_union_fee.confirmed_by="{ item }">
+        <span>{{ item.unionFee.submit_union_fee.confirmed_by ? item.unionFee.submit_union_fee.confirmed_by : '-' }}</span>
+      </template>
+      <template v-slot:item.unionFee.amount_of_money="{ item }">
+        <span>{{ item.unionFee.amount_of_money + ' VND'}}</span>
       </template>
       <template v-slot:footer>
         <div
@@ -214,8 +221,8 @@ export default {
       roleUtils: role,
       searchOptions: [
         {
-          name: 'Họ tên',
-          attribute: 'name'
+          name: 'Mã sinh viên',
+          attribute: 'studentId'
         },
         {
           name: 'Lớp sinh hoạt',
@@ -226,10 +233,13 @@ export default {
         {text: 'Mã sinh viên', value: 'id',},
         {text: 'Họ tên', value: 'name'},
         {text: 'Chi đoàn', value: 'activity_class.name'},
-        {text: 'Nộp đoàn phí', value: 'unionFee.submit_union_fee.submitted',},
+        {text: 'Đợt thu', value: 'unionFee.school_year'},
+        {text: 'Số tiền', value: 'unionFee.amount_of_money'},
+        {text: 'Đã nộp', value: 'unionFee.submit_union_fee.submitted',},
         {text: 'Ngày nộp', value: 'unionFee.submit_union_fee.submitted_at'},
         {text: 'Lớp xác nhận', value: 'unionFee.submit_union_fee.class_confirmed'},
-        {text: 'Trường xác nhận', value: 'unionFee.submit_union_fee.school_confirmed'}
+        {text: 'Trường xác nhận', value: 'unionFee.submit_union_fee.school_confirmed'},
+        {text: 'Người xác nhận', value: 'unionFee.submit_union_fee.confirmed_by'}
       ],
       dialogTitle: null,
       dialogContent: null,
@@ -251,6 +261,7 @@ export default {
       fetchSubmitUnionFee: 'fetchSubmitUnionFee',
       fetchConfirmSubmissionUnionFee: 'fetchConfirmSubmissionUnionFee',
       fetchGetInvoice: 'fetchGetInvoice',
+      fetchCreateUnionFee: 'fetchCreateUnionFee',
     }),
     ...mapMutations({
       setSnackbar: 'setSnackbar',
@@ -258,7 +269,7 @@ export default {
     async handlePageChange() {
       this.setQuery();
       await this.$router.push({
-        name: 'union-fee-of-student-list',
+        name: 'union-fee',
         query: this.query,
       }).catch(() => {});
       this.loading = true;
@@ -268,7 +279,7 @@ export default {
     async changePageSize() {
       this.setQuery();
       await this.$router.push({
-        name: 'union-fee-of-student-list',
+        name: 'union-fee',
         query: this.query,
       }).catch(() => {});
       this.loading = true;
@@ -285,8 +296,9 @@ export default {
     },
     async search() {
       let query = {};
+      console.log('selectedOption - ', this.selectedOption);
       this.searchOptions.forEach(option => {
-        if (option.name === this.selectedOption) {
+        if (option.attribute === this.selectedOption.attribute) {
           query[option.attribute] = this.searchText;
         }
       });
@@ -295,10 +307,10 @@ export default {
       query.page = 1;
       query.size = 10;
       this.$router.push({
-        name: 'union-fee-of-student-list',
+        name: 'union-fee',
         query: query,
       }).catch(() => {});
-      await this.fetchGetUnionFeeOfStudents(query);
+      await this.fetchGetUnionFeeOfStudents({query});
     },
     setQuery() {
       this.searchOptions.forEach(option => {
@@ -309,6 +321,8 @@ export default {
           this.query[option.attribute] = this.searchText;
         }
       });
+      const query = this.$router;
+      console.log('query - ', query);
       this.query.page = this.currentPage;
       this.query.size = this.selectedSize;
     },
@@ -400,8 +414,17 @@ export default {
         text: MESSAGE.GET_INVOICE_FAIL,
       });
     },
-    collectionPeriodDialogHandler() {
-
+    async collectionPeriodDialogHandler(data) {
+      if (data.command === 'Cancel') {
+        this.collectionPeriodDialog = false;
+      }
+      if (data.command === 'Ok') {
+        let isCreated = await this.fetchCreateUnionFee({unionFee: data.unionFee});
+        if (isCreated) {
+          await this.fetchGetUnionFeeOfStudents(this.query);
+        }
+        this.collectionPeriodDialog = false;
+      }
     }
   },
   async created() {
@@ -419,6 +442,8 @@ export default {
   //overflow: auto;
   padding: 20px;
   background-color: #FFFFFF !important;
+  max-width: 1100px !important;
+  height: 100vh;
   .v-card__title {
     padding: 4px 0px 8px 0px !important;
     font: normal 700 18px Roboto;
@@ -554,38 +579,57 @@ export default {
             }
 
 
-            //&:nth-child(1) {
-            //  min-width: 20px !important;
-            //  padding: 0px 8px;
-            //}
-            //
-            //&:nth-child(2) {
-            //  min-width: 100px !important;
-            //}
-            //
-            //&:nth-child(3) {
-            //  min-width: 200px !important;
-            //}
-            //
-            //&:nth-child(4) {
-            //  min-width: 100px !important;
-            //}
-            //
-            //&:nth-child(5) {
-            //  min-width: 120px !important;
-            //}
-            //
-            //&:nth-child(6) {
-            //  min-width: 120px !important;
-            //}
-            //
-            //&:nth-child(7) {
-            //  min-width: 130px !important;
-            //}
-            //
-            //&:nth-child(8) {
-            //  min-width: 300px !important;
-            //}
+            &:nth-child(1) {
+              min-width: 10px !important;
+              max-width: 10px !important;
+            }
+
+            &:nth-child(2) {
+              min-width: 120px !important;
+              max-width: 120px !important;
+            }
+
+            &:nth-child(3) {
+              min-width: 160px !important;
+              max-width: 160px !important;
+            }
+
+            &:nth-child(4) {
+              min-width: 100px !important;
+              max-width: 100px !important;
+            }
+
+            &:nth-child(5) {
+              min-width: 120px !important;
+              max-width: 120px !important;
+            }
+
+            &:nth-child(6) {
+              min-width: 120px !important;
+              max-width: 100px !important;
+            }
+
+            &:nth-child(7) {
+              min-width: 100px !important;
+              max-width: 100px !important;
+            }
+
+            &:nth-child(8) {
+              min-width: 120px !important;
+              max-width: 120px !important;
+            }
+            &:nth-child(9) {
+              min-width: 130px !important;
+              max-width: 130px !important;
+            }
+            &:nth-child(10) {
+              min-width: 150px !important;
+              max-width: 150px !important;
+            }
+            &:nth-child(11) {
+              min-width: 150px !important;
+              max-width: 150px !important;
+            }
           }
 
           &:hover {

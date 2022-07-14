@@ -14,6 +14,21 @@ const get = (query) => {
   return axiosUtils.getRequest(url);
 };
 
+const getById = (id) => {
+  return axiosUtils.getRequest(`${BASE_URL}/${id}`);
+};
+
+
+const create = (activityClass) => {
+  let url = BASE_URL;
+  return axiosUtils.postRequest(url, {activityClass});
+};
+
+const update = (activityClass) => {
+  let url = BASE_URL;
+  return axiosUtils.putRequest(url, {activityClass});
+}
+
 const uploadCSV = (file) => {
   console.log('file - ', file);
   const url = `${BASE_URL}/create-by-csv`;
@@ -25,4 +40,4 @@ const deleteActivityClass = (activityClassId) => {
   const url = `${BASE_URL}/${activityClassId}`;
   return axiosUtils.deleteRequest(url);
 };
-export default {get, uploadCSV, deleteActivityClass};
+export default {get, uploadCSV, deleteActivityClass, create, update, getById};

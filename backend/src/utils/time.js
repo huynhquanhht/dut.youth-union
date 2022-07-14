@@ -26,6 +26,8 @@ const formatDateText = (time) => {
   return `${day}, ngày ${date} tháng ${month} năm ${year}`;
 }
 
+const formatTimeYear = (time) => moment(time).format('DD-MM-YYYY hh:mm:ss');
+
 const formatClock = (time) => moment(time, 'hh:mm DD/MM/YYYY').format('hh:mm');
 const getDay = (time) => {
   const dayNum = moment(time).day();
@@ -71,4 +73,5 @@ module.exports = {
   getDate,
   getMonth,
   getYear,
+  formatTimeYear,
 };

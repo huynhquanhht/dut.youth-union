@@ -45,6 +45,7 @@
                 @keyup.enter="search"
                 v-model="searchText"
                 :disabled="!selectedOption"
+                label="Nhập để tìm kiếm"
               ></v-text-field>
             </div>
             <div class="tool-block d-flex" v-if="currentUser.roles[0].name !== roleUtils.FACULTY_SECRETARY">
@@ -73,7 +74,7 @@
                   @click="update"
               >
                 <v-icon dark size="20">mdi-square-edit-outline</v-icon>
-                Chỉnh sửa
+                Cập nhật
               </v-btn>
               <v-btn
                   text
@@ -117,6 +118,19 @@
         </div>
       </template>
     </v-data-table>
+    <v-dialog
+      v-model="formDialog"
+      width="360px"
+      fullscreen
+      hide-overlay
+      transition="dialog-bottom-transition"
+      scrollable
+    >
+      <activity-class-form
+        :activityClass="activityClass"
+        :formType="formType"
+        @activity-class-form="activityClassFormHandler"/>
+    </v-dialog>
     <v-dialog v-model="confirmDialog" width="400px">
       <confirm-dialog
         @confirm-dialog="handleConfirm"
@@ -143,9 +157,10 @@ import CsvPopup from '@/components/CSVPopup';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import MESSAGE from "@/utils/message";
 import role from '@/utils/role';
+import ActivityClassForm from './Form';
 export default {
   name: 'activity-class-list',
-  components: { CsvPopup, ConfirmDialog, },
+  components: { CsvPopup, ConfirmDialog, ActivityClassForm },
   props: {
     page: {
       type: Number,
@@ -185,6 +200,7 @@ export default {
       selectedOption: {},
       query: {},
       roleUtils: role,
+      formType: '',
       searchOptions: [
         {
           name: 'Tên chi đoàn',
@@ -212,6 +228,9 @@ export default {
         { text: 'Sỉ số', value: 'studentQuantity'},
         { text: 'Đoàn viên', value: 'unionMemberQuantity'},
         { text: 'Nộp sổ đoàn', value: 'unionTextbookQuantity'},
+        { text: 'Bí thư', value: 'secretary.name' },
+        { text: 'Email', value: 'secretary.email'},
+        { text: 'Điện thoại', value: 'secretary.phone'},
       ],
       dialogTitle: null,
       dialogContent: null,
@@ -224,13 +243,17 @@ export default {
     ...mapGetters({
       activityClassList: 'getActivityClassList',
       currentUser: 'getUser',
+      activityClass: 'getActivityClass',
     }),
   },
   methods: {
     ...mapActions({
       fetchGetActivityClassList: 'fetchGetActivityClassList',
+      fetchGetActivityClassById: 'fetchGetActivityClassById',
       fetchUploadActivityClassCSV: 'fetchUploadActivityClassCSV',
       fetchDeleteActivityClass: 'fetchDeleteActivityClass',
+      fetchCreateActivityClass: 'fetchCreateActivityClass',
+      fetchUpdateActivityClass: 'fetchUpdateActivityClass',
     }),
     ...mapMutations({
       setSnackbar: 'setSnackbar'
@@ -311,18 +334,30 @@ export default {
       }
     },
     create() {
-      this.setSnackbar({
-        type: 'info',
-        visible: true,
-        text: MESSAGE.FEATURE_DEVELOP,
-      });
+      this.formType = 'Create'
+      this.formDialog = true;
     },
-    update() {
-      this.setSnackbar({
-        type: 'info',
-        visible: true,
-        text: MESSAGE.FEATURE_DEVELOP,
-      });
+    async update() {
+      if (this.selected.length === 0) {
+        this.setSnackbar({
+          type: 'info',
+          visible: true,
+          text: MESSAGE.CHOOSE_RECORD_FOR_EDIT,
+        });
+        return;
+      }
+      if (this.selected.length > 1) {
+        this.selected = [];
+        this.setSnackbar({
+          type: 'info',
+          visible: true,
+          text: MESSAGE.CHOOSE_ONE_RECORD_FOR_EDIT,
+        });
+        return;
+      }
+      await this.fetchGetActivityClassById({ id: this.selected[0].id})
+      this.formType = 'Update'
+      this.formDialog = true;
     },
     async deleteActivityClass() {
       if (this.selected.length !== 1) {
@@ -351,6 +386,30 @@ export default {
         this.confirmDialog = false;
       }
     },
+    async activityClassFormHandler(data) {
+      if (data.command === 'close') {
+        this.selected = [];
+        this.formDialog = false;
+      }
+      if (data.command === 'Create') {
+        console.log('Create data - ', data);
+        const isCreated = await this.fetchCreateActivityClass({activityClass: data.activityClass});
+        if (isCreated) {
+          await this.fetchGetActivityClassList(this.query);
+        }
+        this.selected = [];
+        this.formDialog = false;
+      }
+      if (data.command === 'Update') {
+        console.log(data.faculty);
+        const isUpdated = await this.fetchUpdateActivityClass({activityClass: data.activityClass});
+        if (isUpdated) {
+          await this.fetchGetActivityClassList(this.query);
+        }
+        this.selected = [];
+        this.formDialog = false;
+      }
+    },
     clickActivityClass(e) {
       this.$router.push({ name: 'student-list', query: {activityClassId: e.id}})
     }
@@ -369,6 +428,7 @@ export default {
   padding: 20px 20px 20px 20px;
   border-radius: 8px !important;
   background-color: #FFFFFF !important;
+  max-width: 1100px !important;
   .v-card__title {
     padding: 4px 0px 8px 0px !important;
     font: normal 700 18px Roboto;
@@ -508,19 +568,19 @@ export default {
             }
 
             &:nth-child(4) {
-              min-width: 100px !important;
+              min-width: 90px !important;
             }
 
             &:nth-child(5) {
-              min-width: 200px !important;
+              min-width: 160px !important;
             }
 
             &:nth-child(6) {
-              min-width: 120px !important;
+              min-width: 80px !important;
             }
 
             &:nth-child(7) {
-              min-width: 120px !important;
+              min-width: 110px !important;
             }
 
             &:nth-child(8) {
@@ -528,10 +588,13 @@ export default {
             }
 
             &:nth-child(9) {
-              min-width: 200px !important;
+              min-width: 160px !important;
             }
 
             &:nth-child(10) {
+              min-width: 120px !important;
+            }
+            &:nth-child(11) {
               min-width: 120px !important;
             }
           }

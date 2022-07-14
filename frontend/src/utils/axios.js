@@ -2,6 +2,7 @@ import axios from 'axios';
 import localStorageUtils from '@/utils/local_storage';
 import router from '@/router';
 import MESSAGE from './message';
+import store from '@/store';
 
 const service = axios.create({
   baseURL: process.env.VUE_APP_SERVER,
@@ -39,6 +40,14 @@ service.interceptors.response.use(
     }
     if (error.response.status === 404) {
       router.replace({ path: '/error/not-found' });
+      return;
+    }
+    if (error.response.status === 403) {
+      store.commit('setSnackbar', {
+        type: 'info',
+        visible: true,
+        text: error.response.data.message,
+      })
       return;
     }
     if (error.response.status === 500) {

@@ -31,7 +31,7 @@
                 height="36px"
                 v-bind="attrs"
                 v-on="on"
-                @click="$router.push('/')"
+                @click="goActionPage"
               >
                 <v-icon dark size="20">mdi-page-next</v-icon>
               </v-btn>
@@ -64,10 +64,22 @@
       </div>
       <div class="banner-news">
         <marquee>
-          Vào ngày 12/06/2022, chương trình Định cư Con người Liên Hợp Quốc #UNHabitat phối hợp cùng Quỹ Nhi đồng Liên Hợp Quốc (UNICEF) sẽ tổ chức sự kiện Diễn đàn thanh niên đô thị 2030 Việt Nam tại thành phố Đà Nẵng. Đây là sự kiện nằm trong khuôn khổ dự án Thanh niên đô thị 2030 di UN-Habitat thực hiện tại 06 quốc
-          ✅Diễn đàn Thanh niên đô thị 2030 Việt Nam #youth2030cities mong muốn tạo ra nền tảng đối thoại giữa thanh niên với các bên liên quan tham gia vào quá trình đô thị hóa bền vững. Kết quả cụ thể của Diễn đàn sẽ là một tuyên bố thanh niên với đô thị hóa bền vững (DeclarACTION) và là đóng góp của thanh niên Việt Nam tại Diễn đàn Đô thị Thế giới lần thứ 11 #WUF11 sắp được tổ chức tại Ba Lan. Tuyên bố này sẽ đóng vai trò làm lộ trình thực hiện và kế hoạch hành động cho giới trẻ nhằm đạt được các Mục tiêu phát triển bền vững và các mục tiêu đề ra trong Chương trình Nghị sự đô thị mới.
-          🏢Vì vậy, Đoàn Thanh niên Trường Đại học Bách Khoa - ĐHĐN kêu gọi các bạn sinh viên, thanh niên tham gia sự kiện lần này. Dự án lần này do UN-Habitat tổ chức với mong muốn tăng cường tiếng nói, sự tham gia của các thanh niên trong việc phát triển đô thị bền vững.
-        </marquee>
+          Cuộc thi “Ý tưởng khởi nghiệp đổi mới sáng tạo Light Up Your Creativity” năm 2022 đã trở lại với các bạn trẻ Đà Nẵng.
+          Cuộc thi năm nay hứa hẹn sẽ tạo ra sân chơi thú vị để học sinh, sinh viên, người đi làm được tự do thể hiện các ý tưởng sáng tạo, khởi nghiệp khi mà cuộc sống bình thường đã quay trở lại nhiều nơi.
+          Ban tổ chức hi vọng các thí sinh sẽ đưa ra những sáng tạo mang tính đột phá, những ý tưởng khởi nghiệp xuất sắc, trong đó tập trung vào lĩnh vực nông nghiệp công nghệ cao🤖🦾🦿
+          Cơ hội tranh tài dành cho các bạn học sinh, sinh viên và người đi làm trên địa bàn thành phố Đà Nẵng; các bạn sinh viên Việt Nam đang học tập tại Hàn Quốc và Áo, sinh viên Trường Đại học Nông Lâm - Đại học Huế!
+          Nhóm lĩnh vực dự thi
+          - Đối tượng dự thi có thể đăng ký ý tưởng, dự án khởi nghiệp đổi mới sáng tạo thuộc tất cả các ngành, lĩnh vực sản xuất, kinh doanh, dịch vụ, công nghiệp, nông nghiệp, bảo vệ môi trường, ứng phó biến đổi khí hậu.
+          - Khuyến khích các ý tưởng, dự án dự thi thuộc các lĩnh vực sau:
+          + Ứng dụng khoa học công nghệ, nông nghiệp công nghệ cao, trong đó chú trọng các mô hình kinh tế sản xuất xanh, kinh tế tuần hoàn, sản xuất các sản phẩm thân thiện với môi trường; ứng dụng kỹ thuật nuôi trồng, bảo quản theo tiêu chuẩn vệ sinh, an toàn thực phẩm; triển khai hiệu quả chương trình “Mỗi xã một sản phẩm” - OCOP, hỗ trợ thông tin kênh tiêu thụ sản phẩm cho thanh niên khởi nghiệp, lập nghiệp.
+          + Ứng dụng khoa học công nghệ kỹ thuật mới thúc đẩy việc phát triển kinh tế, xã hội cho thanh niên vùng dân tộc thiểu số, vùng sâu, vùng xa với các lĩnh vực chủ yếu là chăn nuôi, trồng trọt ứng dụng kỹ thuật công nghệ mới mang lại hiệu quả kinh tế.
+          + Ứng dụng tiến bộ khoa học kỹ thuật, chuyển đổi cơ cấu sản xuất, ứng dụng thương mại điện tử để tiêu thụ sản phẩm; chú trọng hỗ trợ ứng dụng công nghệ trong truy xuất nguồn gốc sản phẩm, đăng ký nhãn hiệu hàng hóa, bản quyền.
+          Phần thưởng dành cho ý tưởng chiến thắng vô cùng hấp dẫn bao gồm:
+          - 01 Giải nhất: Bằng khen của BCH Đoàn TNCS Hồ Chí Minh Thành phố Đà Nẵng và tiền thưởng 8.000.000 đồng/giải.
+          - 01 Giải nhì: Bằng khen của BCH Đoàn TNCS Hồ Chí Minh Thành phố Đà Nẵng và tiền thưởng 5.000.000 đồng giải.
+          - 01 Giải ba: Bằng khen của BCH Đoàn TNCS Hồ Chí Minh Thành phố Đà Nẵng và tiền thưởng 3.000.000 đồng/giải.
+          - 02 Giải khuyến khích: Bằng khen của BCH Đoàn TNCS Hồ Chí Minh Thành phố Đà Nẵng và tiền thưởng 1.000.000 đồng/giải.
+          Ngoài ra Ban Tổ chức sẽ trao giải Dự án tiềm năng và kết nối với Nhà đầu tư.         </marquee>
       </div>
       <div class="event-block">
         <div class="slide-block">
@@ -82,8 +94,8 @@
           </v-carousel>
         </div>
         <div class="image-block">
+          <img src="../../assets/image/mua-he-xanh.jpg" alt="">
           <img src="../../assets/image/282094376_1978610139006451_5596072089181779361_n.jpg" alt="">
-          <img src="../../assets/image/283670943_5389268691119151_4683700183425758671_n.jpg" alt="">
         </div>
       </div>
       <div class="content-block">
@@ -97,23 +109,157 @@
               <div class="content">
                 <span class="tab">MỚI NHẤT</span>
                 <v-divider
-                  class="mx-4"
                 ></v-divider>
-                <div class="notification" v-for="(item, index) in [1,2,3,4,5,6,7,8,9,10]" :key="index">
+                <div class="notification">
                   <div class="post-time">
-                    <span class="date">08/04</span>
+                    <span class="date">07/07</span>
                     <span class="year">2022</span>
                   </div>
                   <div class="title-block">
                     <div class="title-text">
                       <p>
-                        <a href="">Tuyển sinh vào đại học hệ chính quy theo phương thức tuyển sinh riêng năm
-                          2022</a>
+                        <a href="">Cuộc thi “Ý tưởng khởi nghiệp đổi mới sáng tạo Light Up Your Creativity” năm 2022</a>
                       </p>
                     </div>
                     <div class="time">
                       <v-icon>mdi-calendar-month</v-icon>
-                      <span>30/04/2022 08:24</span>
+                      <span>07/07/2022 22:00</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="notification">
+                  <div class="post-time">
+                    <span class="date">05/07</span>
+                    <span class="year">2022</span>
+                  </div>
+                  <div class="title-block">
+                    <div class="title-text">
+                      <p>
+                        <a href="">Tuyển thành viên đội chủ lực Mùa hè xanh 2022</a>
+                      </p>
+                    </div>
+                    <div class="time">
+                      <v-icon>mdi-calendar-month</v-icon>
+                      <span>05/07/2022 19:00</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="notification">
+                  <div class="post-time">
+                    <span class="date">04/07</span>
+                    <span class="year">2022</span>
+                  </div>
+                  <div class="title-block">
+                    <div class="title-text">
+                      <p>
+                        <a href=""> Cuộc thi ảnh mùa hè xanh trong tôi</a>
+                      </p>
+                    </div>
+                    <div class="time">
+                      <v-icon>mdi-calendar-month</v-icon>
+                      <span>04/07/2022 08:30</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="notification">
+                  <div class="post-time">
+                    <span class="date">02/07</span>
+                    <span class="year">2022</span>
+                  </div>
+                  <div class="title-block">
+                    <div class="title-text">
+                      <p>
+                        <a href="">Tập huấn kỹ năng sơ cấp cứu cho TNV tham gia chiến dịch "Sinh viên ĐHĐN tình nguyện hè 2022"</a>
+                      </p>
+                    </div>
+                    <div class="time">
+                      <v-icon>mdi-calendar-month</v-icon>
+                      <span>02/07/2022 08:24</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="notification">
+                  <div class="post-time">
+                    <span class="date">01/07</span>
+                    <span class="year">2022</span>
+                  </div>
+                  <div class="title-block">
+                    <div class="title-text">
+                      <p>
+                        <a href="">Cuộc thi thiết kế ấn phẩm truyền thông “Khởi sắc hè tình nguyện”</a>
+                      </p>
+                    </div>
+                    <div class="time">
+                      <v-icon>mdi-calendar-month</v-icon>
+                      <span>01/07/2022 08:24</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="notification">
+                  <div class="post-time">
+                    <span class="date">30/06</span>
+                    <span class="year">2022</span>
+                  </div>
+                  <div class="title-block">
+                    <div class="title-text">
+                      <p>
+                        <a href="">Kêu gọi quyên góp "Tủ sách yêu thương" - Mùa hè xanh 2022</a>
+                      </p>
+                    </div>
+                    <div class="time">
+                      <v-icon>mdi-calendar-month</v-icon>
+                      <span>30/06/2022 17:28</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="notification">
+                  <div class="post-time">
+                    <span class="date">15/06</span>
+                    <span class="year">2022</span>
+                  </div>
+                  <div class="title-block">
+                    <div class="title-text">
+                      <p>
+                        <a href="">Chung kết BK'S ON THE MIC - Đại học Bách Khoa Đà Nẵng</a>
+                      </p>
+                    </div>
+                    <div class="time">
+                      <v-icon>mdi-calendar-month</v-icon>
+                      <span>15/06/2022 16:39</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="notification">
+                  <div class="post-time">
+                    <span class="date">11/06</span>
+                    <span class="year">2022</span>
+                  </div>
+                  <div class="title-block">
+                    <div class="title-text">
+                      <p>
+                        <a href="">Phát động phong trào "Mùa thi nghiêm túc - Liêm chính học thuật"</a>
+                      </p>
+                    </div>
+                    <div class="time">
+                      <v-icon>mdi-calendar-month</v-icon>
+                      <span>11/06/2022 21:30</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="notification">
+                  <div class="post-time">
+                    <span class="date">11/06</span>
+                    <span class="year">2022</span>
+                  </div>
+                  <div class="title-block">
+                    <div class="title-text">
+                      <p>
+                        <a href="">Chương trình "Singapore from your home - Understanding Asean"</a>
+                      </p>
+                    </div>
+                    <div class="time">
+                      <v-icon>mdi-calendar-month</v-icon>
+                      <span>11/06/2022 08:24</span>
                     </div>
                   </div>
                 </div>
@@ -129,7 +275,6 @@
               <div class="content">
                 <span class="tab">MỚI NHẤT</span>
                 <v-divider
-                  class="mx-4"
                 ></v-divider>
                 <div class="news" v-for="(item, index) in newsList.rows" :key="index">
                   <div class="image">
@@ -161,24 +306,194 @@
               <div class="content">
                 <span class="tab">MỚI NHẤT</span>
                 <v-divider
-                  class="mx-4"
                 ></v-divider>
-                <div class="users" v-for="(item, index) in [1,2,3,4,5,6,7,8,9,10]" :key="index">
+                <div class="users">
                   <div class="avatar">
                     <v-avatar
                       color="#06B5E6"
                       size="36"
-                    ><span class="name">HQ</span></v-avatar>
+                    ><span class="name">TQ</span></v-avatar>
                   </div>
                   <div class="title-block">
                     <div class="title-text">
                       <p>
-                        <a href="">102180126 - Nguyễn Trần Công Tân - 18TCLC_DT1</a>
+                        <a href="">101180128 - Trần Đức Quang - 18C1B</a>
                       </p>
                     </div>
                     <div class="time">
                       <v-icon>mdi-calendar-month</v-icon>
-                      <span>30/04/2022 08:24</span>
+                      <span>23/05/2022 08:24</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="users">
+                  <div class="avatar">
+                    <v-avatar
+                      color="#06B5E6"
+                      size="36"
+                    ><span class="name">NQ</span></v-avatar>
+                  </div>
+                  <div class="title-block">
+                    <div class="title-text">
+                      <p>
+                        <a href="">101180129 - Nguyễn Quốc - 18C1B</a>
+                      </p>
+                    </div>
+                    <div class="time">
+                      <v-icon>mdi-calendar-month</v-icon>
+                      <span>23/05/2022 08:24</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="users">
+                  <div class="avatar">
+                    <v-avatar
+                      color="#06B5E6"
+                      size="36"
+                    ><span class="name">NT</span></v-avatar>
+                  </div>
+                  <div class="title-block">
+                    <div class="title-text">
+                      <p>
+                        <a href="">101180138 - Nguyễn Tuấn Thiện - 18C1B</a>
+                      </p>
+                    </div>
+                    <div class="time">
+                      <v-icon>mdi-calendar-month</v-icon>
+                      <span>23/05/2022 08:24</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="users">
+                  <div class="avatar">
+                    <v-avatar
+                      color="#06B5E6"
+                      size="36"
+                    ><span class="name">TT</span></v-avatar>
+                  </div>
+                  <div class="title-block">
+                    <div class="title-text">
+                      <p>
+                        <a href="">101180139 - Trần Tiến Thịnh - 18C1B</a>
+                      </p>
+                    </div>
+                    <div class="time">
+                      <v-icon>mdi-calendar-month</v-icon>
+                      <span>23/05/2022 08:24</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="users">
+                  <div class="avatar">
+                    <v-avatar
+                      color="#06B5E6"
+                      size="36"
+                    ><span class="name">BT</span></v-avatar>
+                  </div>
+                  <div class="title-block">
+                    <div class="title-text">
+                      <p>
+                        <a href="">101180142 - Bùi Văn Tình - 18C1B</a>
+                      </p>
+                    </div>
+                    <div class="time">
+                      <v-icon>mdi-calendar-month</v-icon>
+                      <span>23/05/2022 08:24</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="users">
+                  <div class="avatar">
+                    <v-avatar
+                      color="#06B5E6"
+                      size="36"
+                    ><span class="name">PT</span></v-avatar>
+                  </div>
+                  <div class="title-block">
+                    <div class="title-text">
+                      <p>
+                        <a href="">101180151 - Phạm Hiếu Trường Tùng - 18C1B</a>
+                      </p>
+                    </div>
+                    <div class="time">
+                      <v-icon>mdi-calendar-month</v-icon>
+                      <span>23/05/2022 08:24</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="users">
+                  <div class="avatar">
+                    <v-avatar
+                      color="#06B5E6"
+                      size="36"
+                    ><span class="name">CĐ</span></v-avatar>
+                  </div>
+                  <div class="title-block">
+                    <div class="title-text">
+                      <p>
+                        <a href="">102180004 - Chế Văn Minh Đức - 18T1</a>
+                      </p>
+                    </div>
+                    <div class="time">
+                      <v-icon>mdi-calendar-month</v-icon>
+                      <span>23/05/2022 08:24</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="users">
+                  <div class="avatar">
+                    <v-avatar
+                      color="#06B5E6"
+                      size="36"
+                    ><span class="name">LH</span></v-avatar>
+                  </div>
+                  <div class="title-block">
+                    <div class="title-text">
+                      <p>
+                        <a href="">101180020 - Lê Văn Hải - 18C1A</a>
+                      </p>
+                    </div>
+                    <div class="time">
+                      <v-icon>mdi-calendar-month</v-icon>
+                      <span>23/05/2022 08:24</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="users">
+                  <div class="avatar">
+                    <v-avatar
+                      color="#06B5E6"
+                      size="36"
+                    ><span class="name">CH</span></v-avatar>
+                  </div>
+                  <div class="title-block">
+                    <div class="title-text">
+                      <p>
+                        <a href="">101180022 - Cao Văn Hảo - 18C1A</a>
+                      </p>
+                    </div>
+                    <div class="time">
+                      <v-icon>mdi-calendar-month</v-icon>
+                      <span>23/05/2022 08:24</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="users">
+                  <div class="avatar">
+                    <v-avatar
+                      color="#06B5E6"
+                      size="36"
+                    ><span class="name">ĐH</span></v-avatar>
+                  </div>
+                  <div class="title-block">
+                    <div class="title-text">
+                      <p>
+                        <a href="">101180023 - Đàm Trung Hiếu - 18C1A</a>
+                      </p>
+                    </div>
+                    <div class="time">
+                      <v-icon>mdi-calendar-month</v-icon>
+                      <span>23/05/2022 08:24</span>
                     </div>
                   </div>
                 </div>
@@ -186,6 +501,12 @@
             </div>
           </v-col>
         </v-row>
+      </div>
+      <div class="footer">
+          <p class="main-title">Đoàn thanh niên trường Đại học Bách Khoa Đà Nẵng</p>
+          <p>Địa chỉ: 54 Nguyễn Lương Bằng, Quận Liên Chiểu, Thành phố Đà Nẵng </p>
+          <p>Hệ thống hỗ trợ quản lý Đoàn thanh niên trường Đại học Bách Khoa</p>
+          <p>© 2022 - Bản quyền thuộc Đoàn thanh niên trường Đại học Bách Khoa Đà Nẵng</p>
       </div>
     </div>
   </div>
@@ -196,6 +517,7 @@
 import localStorageUtils from "@/utils/local_storage";
 import ProfileOption from '@/components/ProfileOption.vue';
 import {mapActions, mapGetters} from "vuex";
+import jwtDecode from "jwt-decode";
 
 export default {
   name: 'Home',
@@ -212,13 +534,19 @@ export default {
       ],
       slideItems: [
         {
+          src: require('../../assets/image/cuoc-thi-khoi-sac-tinh-nguyen.jpg'),
+        },
+        {
+          src: require('../../assets/image/cuoc-thi-mua-he-xanh-trong-toi.jpg'),
+        },
+        {
+          src: require('../../assets/image/slide10.jpg'),
+        },
+        {
           src: require('../../assets/image/slide9.jpg'),
         },
         {
           src: require('../../assets/image/slide5.png'),
-        },
-        {
-          src: require('../../assets/image/slide10.jpg'),
         },
       ]
     }
@@ -226,21 +554,53 @@ export default {
   computed: {
     ...mapGetters({
       newsList: 'getNewsList',
+      user: 'getUser',
     }),
   },
   methods: {
     ...mapActions({
       fetchGetNewsList: 'fetchGetNewsList',
+      fetchGetUserById: 'fetchGetUserById',
     }),
+    goActionPage() {
+      if (this.user.roles[0].name === 'Quản trị viên') {
+        this.$router.push({ name: 'faculty'});
+        return;
+      }
+      if (this.user.roles[0].name === 'Chuyên viên') {
+        this.$router.push({ name: 'faculty'});
+        return;
+      }
+      if (this.user.roles[0].name === 'Ban thường vụ') {
+        this.$router.push({ name: 'faculty'});
+        return;
+      }
+      if (this.user.roles[0].name === 'Bí thư liên chi đoàn') {
+        this.$router.push({ name: 'activity-class-list'});
+        return;
+      }
+      if (this.user.roles[0].name === 'Bí thư chi đoàn') {
+        this.$router.push({ name: 'student-list'});
+        return;
+      }
+      if (this.user.roles[0].name === 'Sinh viên') {
+        console.log('abc');
+        this.$router.push({ name: 'student-profile'});
+        return;
+      }
+    }
   },
   async created() {
-    this.currentUser = localStorageUtils.getService().getCurrentUser();
+    if(localStorageUtils.getToken()) {
+      this.currentUser = jwtDecode(localStorageUtils.getToken());
+      await this.fetchGetUserById({ userId: this.currentUser.userId });
+    }
+
     const query = {
       page: 1,
       size: 10,
     };
     await this.fetchGetNewsList(query);
-    console.log('currentUser - ', this.currentUser);
   }
 }
 </script>
@@ -249,10 +609,8 @@ export default {
 .home-wrapper {
   display: flex;
   justify-content: center;
-
   .home-block {
     width: 1200px;
-
     .header {
       display: flex;
       align-items: center;
@@ -305,7 +663,30 @@ export default {
         }
       }
     }
-
+    .footer {
+      width: 100%;
+      height: 150px;
+      background-color: #075794;
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+      align-items: center;
+      .main-title {
+        font: 700 15px Roboto;
+      }
+      p {
+        color: #FFFFFF;
+        margin-bottom: 0px;
+        font: 400 15px Roboto;
+        line-height: 20px;
+        margin-bottom: 0px !important;
+        line-height: unset !important;
+      }
+      .logo-versace {
+        height: 60px;
+        margin-bottom: 20px;
+      }
+    }
     .banner-news {
       margin-top: 4px;
       background-color: #075794;
@@ -315,7 +696,6 @@ export default {
       display: flex;
       align-items: center;
     }
-
     .event-block {
       display: flex;
       column-gap: 16px;
@@ -376,7 +756,9 @@ export default {
         }
       }
     }
+    .image-activity {
 
+    }
 
     .content-block {
       margin-top: 16px;
@@ -648,7 +1030,6 @@ export default {
                   }
                 }
               }
-
               .time {
                 display: flex;
                 align-items: center;

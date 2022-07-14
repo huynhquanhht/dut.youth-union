@@ -49,6 +49,33 @@
             <div class="tool-block d-flex" v-if="currentUser.roles[0].name !== roleUtils.FACULTY_SECRETARY">
               <v-btn
                 text
+                width="100px"
+                class="tool-button"
+                @click="save"
+              >
+                <v-icon dark size="20" class="mr-1">mdi-plus</v-icon>
+                Thêm mới
+              </v-btn>
+              <v-btn
+                text
+                width="100px"
+                class="tool-button"
+                @click="save"
+              >
+                <v-icon dark size="20" class="mr-1">mdi-square-edit-outline</v-icon>
+                Cập nhật
+              </v-btn>
+              <v-btn
+                text
+                width="50px"
+                class="tool-button"
+                @click="save"
+              >
+                <v-icon dark size="20" class="mr-1">mdi-trash-can-outline</v-icon>
+                Xóa
+              </v-btn>
+              <v-btn
+                text
                 width="50px"
                 class="tool-button"
                 @click="save"
@@ -91,6 +118,9 @@
       </template>
       <template v-slot:item.union_textbook.school_confirmed="{ item }">
         <span>{{ formatTime(item.union_textbook.school_confirmed)}}</span>
+      </template>
+      <template v-slot:item.union_textbook.confirmed_by="{ item }">
+        <span>{{ item.union_textbook.confirmed_by ? item.union_textbook.confirmed_by : '-'}}</span>
       </template>
       <template v-slot:footer>
         <div
@@ -199,7 +229,8 @@ export default {
         {text: 'Nộp sổ đoàn', value: 'union_textbook.submitted',},
         {text: 'Ngày nộp', value: 'union_textbook.submitted_at'},
         {text: 'Lớp xác nhận', value: 'union_textbook.class_confirmed'},
-        {text: 'Trường xác nhận', value: 'union_textbook.school_confirmed'}
+        {text: 'Trường xác nhận', value: 'union_textbook.school_confirmed'},
+        {text: 'Người xác nhận', value: 'union_textbook.confirmed_by'}
       ],
       dialogTitle: null,
       dialogContent: null,

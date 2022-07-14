@@ -19,6 +19,55 @@ const get = async (req, res) => {
   }
 };
 
+// [GET]: /student/:id
+const getById = async (req, res) => {
+  try {
+    const studentId = req.params.id;
+    const student = await studentService.getById(studentId);
+    res.status(200).send(student);
+  } catch (error) {
+    res.status(500).send({ message: MESSAGE.SERVER_ERROR});
+  }
+};
+
+// [POST]: /student
+const create = async (req, res) => {
+  try {
+    let student = req.body.student;
+    if (!student.id || !student.name) {
+      res.status(400).send({message: MESSAGE.CREATE_FAIL});
+    }
+    const newStudent = await studentService.create(student);
+    console.log('new - ', newStudent);
+    res.status(200).send({
+      message: MESSAGE.CREATE_SUCCESS,
+      newStudent: newStudent,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ message: MESSAGE.SERVER_ERROR});
+  }
+};
+
+// [PUT]: /student
+const update = async (req, res) => {
+  try {
+    let student = req.body.student;
+    if (!student.id || !student.name) {
+      res.status(400).send({ message: MESSAGE.UPDATE_FAIL });
+    }
+    const isUpdated = await studentService.update(student);
+    if (isUpdated) {
+      res.status(200).send({ message: MESSAGE.UPDATE_SUCCESS });
+      return;
+    }
+    res.status(400).send({ message: MESSAGE.UPDATE_FAIL });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ message: MESSAGE.SERVER_ERROR});
+  }
+}
+
 // [POST]: /student/create-by-csv
 const createByCSV = async (req, res) => {
   try {
@@ -56,4 +105,7 @@ module.exports = {
   get,
   createByCSV,
   deleteStudent,
+  getById,
+  create,
+  update
 };

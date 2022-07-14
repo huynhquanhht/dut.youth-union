@@ -46,6 +46,10 @@ module.exports = (seqeulize, Datatypes) => {
         type: Datatypes.DATE,
         allowNull: true,
       },
+      confirmed_by: {
+        type: Datatypes.INTEGER,
+        allowNull: true,
+      }
     },
     {
       timestamps: true,

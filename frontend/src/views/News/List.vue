@@ -63,7 +63,7 @@
                 @click="edit"
               >
                 <v-icon dark size="20">mdi-square-edit-outline</v-icon>
-                Chỉnh sửa
+                Cập nhật
               </v-btn>
               <v-btn
                 text

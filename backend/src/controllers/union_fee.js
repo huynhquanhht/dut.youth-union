@@ -12,10 +12,12 @@ const unionTextbookService = require("../services/union_textbook");
 const get = async (req, res) => {
   try {
     let query = req.query;
+    console.log('query - ', query);
     let currentUserId = req.payload.userId;
     const result = await unionFeeService.get(currentUserId, query);
     res.status(200).send(result);
   } catch (error) {
+    console.log(error);
     res.status(500).send({ message: MESSAGE.SERVER_ERROR });
   }
 };
@@ -24,6 +26,7 @@ const get = async (req, res) => {
 const getOfStudent = async (req, res) => {
   try {
     let query = req.query;
+
     let currentUserId = req.payload.userId;
     const result = await unionFeeService.getOfStudent(currentUserId, query);
     res.status(200).send(result);
@@ -90,9 +93,12 @@ const confirmSubmission = async (req, res) => {
 // [POST]: /union-fee
 const createUnionFee = async (req, res) => {
   try {
-    let schoolYear = req.body.schoolYear;
-    let amountOfMoney = req.body.amountOfMoney;
-    const unionFee = { schoolYear, amountOfMoney };
+    const unionFee = req.body.unionFee;
+    console.log('unionFee - ', unionFee);
+    if (!unionFee.schoolYear || !unionFee.amountOfMoney) {
+      res.status(400).send({ message: MESSAGE.CREATE_FAIL });
+      return;
+    }
     let isCreated = await unionFeeService.create(unionFee);
     if (isCreated) {
       res.status(200).send({ message: MESSAGE.CREATE_SUCCESS });

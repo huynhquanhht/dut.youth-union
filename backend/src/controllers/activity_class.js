@@ -7,19 +7,20 @@ const timeUtils = require("../utils/time");
 
 // [POST]: /activity-class
 const create = async (req, res) => {
-  const name = req.body.name;
-  if (!name) {
+  const activityClass = req.body.activityClass;
+  if (!activityClass.name || !activityClass.id || !activityClass.faculty_id || !activityClass.course_id) {
     res.status(400).send({ message: MESSAGE.CREATE_FAIL });
     return;
   }
   try {
-    const creation = await activityClassService.create(name);
+    const creation = await activityClassService.create(activityClass);
     if (!creation.result) {
       res.status(400).send({ message: creation.message });
       return;
     }
     res.status(200).send({ message: creation.message });
   } catch (error) {
+    console.log(error);
     res.status(500).send({ message: MESSAGE.SERVER_ERROR});
   }
 }
@@ -52,8 +53,8 @@ const getById = async (req, res) => {
 const update = async (req, res) => {
   try {
     const activityClass = req.body.activityClass;
-    if (!activityClass.id || !activityClass.name) {
-      res.status(400).send({ message: MESSAGE.UPDATE_FAIL });
+    if (!activityClass.name || !activityClass.id || !activityClass.faculty_id || !activityClass.course_id) {
+      res.status(400).send({ message: MESSAGE.CREATE_FAIL });
       return;
     }
     const update = await activityClassService.update(activityClass);
@@ -64,6 +65,7 @@ const update = async (req, res) => {
     res.status(400).send({ message: update.message });
     return;
   } catch (error) {
+    console.log(error);
     res.status(500).send({ message: MESSAGE.SERVER_ERROR});
   }
 };

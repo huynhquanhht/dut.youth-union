@@ -9,6 +9,16 @@ const userRepo = require('../repositories/user');
 const roleUtils = require('../utils/role');
 const commonService = require('./common');
 
+const getUserAndRole = async (currentUserId) => {
+  let option = {};
+  option.include = [{ model: models.role, deleted_at: null,}];
+  option.where = { id: currentUserId, deleted_at: null };
+  let user = await userRepo.getOne(option);
+  user = JSON.parse(JSON.stringify(user));
+  return user;
+}
+
+
 const get = async (currentUserId, query) => {
   let userRole = await commonService.getUserAndRole(currentUserId);
   let option = {};
@@ -64,6 +74,13 @@ const get = async (currentUserId, query) => {
     }
     let unionTextbooks = await studentRepo.get(option);
     unionTextbooks = sequelizeUtils.convertJsonToObject(unionTextbooks);
+    for (let item of unionTextbooks.rows) {
+      const user = await getUserAndRole(currentUserId);
+      console.log('item - ', item);
+      if (item.union_textbook.confirmed_by) {
+        item.union_textbook.confirmed_by = user.name;
+      }
+    }
     return unionTextbooks;
   }
 };
@@ -115,7 +132,8 @@ const confirmSubmission = async (currentUserId, unionTextbookIds) => {
     } else {
       await unionTextbookRepo.update({
         submitted: true,
-        school_confirmed: timeUtils.getCurrentTime()
+        school_confirmed: timeUtils.getCurrentTime(),
+        confirmed_by: currentUserId,
       }, unionTextbookIds, transaction);
     }
     await transaction.commit();

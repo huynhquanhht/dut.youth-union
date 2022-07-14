@@ -63,7 +63,7 @@
                   @click="edit"
               >
                 <v-icon dark size="20">mdi-square-edit-outline</v-icon>
-                Chỉnh sửa
+                Cập nhật
               </v-btn>
                 <v-btn
                     text
@@ -105,23 +105,23 @@
       </template>
       <template v-slot:item.status="{ item }">
         <v-chip
-          class="ma-2"
+          class="my-2"
           color="error"
-          v-if="timeUtils.formatTime(timeUtils.getCurrentTime()) < timeUtils.formatTime(item.begin_at)"
+          v-if="Date.parse(timeUtils.getCurrentTime()) < Date.parse(item.begin_at)"
         >
           Sắp diễn ra
         </v-chip>
         <v-chip
-          v-if="timeUtils.formatTime(timeUtils.getCurrentTime()) >= timeUtils.formatTime(item.begin_at) &&
-      timeUtils.formatTime(timeUtils.getCurrentTime()) <= timeUtils.formatTime(item.end_at)"
-          class="ma-2"
+          v-if="Date.parse(timeUtils.getCurrentTime()) >= Date.parse(item.begin_at) &&
+      Date.parse(timeUtils.getCurrentTime()) <= Date.parse(item.end_at)"
+          class="my-2"
           color="orange"
         >
           Đang diễn ra
         </v-chip>
         <v-chip
-          v-if="timeUtils.formatTime(timeUtils.getCurrentTime()) > timeUtils.formatTime(item.end_at)"
-          class="ma-2"
+          v-if="Date.parse(timeUtils.getCurrentTime()) > Date.parse(item.end_at)"
+          class="my-2"
           color="success"
         >
           Kết thúc
@@ -431,6 +431,10 @@ export default {
   background-color: #FFFFFF !important;
   padding: 20px 20px 20px 20px;
   border-radius: 8px !important;
+  max-width: 1100px;
+  .v-chip__content {
+    color: white;
+  }
   .v-card__title {
     padding: 4px 0px 8px 0px !important;
     font: normal 700 18px Roboto;

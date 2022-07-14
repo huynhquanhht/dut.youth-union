@@ -66,6 +66,15 @@
                 Thêm mới
               </v-btn>
               <v-btn
+                text
+                width="100px"
+                class="tool-button"
+                @click="update"
+              >
+                <v-icon dark size="24">mdi-square-edit-outline</v-icon>
+                Cập nhật
+              </v-btn>
+              <v-btn
                   text
                   width="50px"
                   class="tool-button"
@@ -117,6 +126,19 @@
         </div>
       </template>
     </v-data-table>
+    <v-dialog
+      v-model="formDialog"
+      width="360px"
+      fullscreen
+      hide-overlay
+      transition="dialog-bottom-transition"
+      scrollable
+    >
+      <student-form
+        :student="student"
+        :formType="formType"
+        @student-form="studentFormHandler"/>
+    </v-dialog>
     <v-dialog v-model="dialog" width="400px">
       <confirm-dialog
           @confirm-dialog="handleConfirm"
@@ -143,12 +165,14 @@ import ConfirmDialog from '@/components/ConfirmDialog';
 import CsvPopup from '@/components/CSVPopup';
 import MESSAGE from "@/utils/message";
 import role from '@/utils/role';
+import StudentForm from '@/views/Student/Form';
 
 export default {
   name: 'activity-list',
   components: {
     ConfirmDialog,
     CsvPopup,
+    StudentForm,
   },
   props: {
     page: {
@@ -198,27 +222,37 @@ export default {
       headers: [
         {text: 'Mã số', value: 'id',},
         {text: 'Họ tên', value: 'name'},
+        { text: 'Email', value: 'email'},
+        { text: 'Điện thoại', value: 'phone'},
         {text: 'Chi đoàn', value: 'activity_class.name'},
         {text: 'Đoàn viên', value: 'is_union_member',},
-        {text: 'Nộp sổ đoàn', value: 'submitted_union_book_at',}
+        {text: 'Nộp sổ đoàn', value: 'submitted_union_book_at',
+
+        }
       ],
       dialogTitle: null,
       dialogContent: null,
       csvDialog: false,
       btnOkLoading: false,
+      formType: '',
+
     };
   },
   computed: {
     ...mapGetters({
       students: 'getStudents',
       currentUser: 'getUser',
+      student: 'getStudent'
     }),
   },
-
   methods: {
     ...mapActions({
       fetchGetStudents: 'fetchGetStudents',
       fetchCreateStudentByCSV: 'fetchCreateStudentByCSV',
+      fetchGetStudentById: 'fetchGetStudentById',
+      fetchCreateStudent: 'fetchCreateStudent',
+      fetchUpdateStudent: 'fetchUpdateStudent',
+      fetchGetActivityClassList: 'fetchGetActivityClassList'
     }),
     ...mapMutations({
       setSnackbar: 'setSnackbar',
@@ -248,6 +282,30 @@ export default {
         this.formDialog = false;
       }
       if (payload.command === 'Save') {
+        this.formDialog = false;
+      }
+    },
+    async studentFormHandler(data) {
+      if (data.command === 'close') {
+        this.selected = [];
+        this.formDialog = false;
+      }
+      if (data.command === 'Create') {
+        console.log('data - ', data);
+        const isCreated = await this.fetchCreateStudent({student: data.student});
+        if (isCreated) {
+          await this.fetchGetStudents(this.query);
+        }
+        this.selected = [];
+        this.formDialog = false;
+      }
+      if (data.command === 'Update') {
+        console.log(data.faculty);
+        const isUpdated = await this.fetchUpdateStudent({student: data.student});
+        if (isUpdated) {
+          await this.fetchGetStudents(this.query);
+        }
+        this.selected = [];
         this.formDialog = false;
       }
     },
@@ -298,18 +356,30 @@ export default {
       }
     },
     create() {
-      this.setSnackbar({
-        type: 'info',
-        visible: true,
-        text: MESSAGE.FEATURE_DEVELOP,
-      });
+      this.formType = 'Create';
+      this.formDialog = true;
     },
-    update() {
-      this.setSnackbar({
-        type: 'info',
-        visible: true,
-        text: MESSAGE.FEATURE_DEVELOP,
-      });
+    async update() {
+      if (this.selected.length === 0) {
+        this.setSnackbar({
+          type: 'info',
+          visible: true,
+          text: MESSAGE.CHOOSE_RECORD_FOR_EDIT,
+        });
+        return;
+      }
+      if (this.selected.length > 1) {
+        this.setSnackbar({
+          type: 'info',
+          visible: true,
+          text: MESSAGE.CHOOSE_ONE_RECORD_FOR_EDIT,
+        });
+        return;
+      }
+      await this.fetchGetStudentById({ id: this.selected[0].id})
+      await this.fetchGetActivityClassList({ faculty_id: this.student.activity_class.faculty_id })
+      this.formType = 'Update';
+      this.formDialog = true;
     },
   },
   async created() {
@@ -327,6 +397,7 @@ export default {
   padding: 20px 20px 20px 20px;
   background-color: #FFFFFF !important;
   border-radius: 8px !important;
+  height: 100vh;
   .v-card__title {
     padding: 4px 0px 8px 0px !important;
     font: normal 700 18px Roboto;
@@ -484,15 +555,15 @@ export default {
             }
 
             &:nth-child(6) {
-              min-width: 300px !important;
+              min-width: 116px !important;
             }
 
             &:nth-child(7) {
-              min-width: 100px !important;
+              min-width: 116px !important;
             }
 
             &:nth-child(8) {
-              min-width: 300px !important;
+              min-width: 116px !important;
             }
 
             &:nth-child(9) {

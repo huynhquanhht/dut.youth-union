@@ -19,23 +19,21 @@ const getStudentByUserId = async (currentUserId) => {
 };
 
 const get = async (option) => {
-  if (option === 'Common') {
+  if (option === 'common') {
+    console.log('b');
     return await getCommonActivity();
   }
-  if (option === 'This week') {
+  if (option === 'this-week') {
     return await getActivityInThisWeek();
   }
-  if (option === 'This month') {
-    return await getActivityInThisMonth();
-  }
-  if (option === 'Upcomming') {
+  if (option === 'upcoming') {
     return await getUpcomingActivity();
   }
-  if (option === 'Occurring') {
+  if (option === 'occurring') {
     return await getOccurringActivity();
   }
-  if (option === 'Your faculty') {
-    return await getActivityOfYourFaculty();
+  if (option === 'end') {
+    return await getEndActivity();
   }
 };
 
@@ -47,36 +45,166 @@ const getCommonActivity = async () => {
   }];
   let activityList = await activityRepo.getAllAndCount(options);
   activityList = sequelizeUtils.convertJsonToObject(activityList);
-  activityList.rows.forEach((item) => {
-    item.begin_at = timeUtils.formatTime(item.begin_at);
-    item.begin_at.replace(' ', '\n');
-    item.end_at = timeUtils.formatTime(item.end_at);
-    item.end_at.replace(' ', '\n');
-    item.startTimeText = timeUtils.formatTimeText(item.begin_at);
-    item.endTimeText = timeUtils.formatTimeText(item.end_at);
-  });
+  let newActivityList = [];
+  activityList.rows = activityList.rows.forEach((item) => {
+    console.log('a');
+    if (Date.parse(item.end_at) >= Date.parse(timeUtils.getCurrentTime())) {
+        item.begin_at = timeUtils.formatTime(item.begin_at);
+      item.begin_at.replace(' ', '\n');
+      item.end_at = timeUtils.formatTime(item.end_at);
+      item.end_at.replace(' ', '\n');
+      item.startTimeText = timeUtils.formatTimeText(item.begin_at);
+      item.endTimeText = timeUtils.formatTimeText(item.end_at);
+      newActivityList.push(item);
+  }});
+  activityList.rows = newActivityList;
   return activityList;
 };
 
-const getActivityInThisWeek = () => {
-
+const getActivityInThisWeek = async () => {
+  var curr = new Date;
+  var first = curr.getDate() - curr.getDay() + 1;
+  var last = first + 6;
+  var firstDay = new Date(curr.setDate(first));
+  firstDay.setUTCHours(0);
+  firstDay.setUTCMinutes(0);
+  firstDay.setUTCSeconds(0);
+  var lastDay = new Date(curr.setDate(last));
+  lastDay.setUTCHours(23);
+  lastDay.setUTCMinutes(59);
+  lastDay.setUTCSeconds(59);
+  let options = {};
+  options.include = [{
+    model: models.student,
+    required: false,
+  }];
+  let activityList = await activityRepo.getAllAndCount(options);
+  activityList = sequelizeUtils.convertJsonToObject(activityList);
+  let newActivityList = [];
+  activityList.rows = activityList.rows.forEach((item) => {
+    console.log('a');
+    if (Date.parse(item.end_at) > Date.parse(timeUtils.getCurrentTime())) {
+      if (Date.parse(item.begin_at) >= Date.parse(firstDay) &&
+          Date.parse(item.end_at) <= Date.parse(lastDay)
+      )
+      item.begin_at = timeUtils.formatTime(item.begin_at);
+      item.begin_at.replace(' ', '\n');
+      item.end_at = timeUtils.formatTime(item.end_at);
+      item.end_at.replace(' ', '\n');
+      item.startTimeText = timeUtils.formatTimeText(item.begin_at);
+      item.endTimeText = timeUtils.formatTimeText(item.end_at);
+      newActivityList.push(item);
+    }
+  });
+  activityList.rows = newActivityList;
+  return activityList;
 };
 
-const getActivityInThisMonth = () => {
-
+const getUpcomingActivity = async () => {
+  var curr = new Date;
+  var first = curr.getDate() - curr.getDay() + 1;
+  var last = first + 6;
+  var firstDay = new Date(curr.setDate(first));
+  firstDay.setUTCHours(0);
+  firstDay.setUTCMinutes(0);
+  firstDay.setUTCSeconds(0);
+  var lastDay = new Date(curr.setDate(last));
+  lastDay.setUTCHours(23);
+  lastDay.setUTCMinutes(59);
+  lastDay.setUTCSeconds(59);
+  let options = {};
+  options.include = [{
+    model: models.student,
+    required: false,
+  }];
+  let activityList = await activityRepo.getAllAndCount(options);
+  activityList = sequelizeUtils.convertJsonToObject(activityList);
+  let newActivityList = [];
+  activityList.rows = activityList.rows.forEach((item) => {
+    if (Date.parse(item.begin_at) > Date.parse(timeUtils.getCurrentTime())) {
+      item.begin_at = timeUtils.formatTime(item.begin_at);
+      item.begin_at.replace(' ', '\n');
+      item.end_at = timeUtils.formatTime(item.end_at);
+      item.end_at.replace(' ', '\n');
+      item.startTimeText = timeUtils.formatTimeText(item.begin_at);
+      item.endTimeText = timeUtils.formatTimeText(item.end_at);
+      newActivityList.push(item);
+  }});
+  activityList.rows = newActivityList;
+  return activityList;
 };
 
-const getUpcomingActivity = () => {
-
+const getOccurringActivity = async () => {
+  var curr = new Date;
+  var first = curr.getDate() - curr.getDay() + 1;
+  var last = first + 6;
+  var firstDay = new Date(curr.setDate(first));
+  firstDay.setUTCHours(0);
+  firstDay.setUTCMinutes(0);
+  firstDay.setUTCSeconds(0);
+  var lastDay = new Date(curr.setDate(last));
+  lastDay.setUTCHours(23);
+  lastDay.setUTCMinutes(59);
+  lastDay.setUTCSeconds(59);
+  let options = {};
+  options.include = [{
+    model: models.student,
+    required: false,
+  }];
+  let activityList = await activityRepo.getAllAndCount(options);
+  activityList = sequelizeUtils.convertJsonToObject(activityList);
+  let newActivityList = [];
+  activityList.rows = activityList.rows.forEach((item) => {
+    console.log('a');
+    if (Date.parse(item.begin_at) <= Date.parse(timeUtils.getCurrentTime()) &&
+        Date.parse(item.end_at) >= Date.parse(timeUtils.getCurrentTime())
+    ) {
+      item.begin_at = timeUtils.formatTime(item.begin_at);
+      item.begin_at.replace(' ', '\n');
+      item.end_at = timeUtils.formatTime(item.end_at);
+      item.end_at.replace(' ', '\n');
+      item.startTimeText = timeUtils.formatTimeText(item.begin_at);
+      item.endTimeText = timeUtils.formatTimeText(item.end_at);
+      newActivityList.push(item);
+    }});
+  activityList.rows = newActivityList;
+  return activityList;
 };
 
-const getOccurringActivity = () => {
-
+const getEndActivity = async () => {
+  var curr = new Date;
+  var first = curr.getDate() - curr.getDay() + 1;
+  var last = first + 6;
+  var firstDay = new Date(curr.setDate(first));
+  firstDay.setUTCHours(0);
+  firstDay.setUTCMinutes(0);
+  firstDay.setUTCSeconds(0);
+  var lastDay = new Date(curr.setDate(last));
+  lastDay.setUTCHours(23);
+  lastDay.setUTCMinutes(59);
+  lastDay.setUTCSeconds(59);
+  let options = {};
+  options.include = [{
+    model: models.student,
+    required: false,
+  }];
+  let activityList = await activityRepo.getAllAndCount(options);
+  activityList = sequelizeUtils.convertJsonToObject(activityList);
+  let newActivityList = [];
+  activityList.rows = activityList.rows.forEach((item) => {
+    if (Date.parse(item.end_at) < Date.parse(timeUtils.getCurrentTime())
+    ) {
+      item.begin_at = timeUtils.formatTime(item.begin_at);
+      item.begin_at.replace(' ', '\n');
+      item.end_at = timeUtils.formatTime(item.end_at);
+      item.end_at.replace(' ', '\n');
+      item.startTimeText = timeUtils.formatTimeText(item.begin_at);
+      item.endTimeText = timeUtils.formatTimeText(item.end_at);
+      newActivityList.push(item);
+    }});
+  activityList.rows = newActivityList;
+  return activityList;
 };
-
-const getActivityOfYourFaculty = () => {
-
-}
 
 const getByStudent = async (query, currentUserId) => {
   let options = {};
@@ -97,28 +225,47 @@ const getByStudent = async (query, currentUserId) => {
   student = await studentRepo.getOne(options);
   student = sequelizeUtils.convertJsonToObject(student);
   console.log('student - ', student);
+
+  let newActivityList = [];
   student.activities.forEach((item) => {
-    item.begin_at = timeUtils.formatTime(item.begin_at);
-    item.begin_at.replace(' ', '\n');
-    item.end_at = timeUtils.formatTime(item.end_at);
-    item.end_at.replace(' ', '\n');
-    item.startTimeText = timeUtils.formatTimeText(item.begin_at);
-    item.endTimeText = timeUtils.formatTimeText(item.end_at);
+    if (Date.parse(item.end_at) > Date.parse(timeUtils.getCurrentTime())) {
+      item.begin_at = timeUtils.formatTime(item.begin_at);
+      item.begin_at.replace(' ', '\n');
+      item.end_at = timeUtils.formatTime(item.end_at);
+      item.end_at.replace(' ', '\n');
+      item.startTimeText = timeUtils.formatTimeText(item.begin_at);
+      item.endTimeText = timeUtils.formatTimeText(item.end_at);
+      newActivityList.push(item);
+    }
+
   });
+  student.activities = newActivityList;
   return student.activities;
 };
 
-const getPointListOfCurrentStudent = async (currentUserId) => {
+const getPointListOfCurrentStudent = async (currentUserId, schoolYear) => {
   let options = {};
+  let schoolYears;
   // Get current student by user id
   let student = await getStudentByUserId(currentUserId);
   student = JSON.parse(JSON.stringify(student));
   const activityPoints = [];
   // Get school year
-  let schoolYears = await activityRepo.getAll({
-    attributes: ['school_year'],
-  });
+  if (schoolYear === 'Tất cả') {
+    schoolYears = await activityRepo.getAll({
+      attributes: ['school_year'],
+    });
+  } else {
+    schoolYears = await activityRepo.getAll({
+      attributes: ['school_year'],
+      where: {
+        school_year: schoolYear
+      }
+    });
+  }
+
   schoolYears = JSON.parse(JSON.stringify(schoolYears));
+  console.log('schoolYears - ', schoolYears);
   // Filter school year
   const registeredYear = new Date(student.created_at).getFullYear();
   const startSchoolYear = registeredYear + ' - ' + (registeredYear + 1)
@@ -235,6 +382,7 @@ const isCurrentUserAttended = async (activityId, userId) => {
 };
 
 const create = async (newActivity, currentUserId) => {
+  console.log('newActivity - ', newActivity);
   const data = {
     name: newActivity.activityName,
     organization_unit: newActivity.organizationUnit,
@@ -346,8 +494,6 @@ const getRegisteredList = async (activityId) => {
 };
 
 const addParticipant = async (activityId, studentId) => {
-  console.log('activityId - ', activityId);
-  console.log('studentId - ', studentId);
   const newRegisterJoin = {
     activity_id: activityId,
     student_id: studentId,
@@ -360,11 +506,19 @@ const deleteParticipants = async (registrationIds) => {
   let transaction;
   try {
     transaction = await models.sequelizeConfig.transaction();
+    const options = {
+      where: {
+        id: registrationIds
+      },
+      force: true
+    };
     const deletionResult = await registerJoinRepo.deleteByIds(options);
-    if (deletionResult.length === registrationIds.length) {
+    console.log('deletetionResult - ', deletionResult)
+    if (deletionResult === registrationIds.length) {
+      await transaction.commit();
       return deletionResult;
     } else {
-      await transaction.commit();
+      await transaction.rollback();
       return null;
     }
   } catch (error) {

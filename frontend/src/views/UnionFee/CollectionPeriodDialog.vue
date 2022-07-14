@@ -79,11 +79,16 @@ export default {
       this.uploadedFile = file;
     },
     btnOkHandler() {
-      this.$emit('collection-dialog', { command: 'Ok', file: this.uploadedFile });
+      this.$emit('collection-period-dialog', { command: 'Ok', unionFee: {
+          schoolYear: this.collectionPeriod,
+          amountOfMoney: this.moneyQuantity
+        }
+      });
     },
     btnCancelHandler() {
-      this.fileInput = null;
-      this.$emit('collection-dialog', { command: 'Cancel' });
+      this.collectionPeriod = null;
+      this.moneyQuantity = null;
+      this.$emit('collection-period-dialog', { command: 'Cancel' });
     }
   },
 }

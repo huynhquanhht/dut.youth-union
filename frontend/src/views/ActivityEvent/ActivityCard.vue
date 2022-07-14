@@ -30,9 +30,9 @@ export default {
 <style lang="scss" scoped>
 .activity-card-wrapper {
   .cover-block {
-    width: 300px;
+    width: 100%;
     .cover {
-      width: 316px;
+      width: 100%;
       border-radius: 4px;
     }
   }

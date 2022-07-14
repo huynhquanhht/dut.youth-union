@@ -6,26 +6,32 @@ const models = require('../models');
 const sequelizeUtils = require('../utils/sequelize');
 const userRepo = require("../repositories/user");
 const lectureRepo = require("../repositories/lecture");
+const studentRepo = require("../repositories/student");
 const roleUtils = require("../utils/role");
 
-const create = async (name) => {
-  const option = {where: {name: name}};
+const create = async (activityClass) => {
+  const option = {where: {name: activityClass.name}};
   const oldActivityClass = await activityClassRepo.getOne(option);
   if (oldActivityClass) {
     return {message: MESSAGE.EXISTED_DATA, result: false};
   }
   if (oldActivityClass && oldActivityClass.deleted_at) {
-    const condition = {where: {name: name}};
+    const condition = {where: {name: activityClass.name}};
     const newActivityClass = {deleted_at: null};
     await activityClassRepo.update(condition, newActivityClass);
     return {message: MESSAGE.CREATE_SUCCESS, result: true};
   }
-  const activityClass = await activityClassRepo.create({name});
-  if (activityClass) {
+  const newActivityClass = await activityClassRepo.create({
+    id: activityClass.id,
+    name: activityClass.name,
+    course_id: activityClass.course_id,
+    faculty_id: activityClass.faculty_id,
+  });
+  if (newActivityClass) {
     return {
       message: MESSAGE.CREATE_SUCCESS,
       result: true,
-      activityClass: activityClass,
+      activityClass: newActivityClass,
     };
   }
   return {message: MESSAGE.CREATE_FAIL, result: false};
@@ -49,18 +55,21 @@ const createMany = async (activityClasses) => {
 const get = async (query, userId) => {
   let option = {};
   let optionCount = {};
+  if (query.option && query.option === 'all') {
+    delete query.option;
+  } else {
+    option.limit = query.size ? +query.size : 10;
+    option.offset = query.page ? (query.page - 1) * query.size : 1;
+  }
   option.where = {deleted_at: null};
-  option.limit = query.size ? +query.size : 10;
-  option.offset = query.page ? (query.page - 1) * query.size : 1;
+
   query.facultyName = query.facultyName ? query.facultyName : '';
   query.facultyId = query.facultyId ? query.facultyId : '';
   query.courseName = query.courseName ? query.courseName : '';
   const user = await getUserAndRole(userId);
-  console.log('user - ', roleUtils.FACULTY_SECRETARY);
   if (user.roles[0].name === roleUtils.FACULTY_SECRETARY) {
     const lecture = await lectureRepo.getOne({ where: {user_id: user.id}});
     const facultyId = lecture.faculty_id;
-    console.log('facultyId - ', facultyId);
     option.include = [
       {
         model: models.course,
@@ -111,15 +120,22 @@ const get = async (query, userId) => {
       }
     }
   }
+  // Student, class = , is_secretary = true
   let activityClassList = await activityClassRepo.get(option);
   let count = await activityClassRepo.countAll(optionCount);
   activityClassList = sequelizeUtils.convertJsonToObject(activityClassList);
   for (let activityClass of activityClassList.rows) {
+    let secretary = await studentRepo.getOne({ where: {
+        activity_class_id: activityClass.id,
+        is_class_secretary: true,
+      }});
+    secretary = JSON.parse(JSON.stringify(secretary));
     activityClass.unionMemberQuantity = activityClass.students.filter(
       (student) => student.unionMemberQuantity !== null).length;
     activityClass.unionTextbookQuantity = activityClass.students.filter(
       (student) => student.submitted_union_book_at !== null).length;
     activityClass.studentQuantity = activityClass.students.length;
+    activityClass.secretary = secretary;
   }
   return {
     count: count,
@@ -139,19 +155,23 @@ const getById = async (activityClassId) => {
 
 const update = async (activityClass) => {
   // Check find activityClass
-  let option = {where: {id: +activityClass.id, deleted_at: null}};
+  let option = {where: {id: activityClass.id, deleted_at: null}};
   const oldActivityClass = await activityClassRepo.getOne(option);
   // Check existed name
-  option = {where: {name: activityClass.name}};
-  const existedActivityClass = await activityClassRepo.getOne(option);
-  if (!oldActivityClass) {
-    return {message: MESSAGE.EMPTY_DATA, result: false};
-  }
-  if (existedActivityClass) {
-    return {message: MESSAGE.EXISTED_NAME, result: false};
-  }
-  let condition = {where: {id: +activityClass.id}};
-  const newActivityClass = {name: activityClass.name};
+  // option = {where: {name: activityClass.name}};
+  // const existedActivityClass = await activityClassRepo.getOne(option);
+  // if (!oldActivityClass) {
+  //   return {message: MESSAGE.EMPTY_DATA, result: false};
+  // }
+  // if (existedActivityClass) {
+  //   return {message: MESSAGE.EXISTED_NAME, result: false};
+  // }
+  let condition = {where: {id: activityClass.id}};
+  const newActivityClass = {
+    name: activityClass.name,
+    course_id: activityClass.course_id,
+    faculty_id: activityClass.faculty_id,
+  };
   const result = await activityClassRepo.update(condition, newActivityClass);
   if (result[0]) {
     return {message: MESSAGE.UPDATE_SUCCESS, result: true};

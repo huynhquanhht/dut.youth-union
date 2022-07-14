@@ -10,6 +10,7 @@ import role from './role';
 import unionTextbook from './union_textbook';
 import unionFee from './union_fee';
 import news from './news';
+import permission from "./permission";
 
 Vue.use(Vuex);
 
@@ -21,6 +22,6 @@ export default new Vuex.Store({
   actions: {
   },
   modules: {
-    app, user, faculty, activity, activityClass, student, role, unionTextbook, unionFee, news,
+    app, user, faculty, activity, activityClass, student, role, unionTextbook, unionFee, news, permission
   }
 })

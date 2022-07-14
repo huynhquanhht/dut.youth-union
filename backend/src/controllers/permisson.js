@@ -1,7 +1,6 @@
 'use strict';
 const permissionService = require('../services/permission');
 const MESSAGE = require('../utils/message');
-const {permission} = require("../models");
 
 // [POST]: /permission
 const create = async (req, res) => {
@@ -47,13 +46,15 @@ const getById = async (req, res) => {
 // [PUT]: /permission
 const update = async (req, res) => {
   try {
+    console.log(req.body.permission);
     const permission = req.body.permission;
-    if (!permission.id || !permission.name) {
+    console.log('permission - ', permission);
+    if (!permission.id) {
       res.status(400).send({ message: MESSAGE.UPDATE_FAIL });
       return;
     }
     const update = await permissionService.update(permission);
-    if (update.result) {
+    if (!!update[0]) {
       res.status(200).send({ message: update.message });
       return;
     }

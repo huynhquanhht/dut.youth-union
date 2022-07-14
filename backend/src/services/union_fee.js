@@ -41,18 +41,17 @@ const get = async (currentUserId, query) => {
   return unionFee;
 };
 
-const getOfStudents = async (currentUserId, query) => {
+const  getOfStudents = async (currentUserId, query) => {
   const user = await getUserAndRole(currentUserId);
   let option = {};
   if (user.roles[0].name === roleUtils.FACULTY_SECRETARY) {
     const lecture = await lectureRepo.getOne({where: {user_id: user.id}});
     const facultyId = lecture.faculty_id;
-
     option.limit = query.size ? +query.size : 10;
     option.offset = query.page ? (query.page - 1) * query.size : 1;
     option.include = [{
       model: models.unionFee,
-      where: {id: 23},
+      // where: {id: 23},
       require: false,
     }, {
       model: models.activityClass,
@@ -60,26 +59,44 @@ const getOfStudents = async (currentUserId, query) => {
         model: models.faculty,
         where: {id: facultyId}
       }]
-      // where: {id: user.student.activity_class_id}
     }];
-    // option.where = {activity_class_id: user.student.activity_class_id};
+    if (query.studentId !== null) {
+      option.where = {id: query.studentId};
+    }
+    if (query.className !== null) {
+      option.include[1].where = { id: query.className };
+    }
   } else {
     option.limit = query.size ? +query.size : 10;
     option.offset = query.page ? (query.page - 1) * query.size : 1;
     option.include = [{
       model: models.unionFee,
-      where: {id: 23},
-      require: false,
+      // where: {id: 23},
+      require: true,
     }, {
       model: models.activityClass,
     }];
+    if (query.studentId) {
+      console.log('a');
+      option.where = {id: query.studentId};
+    }
+    if (query.className) {
+      console.log('b');
+      option.include[1].where = { id: query.className };
+    }
   }
   let unionFeeOfStudents = await studentRepo.get(option);
   unionFeeOfStudents = JSON.parse(JSON.stringify(unionFeeOfStudents));
   unionFeeOfStudents.rows.forEach(item => {
-    item.unionFee = item.union_fees[0];
+    // item.unionFee = item.union_fees[0];
   })
-  unionFeeOfStudents = sequelizeUtils.convertJsonToObject(unionFeeOfStudents);
+  for (let item of unionFeeOfStudents.rows) {
+    item.unionFee = item.union_fees[0];
+    if (item.unionFee.submit_union_fee.confirmed_by != null) {
+      const user = await getUserAndRole(item.unionFee.submit_union_fee.confirmed_by);
+      item.unionFee.submit_union_fee.confirmed_by = user.name;
+    }
+  }
   return unionFeeOfStudents;
 };
 
@@ -151,7 +168,8 @@ const confirmSubmission = async (currentUserId, submitUnionFeeIds) => {
     } else {
       await submitUnionFeeRepo.update({
         submitted: true,
-        school_confirmed: timeUtils.getCurrentTime()
+        school_confirmed: timeUtils.getCurrentTime(),
+        confirmed_by: currentUserId,
       }, submitUnionFeeIds, transaction);
     }
     await transaction.commit();
