@@ -49,12 +49,12 @@
             <div class="tool-block d-flex align-center">
                 <v-btn
                     icon
-                    width="180px"
+                    width="100px"
                     class="tool-button"
                     @click="$router.push('/activity/create')"
                 >
                   <v-icon dark size="24">mdi-plus</v-icon>
-                  Thêm người tham gia
+                  Thêm mới
                 </v-btn>
               <v-btn
                   text
@@ -431,7 +431,7 @@ export default {
   background-color: #FFFFFF !important;
   padding: 20px 20px 20px 20px;
   border-radius: 8px !important;
-  max-width: 1000px;
+  max-width: 1100px;
   .v-chip__content {
     color: white;
   }

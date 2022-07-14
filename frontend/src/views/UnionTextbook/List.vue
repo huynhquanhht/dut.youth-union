@@ -119,6 +119,9 @@
       <template v-slot:item.union_textbook.school_confirmed="{ item }">
         <span>{{ formatTime(item.union_textbook.school_confirmed)}}</span>
       </template>
+      <template v-slot:item.union_textbook.confirmed_by="{ item }">
+        <span>{{ item.union_textbook.confirmed_by ? item.union_textbook.confirmed_by : '-'}}</span>
+      </template>
       <template v-slot:footer>
         <div
           class="footer-block pagination-block d-flex align-center justify-end mt-2"
@@ -227,7 +230,7 @@ export default {
         {text: 'Ngày nộp', value: 'union_textbook.submitted_at'},
         {text: 'Lớp xác nhận', value: 'union_textbook.class_confirmed'},
         {text: 'Trường xác nhận', value: 'union_textbook.school_confirmed'},
-        {text: 'Người xác nhận', value: ''}
+        {text: 'Người xác nhận', value: 'union_textbook.confirmed_by'}
       ],
       dialogTitle: null,
       dialogContent: null,

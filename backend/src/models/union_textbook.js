@@ -25,6 +25,10 @@ module.exports = (sequelize, Datatypes) => {
         type: Datatypes.DATE,
         allowNull: true,
       },
+      confirmed_by: {
+        type: Datatypes.INTEGER,
+        allowNull: true,
+      },
       join_union_at: {
         type: Datatypes.BOOLEAN,
         allowNull: true,

@@ -49,12 +49,12 @@
             <div class="tool-block d-flex align-center">
               <v-btn
                 icon
-                width="100px"
+                width="170px"
                 class="tool-button"
                 @click="registerDialog = true"
               >
                 <v-icon dark size="24">mdi-plus</v-icon>
-                Thêm mới
+                Thêm người tham gia
               </v-btn>
               <v-btn
                 text

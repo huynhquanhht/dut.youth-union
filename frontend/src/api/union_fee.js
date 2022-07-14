@@ -14,10 +14,6 @@ const get = (query) => {
   return axiosUtils.getRequest(url);
 };
 
-const create = (query) => {
-
-};
-
 const getOfStudent = () => {
   let url = `${BASE_URL}/student`;
   return axiosUtils.getRequest(url);
@@ -52,5 +48,10 @@ const getInvoice = (studentId, unionFeeId) => {
   const url = `${BASE_URL}/invoice?studentId=${studentId}&unionFeeId=${unionFeeId}`;
   return axiosUtils.getRequest(url);
 };
+
+const create = (unionFee) => {
+  const url = `${BASE_URL}`;
+  return axiosUtils.postRequest(url, { unionFee });
+}
 
 export default { create, get, getOfStudent, submit, confirmSubmission, getInvoice, getOfStudents };

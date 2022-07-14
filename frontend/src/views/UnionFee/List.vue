@@ -110,6 +110,9 @@
       <template v-slot:item.unionFee.submit_union_fee.school_confirmed="{ item }">
         <span>{{ formatTime(item.unionFee.submit_union_fee.school_confirmed)}}</span>
       </template>
+      <template v-slot:item.unionFee.submit_union_fee.confirmed_by="{ item }">
+        <span>{{ item.unionFee.submit_union_fee.confirmed_by ? item.unionFee.submit_union_fee.confirmed_by : '-' }}</span>
+      </template>
       <template v-slot:item.unionFee.amount_of_money="{ item }">
         <span>{{ item.unionFee.amount_of_money + ' VND'}}</span>
       </template>
@@ -236,7 +239,7 @@ export default {
         {text: 'Ngày nộp', value: 'unionFee.submit_union_fee.submitted_at'},
         {text: 'Lớp xác nhận', value: 'unionFee.submit_union_fee.class_confirmed'},
         {text: 'Trường xác nhận', value: 'unionFee.submit_union_fee.school_confirmed'},
-        {text: 'Người xác nhận', value: ''}
+        {text: 'Người xác nhận', value: 'unionFee.submit_union_fee.confirmed_by'}
       ],
       dialogTitle: null,
       dialogContent: null,
@@ -258,6 +261,7 @@ export default {
       fetchSubmitUnionFee: 'fetchSubmitUnionFee',
       fetchConfirmSubmissionUnionFee: 'fetchConfirmSubmissionUnionFee',
       fetchGetInvoice: 'fetchGetInvoice',
+      fetchCreateUnionFee: 'fetchCreateUnionFee',
     }),
     ...mapMutations({
       setSnackbar: 'setSnackbar',
@@ -410,12 +414,16 @@ export default {
         text: MESSAGE.GET_INVOICE_FAIL,
       });
     },
-    collectionPeriodDialogHandler(data) {
+    async collectionPeriodDialogHandler(data) {
       if (data.command === 'Cancel') {
         this.collectionPeriodDialog = false;
       }
       if (data.command === 'Ok') {
-
+        let isCreated = await this.fetchCreateUnionFee({unionFee: data.unionFee});
+        if (isCreated) {
+          await this.fetchGetUnionFeeOfStudents(this.query);
+        }
+        this.collectionPeriodDialog = false;
       }
     }
   },
@@ -592,8 +600,8 @@ export default {
             }
 
             &:nth-child(5) {
-              min-width: 100px !important;
-              max-width: 100px !important;
+              min-width: 120px !important;
+              max-width: 120px !important;
             }
 
             &:nth-child(6) {
