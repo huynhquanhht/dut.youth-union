@@ -19,7 +19,7 @@
         Không có dữ liệu để hiển thị!
       </template>
       <template v-slot:top>
-        <v-card-title>QUẢN LÝ ĐOÀN PHÍ </v-card-title>
+        <v-card-title>QUẢN LÝ ĐOÀN PHÍ</v-card-title>
         <div class="toolbar mb-1" flat>
           <div class="toolbar-block">
             <div class="search-block d-flex">
@@ -102,19 +102,21 @@
         ></v-simple-checkbox>
       </template>
       <template v-slot:item.unionFee.submit_union_fee.submitted_at="{ item }">
-        <span>{{ formatTime(item.unionFee.submit_union_fee.submitted_at)}}</span>
+        <span>{{ formatTime(item.unionFee.submit_union_fee.submitted_at) }}</span>
       </template>
       <template v-slot:item.unionFee.submit_union_fee.class_confirmed="{ item }">
-        <span>{{ formatTime(item.unionFee.submit_union_fee.class_confirmed)}}</span>
+        <span>{{ formatTime(item.unionFee.submit_union_fee.class_confirmed) }}</span>
       </template>
       <template v-slot:item.unionFee.submit_union_fee.school_confirmed="{ item }">
-        <span>{{ formatTime(item.unionFee.submit_union_fee.school_confirmed)}}</span>
+        <span>{{ formatTime(item.unionFee.submit_union_fee.school_confirmed) }}</span>
       </template>
       <template v-slot:item.unionFee.submit_union_fee.confirmed_by="{ item }">
-        <span>{{ item.unionFee.submit_union_fee.confirmed_by ? item.unionFee.submit_union_fee.confirmed_by : '-' }}</span>
+        <span>{{
+            item.unionFee.submit_union_fee.confirmed_by ? item.unionFee.submit_union_fee.confirmed_by : '-'
+          }}</span>
       </template>
       <template v-slot:item.unionFee.amount_of_money="{ item }">
-        <span>{{ item.unionFee.amount_of_money + ' VND'}}</span>
+        <span>{{ item.unionFee.amount_of_money + ' VND' }}</span>
       </template>
       <template v-slot:footer>
         <div
@@ -153,15 +155,15 @@
       ></confirm-dialog>
     </v-dialog>
     <v-dialog v-model="collectionPeriodDialog" width="400px">
-    <collection-period-dialog
-      :title="dialogTitle"
-      :content="dialogContent"
-      @collection-period-dialog="collectionPeriodDialogHandler"
-    ></collection-period-dialog>
-  </v-dialog>
-  <div class="invoice">
-    <invoice :invoiceInfo="invoice" v-show="false"/>
-  </div>
+      <collection-period-dialog
+        :title="dialogTitle"
+        :content="dialogContent"
+        @collection-period-dialog="collectionPeriodDialogHandler"
+      ></collection-period-dialog>
+    </v-dialog>
+    <div class="invoice">
+      <invoice :invoiceInfo="invoice" v-show="false"/>
+    </div>
   </div>
 </template>
 
@@ -174,6 +176,7 @@ import timeUtils from "@/utils/time";
 import CollectionPeriodDialog from "@/views/UnionFee/CollectionPeriodDialog";
 import Invoice from '@/views/UnionFee/Invoice';
 import MESSAGE from "@/utils/message";
+
 export default {
   name: 'union-fee-of-student-list',
   components: {
@@ -271,7 +274,8 @@ export default {
       await this.$router.push({
         name: 'union-fee',
         query: this.query,
-      }).catch(() => {});
+      }).catch(() => {
+      });
       this.loading = true;
       await this.fetchGetUnionFeeOfStudents(this.query);
       this.loading = false;
@@ -281,7 +285,8 @@ export default {
       await this.$router.push({
         name: 'union-fee',
         query: this.query,
-      }).catch(() => {});
+      }).catch(() => {
+      });
       this.loading = true;
       await this.fetchGetUnionFeeOfStudents(this.query);
       this.loading = false;
@@ -309,7 +314,8 @@ export default {
       this.$router.push({
         name: 'union-fee',
         query: query,
-      }).catch(() => {});
+      }).catch(() => {
+      });
       await this.fetchGetUnionFeeOfStudents({query});
     },
     setQuery() {
@@ -343,7 +349,7 @@ export default {
       if (command === 'Ok') {
         if (this.command == 'Save') {
           const changeUnionFee = Array.from(this.changeUnionFee, ([key, value]) => {
-            return { id: key, submitted: value };
+            return {id: key, submitted: value};
           });
           if (changeUnionFee.length === 0) {
             this.setSnackbar({
@@ -376,7 +382,39 @@ export default {
             await this.fetchGetUnionFeeOfStudents(this.query);
           }
         }
-        return;
+        if (this.command == 'PrintInvoice') {
+          await this.fetchGetInvoice({
+            studentId: this.selected[0].id,
+            unionFeeId: this.selected[0].unionFee.id
+          });
+          if (this.invoice) {
+            const unionFeeIds = this.selected.map(item => item.unionFee.submit_union_fee.id);
+            this.loadingButton = true;
+            let isSuccess = await this.fetchConfirmSubmissionUnionFee({unionFeeIds});
+            this.loadingButton = false;
+            if (isSuccess) {
+              this.confirmDialog = false;
+              await this.fetchGetUnionFeeOfStudents(this.query);
+              this.selected = [];
+              await this.$htmlToPaper('invoice-wrapper', {
+                styles: [
+                  './invoice.css'
+                ]
+              });
+            }
+            return;
+          } else {
+            this.setSnackbar({
+              type: 'info',
+              visible: true,
+              text: MESSAGE.GET_INVOICE_FAIL,
+            });
+          }
+          this.confirmDialog = false;
+          this.selected = [];
+          await this.fetchGetUnionFeeOfStudents(this.query);
+          return;
+        }
       }
       if (command === 'Cancel') {
         this.confirmDialog = false;
@@ -384,7 +422,7 @@ export default {
     },
     confirm() {
       this.command = 'Confirm';
-      this.confirmDialogContent = "Bạn chắc chắn muốn lưu thông tin sổ đoàn đã chọn?"
+      this.confirmDialogContent = "Bạn chắc chắn muốn lưu thông tin đoàn phí đã chọn?"
       this.confirmDialog = true;
     },
     async printInvoice() {
@@ -394,6 +432,13 @@ export default {
           visible: true,
           text: MESSAGE.CHOOSE_ONE_RECORD_FOR_EXPORT_BILL,
         });
+        return;
+      }
+      console.log('selected - ', this.selected[0].unionFee.submit_union_fee.school_confirmed);
+      if (!this.selected[0].unionFee.submit_union_fee.school_confirmed) {
+        this.command = 'PrintInvoice';
+        this.confirmDialogContent = "Để in hóa đơn cần xác nhận nộp đoàn phí. Bạn chắc chắn muốn xác nhận?";
+        this.confirmDialog = true;
         return;
       }
       await this.fetchGetInvoice({
@@ -444,12 +489,14 @@ export default {
   background-color: #FFFFFF !important;
   max-width: 1100px !important;
   height: 100vh;
+
   .v-card__title {
     padding: 4px 0px 8px 0px !important;
     font: normal 700 18px Roboto;
     text-shadow: rgb(0 0 0 / 12%) 0px 3px 6px, rgb(0 0 0 / 23%) 0px 3px 6px;
     color: #0b8ee7;
   }
+
   .toolbar-block {
     width: 100%;
     display: flex !important;
@@ -618,14 +665,17 @@ export default {
               min-width: 120px !important;
               max-width: 120px !important;
             }
+
             &:nth-child(9) {
               min-width: 130px !important;
               max-width: 130px !important;
             }
+
             &:nth-child(10) {
               min-width: 150px !important;
               max-width: 150px !important;
             }
+
             &:nth-child(11) {
               min-width: 150px !important;
               max-width: 150px !important;

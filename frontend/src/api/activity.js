@@ -15,7 +15,7 @@ const get = (query) => {
     queryString = queryString.slice(1, queryString.length);
     url += '?' + queryString;
   }
-  return axiosUtils.getRequest(url);
+  return axiosUtils.getRequest(url, 'AC-01');
 };
 
 const getRegisteredListById = (activityId, query) => {
@@ -28,7 +28,7 @@ const getRegisteredListById = (activityId, query) => {
     queryString = queryString.slice(1, queryString.length);
     url += '?' + queryString;
   }
-  return axiosUtils.getRequest(url);
+  return axiosUtils.getRequest(url, 'AC-02');
 };
 
 const getByCurrentStudent = (query) => {
@@ -44,27 +44,49 @@ const getByCurrentStudent = (query) => {
   return axiosUtils.getRequest(url);
 };
 
-const getPointListOfCurrentStudent = (schoolYear) => {
-  let url = `${BASE_URL}/student/point-list?schoolYear=${schoolYear}`;
-  return axiosUtils.getRequest(url);
+const create = (activity) => {
+  return axiosUtils.postRequest(`${BASE_URL}`, { newActivity: activity }, 'AC-03');
 };
 
-const create = (activity) => {
-  return axiosUtils.postRequest(`${BASE_URL}`, { newActivity: activity });
+const update = (id, activity) => {
+  console.log('mnk');
+  return axiosUtils.putRequest(`${BASE_URL}`, {activityId: id, newActivity: activity}, 'AC-04');
 };
+
+const deleteActivities = (activityIds) => {
+  return axiosUtils.deleteRequest(`${BASE_URL}`, {activityIds}, 'AC-05');
+};
+
+const getPointListOfCurrentStudent = (schoolYear) => {
+  let url = `${BASE_URL}/student/point-list?schoolYear=${schoolYear}`;
+  return axiosUtils.getRequest(url, 'AC-06');
+};
+
+const register = (activityId) => {
+  return axiosUtils.postRequest(`${BASE_URL}/register/${activityId}`, 'AC-08');
+}
+
+const attend = (activityId) => {
+  return axiosUtils.putRequest(`${BASE_URL}/attend/${activityId}, 'AC-09'`);
+}
+
+const addParticipant = (participantInfo) => {
+  return axiosUtils.postRequest(`${BASE_URL}/add-participant`, participantInfo, 'AC-10');
+};
+
+const attendParticipants = (registrationIds) => {
+  return axiosUtils.putRequest(`${BASE_URL}/attend-participants`, {registrationIds}, 'AC-11');
+};
+
+const deleteParticipants = (registrationIds) => {
+  return axiosUtils.deleteRequest(`${BASE_URL}/delete-participants`, {registrationIds});
+}
+
 
 const getById = (id) => {
   return axiosUtils.getRequest(`${BASE_URL}/${id}`);
 };
 
-const update = (id, activity) => {
-  console.log('mnk');
-  return axiosUtils.putRequest(`${BASE_URL}`, {activityId: id, newActivity: activity});
-};
-
-const deleteActivities = (activityIds) => {
-  return axiosUtils.deleteRequest(`${BASE_URL}`, {activityIds});
-};
 
 const openActivityRegistration = (activityId) => {
   return axiosUtils.putRequest(`${BASE_URL}/open-registration/${activityId}`);
@@ -74,25 +96,8 @@ const closeActivityRegistration = (activityId) => {
   return axiosUtils.putRequest(`${BASE_URL}/close-registration/${activityId}`);
 };
 
-const register = (activityId) => {
-  return axiosUtils.postRequest(`${BASE_URL}/register/${activityId}`);
-}
 
-const attend = (activityId) => {
-  return axiosUtils.putRequest(`${BASE_URL}/attend/${activityId}`);
-}
 
-const addParticipant = (participantInfo) => {
-  return axiosUtils.postRequest(`${BASE_URL}/add-participant`, participantInfo);
-};
-
-const attendParticipants = (registrationIds) => {
-  return axiosUtils.putRequest(`${BASE_URL}/attend-participants`, {registrationIds});
-};
-
-const deleteParticipants = (registrationIds) => {
-  return axiosUtils.deleteRequest(`${BASE_URL}/delete-participants`, {registrationIds});
-}
 
 export default {
   getAll,

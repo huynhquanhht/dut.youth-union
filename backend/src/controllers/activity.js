@@ -203,13 +203,16 @@ const deleteActivity = async (req, res) => {
       return;
     }
     const deletionResult = await activityService.deleteByIds(activityIds);
-    res.status(200).send({
-      message:
-        MESSAGE.DELETE_SUCCESS + ` (${deletionResult}/${activityIds.length})`,
-    });
-    return;
+    if (deletionResult) {
+      res.status(200).send({
+        message:
+          MESSAGE.DELETE_SUCCESS + ` (${deletionResult}/${activityIds.length})`,
+      });
+      return;
+    }
+    res.status(400).send({ message: MESSAGE.DELETE_FAIL });
   } catch (error) {
-    console.log(error);
+
     res.status(500).send({ message: MESSAGE.SERVER_ERROR });
   }
 };

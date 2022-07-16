@@ -45,8 +45,10 @@ const  getOfStudents = async (currentUserId, query) => {
   const user = await getUserAndRole(currentUserId);
   let option = {};
   if (user.roles[0].name === roleUtils.FACULTY_SECRETARY) {
+    console.log('a');
     const lecture = await lectureRepo.getOne({where: {user_id: user.id}});
     const facultyId = lecture.faculty_id;
+    console.log('facultyId - ', facultyId);
     option.limit = query.size ? +query.size : 10;
     option.offset = query.page ? (query.page - 1) * query.size : 1;
     option.include = [{
@@ -55,18 +57,22 @@ const  getOfStudents = async (currentUserId, query) => {
       require: false,
     }, {
       model: models.activityClass,
-      include: [{
-        model: models.faculty,
-        where: {id: facultyId}
-      }]
+      where: { faculty_id: facultyId }
+      // include: [{
+      //   model: models.faculty,
+      //   where: {id: facultyId}
+      // }]
     }];
-    if (query.studentId !== null) {
+    if (query.studentId) {
+      console.log('m - ', query.studentId);
       option.where = {id: query.studentId};
     }
-    if (query.className !== null) {
+    if (query.className) {
+      console.log('n - ', query.className);
       option.include[1].where = { id: query.className };
     }
   } else {
+    console.log('b');
     option.limit = query.size ? +query.size : 10;
     option.offset = query.page ? (query.page - 1) * query.size : 1;
     option.include = [{

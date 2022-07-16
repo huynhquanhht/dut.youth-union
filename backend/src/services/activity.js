@@ -423,7 +423,7 @@ const update = async (activityId, newActivity) => {
 const deleteByIds = async (activityIds) => {
   const options = { where: { id: activityIds } };
   console.log('options - ', options);
-  const deletionResult = await registerJoinRepo.deleteByIds(options);
+  const deletionResult = await activityRepo.deleteByIds(options);
   console.log('delete - ', deletionResult);
   return deletionResult;
 };
