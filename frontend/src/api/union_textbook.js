@@ -11,17 +11,17 @@ const get = (query) => {
     queryString = queryString.slice(1, queryString.length);
     url += '?' + queryString;
   }
-  return axiosUtils.getRequest(url);
+  return axiosUtils.getRequest(url, 'UT-01');
 };
 
 const update = (unionTextbooks) => {
   let url = BASE_URL;
-  return axiosUtils.putRequest(url, {unionTextbooks});
+  return axiosUtils.putRequest(url, {unionTextbooks}, 'UT-03');
 };
 
 const confirmSubmission = (unionTextbookIds) => {
   let url = `${BASE_URL}/confirm-submission`;
-  return axiosUtils.putRequest(url, {unionTextbookIds});
+  return axiosUtils.putRequest(url, {unionTextbookIds}, 'UT-04');
 }
 
 export default { get, update, confirmSubmission};

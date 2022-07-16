@@ -28,11 +28,12 @@
         class="row-func-block d-flex flex-column"
         v-for="groupFunction in role.rows"
         :key="groupFunction.id">
-        <div class="group-func-name"> {{ groupFunction.name }}</div>
+        <div class="group-func-name mb-4"> {{ groupFunction.name }}</div>
         <div class="col-func-block d-flex flex-row">
+          <v-row>
           <v-col
             class="col-func d-flex align-center"
-            xs="2" sm="2" md="2" lg="2" xl="2"
+            xs="3" sm="3" md="3" lg="3" xl="2"
             v-for="func in groupFunction.functions"
             :key="func.id"
           >
@@ -43,6 +44,7 @@
             ></v-simple-checkbox>
             <span class="text-content">{{ func.name }}</span>
           </v-col>
+          </v-row>
         </div>
       </v-row>
     </div>
@@ -200,7 +202,7 @@ export default {
   .group-func-block {
     padding: 0px 12px;
     .row-func-block {
-      padding: 8px 12px;
+      padding: 12px 12px;
       border-radius: 4px;
       margin-bottom: 8px;
       background-color: #FFFFFF;

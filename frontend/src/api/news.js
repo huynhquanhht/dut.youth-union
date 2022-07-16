@@ -15,7 +15,7 @@ const get = (query) => {
     queryString = queryString.slice(1, queryString.length);
     url += '?' + queryString;
   }
-  return axiosUtils.getRequest(url);
+  return axiosUtils.getRequest(url, 'NE-01');
 };
 
 const getByCurrentStudent = (query) => {
@@ -28,24 +28,24 @@ const getByCurrentStudent = (query) => {
     queryString = queryString.slice(1, queryString.length);
     url += '?' + queryString;
   }
-  return axiosUtils.getRequest(url);
+  return axiosUtils.getRequest(url, 'NE-01');
 }
 
 const create = (news) => {
-  return axiosUtils.postRequest(`${BASE_URL}`, { news: news });
+  return axiosUtils.postRequest(`${BASE_URL}`, { news: news }, 'NE-03');
 };
 
 const getById = (id) => {
-  return axiosUtils.getRequest(`${BASE_URL}/${id}`);
+  return axiosUtils.getRequest(`${BASE_URL}/${id}`, 'NE-02');
 };
 
 const update = (id, news) => {
   console.log('mnk');
-  return axiosUtils.putRequest(`${BASE_URL}`, {newsId: id, news: news});
+  return axiosUtils.putRequest(`${BASE_URL}`, {newsId: id, news: news}, 'NE-04');
 };
 
 const deleteActivities = (newsIds) => {
-  return axiosUtils.deleteRequest(`${BASE_URL}`, {newsIds});
+  return axiosUtils.deleteRequest(`${BASE_URL}`, {newsIds}, 'NE-05');
 };
 
 
