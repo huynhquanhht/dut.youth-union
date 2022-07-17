@@ -341,7 +341,7 @@ export default {
     },
     save() {
       this.command = 'Save';
-      this.confirmDialogContent = "Bạn chắc chắn muốn lưu thông tin sổ đoàn đã chọn?"
+      this.confirmDialogContent = "Bạn chắc chắn muốn lưu thông tin đoàn phí đã chọn?"
       this.confirmDialog = true;
     },
     async processConfirmDialog(command) {

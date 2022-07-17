@@ -28,7 +28,7 @@ const getRegisteredListById = (activityId, query) => {
     queryString = queryString.slice(1, queryString.length);
     url += '?' + queryString;
   }
-  return axiosUtils.getRequest(url, 'AC-02');
+  return axiosUtils.getRequest(url, 'AC-07');
 };
 
 const getByCurrentStudent = (query) => {
@@ -79,12 +79,12 @@ const attendParticipants = (registrationIds) => {
 };
 
 const deleteParticipants = (registrationIds) => {
-  return axiosUtils.deleteRequest(`${BASE_URL}/delete-participants`, {registrationIds});
+  return axiosUtils.deleteRequest(`${BASE_URL}/delete-participants`, {registrationIds}, 'AC-12');
 }
 
 
 const getById = (id) => {
-  return axiosUtils.getRequest(`${BASE_URL}/${id}`);
+  return axiosUtils.getRequest(`${BASE_URL}/${id}`, 'AC-02');
 };
 
 

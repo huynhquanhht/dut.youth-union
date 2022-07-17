@@ -8,6 +8,9 @@ const timeUtils = require('../utils/time');
 
 const authorize = async (payload, functionId) => {
   const option = {};
+  if (!functionId) {
+    return null;
+  }
   option.include = [
     {
       model: models.role,
@@ -31,7 +34,7 @@ const authorize = async (payload, functionId) => {
   // option.attributes =  {exclude: ['password']};
   option.where = { id: payload.userId, deleted_at: null };
   let user = await userRepo.get(option);
-  console.log('user - ', user.rows[0].roles[0].fucntions);
+  console.log('user - ', user.rows[0].roles[0].functions);
   if (user.rows[0].roles[0].functions[0].id == functionId) {
     return user;
   }

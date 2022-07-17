@@ -107,6 +107,8 @@ const update = async (unionTextbooks) => {
       await unionTextbookRepo.update({
         submitted: false,
         submitted_at: null,
+        school_confirmed: null,
+        confirmed_by: null,
       }, falseUpdation, transaction);
     }
     await transaction.commit();
@@ -127,10 +129,11 @@ const confirmSubmission = async (currentUserId, unionTextbookIds) => {
   try {
     if (user.roles[0].name === roleUtils.CLASS_SECRETARY) {
       await unionTextbookRepo.update({
-        class_confirmed: timeUtils.getCurrentTime()
+        class_confirmed: timeUtils.getCurrentTime(),
       }, unionTextbookIds, transaction);
     } else {
       await unionTextbookRepo.update({
+        submitted_at: timeUtils.getCurrentTime(),
         submitted: true,
         school_confirmed: timeUtils.getCurrentTime(),
         confirmed_by: currentUserId,
