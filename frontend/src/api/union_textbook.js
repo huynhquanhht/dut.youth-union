@@ -16,12 +16,12 @@ const get = (query) => {
 
 const update = (unionTextbooks) => {
   let url = BASE_URL;
-  return axiosUtils.putRequest(url, {unionTextbooks}, 'UT-03');
+  return axiosUtils.putRequest(url, {unionTextbooks}, 'UT-02');
 };
 
 const confirmSubmission = (unionTextbookIds) => {
   let url = `${BASE_URL}/confirm-submission`;
-  return axiosUtils.putRequest(url, {unionTextbookIds}, 'UT-04');
+  return axiosUtils.putRequest(url, {unionTextbookIds}, 'UT-03');
 }
 
 export default { get, update, confirmSubmission};

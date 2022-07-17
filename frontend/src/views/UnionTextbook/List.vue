@@ -49,33 +49,6 @@
             <div class="tool-block d-flex" v-if="currentUser.roles[0].name !== roleUtils.FACULTY_SECRETARY">
               <v-btn
                 text
-                width="100px"
-                class="tool-button"
-                @click="save"
-              >
-                <v-icon dark size="20" class="mr-1">mdi-plus</v-icon>
-                Thêm mới
-              </v-btn>
-              <v-btn
-                text
-                width="100px"
-                class="tool-button"
-                @click="save"
-              >
-                <v-icon dark size="20" class="mr-1">mdi-square-edit-outline</v-icon>
-                Cập nhật
-              </v-btn>
-              <v-btn
-                text
-                width="50px"
-                class="tool-button"
-                @click="save"
-              >
-                <v-icon dark size="20" class="mr-1">mdi-trash-can-outline</v-icon>
-                Xóa
-              </v-btn>
-              <v-btn
-                text
                 width="50px"
                 class="tool-button"
                 @click="save"
@@ -96,11 +69,11 @@
           </div>
         </div>
       </template>
-<!--      <template v-slot:item.data-table-select="{ item}">-->
-<!--        <v-simple-checkbox-->
-<!--          :readonly="item.union_textbook.class_confirmed"-->
-<!--        ></v-simple-checkbox>-->
-<!--      </template>-->
+      <!--      <template v-slot:item.data-table-select="{ item}">-->
+      <!--        <v-simple-checkbox-->
+      <!--          :readonly="item.union_textbook.class_confirmed"-->
+      <!--        ></v-simple-checkbox>-->
+      <!--      </template>-->
       <template v-slot:item.union_textbook.submitted="{ item }">
         <v-simple-checkbox
           color="info"
@@ -348,6 +321,7 @@ export default {
             this.confirmDialog = false;
             await this.fetchGetUnionTextbooks(this.query);
           }
+          this.selected = [];
         }
         if (this.command == 'Confirm') {
           const unionTextbookIds = this.selected.map(item => item.union_textbook.id);
@@ -358,11 +332,13 @@ export default {
             this.confirmDialog = false;
             await this.fetchGetUnionTextbooks(this.query);
           }
+          this.selected = [];
         }
         return;
       }
       if (command === 'Cancel') {
         this.confirmDialog = false;
+        this.selected = [];
       }
     },
     confirm() {

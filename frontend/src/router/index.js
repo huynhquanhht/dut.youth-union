@@ -15,7 +15,7 @@ const routes = [
       if (!token) {
         next();
       } else {
-        router.push("/admin/activity");
+        router.push("/home");
       }
     },
   },

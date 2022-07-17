@@ -151,6 +151,8 @@ const submit = async (unionFees) => {
       await submitUnionFeeRepo.update({
         submitted: false,
         submitted_at: null,
+        school_confirmed: null,
+        confirmed_by: null,
       }, falseUpdation, transaction);
     }
     await transaction.commit();

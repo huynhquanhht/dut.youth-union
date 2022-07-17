@@ -282,9 +282,11 @@ export default {
           this.dialog = false;
           return;
         }
+        this.selected = []
       }
       if (command === 'Cancel') {
         this.dialog = false;
+        this.selected = []
       }
     },
     async handlePageChange() {

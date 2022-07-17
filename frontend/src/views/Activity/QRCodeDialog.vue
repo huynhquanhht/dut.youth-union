@@ -17,6 +17,7 @@
         width="140px"
         class="download-button"
         color="#0078D4"
+        @click="downloadQR"
       >
         <a></a>
         <v-icon dark size="20" class="mr-2">mdi-download</v-icon>
@@ -28,6 +29,8 @@
 
 <script>
 import QrcodeVue from 'qrcode.vue'
+import MESSAGE from "@/utils/message";
+import { mapMutations } from 'vuex';
 
 export default {
   name: "QRCodeDialog",
@@ -46,6 +49,9 @@ export default {
     }
   },
   methods: {
+    ...mapMutations({
+      setSnackbar: 'setSnackbar',
+    }),
     selectText(element) {
       if (document.body.createTextRange) {
         const range = document.body.createTextRange();
@@ -91,6 +97,13 @@ export default {
       document.body.append();
       a.click();
       a.remove();
+    },
+    downloadQR() {
+      this.setSnackbar({
+        type: 'info',
+        visible: true,
+        text: MESSAGE.FEATURE_DEVELOP,
+      });
     }
   }
 }
