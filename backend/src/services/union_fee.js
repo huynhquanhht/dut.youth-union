@@ -48,7 +48,6 @@ const  getOfStudents = async (currentUserId, query) => {
     console.log('a');
     const lecture = await lectureRepo.getOne({where: {user_id: user.id}});
     const facultyId = lecture.faculty_id;
-    console.log('facultyId - ', facultyId);
     option.limit = query.size ? +query.size : 10;
     option.offset = query.page ? (query.page - 1) * query.size : 1;
     option.include = [{
@@ -64,11 +63,9 @@ const  getOfStudents = async (currentUserId, query) => {
       // }]
     }];
     if (query.studentId) {
-      console.log('m - ', query.studentId);
       option.where = {id: query.studentId};
     }
     if (query.className) {
-      console.log('n - ', query.className);
       option.include[1].where = { id: query.className };
     }
   } else {
@@ -110,7 +107,6 @@ const getOfStudent = async (currentUserId, query) => {
   let userRole = await getUserAndRole(currentUserId);
   let student = await studentRepo.getOne({where: {user_id: currentUserId}});
   student = JSON.parse(JSON.stringify(student));
-  console.log('student - ', student);
   let option = {};
   let unionFeeOfStudent = [];
   // if (userRole.roles[0].name === roleUtils.CLASS_SECRETARY) {

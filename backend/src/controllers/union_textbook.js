@@ -39,7 +39,6 @@ const confirmSubmission = async (req, res) => {
   try {
     let unionTextbookIds = req.body.unionTextbookIds;
     let currentUserId = req.payload.userId;
-    console.log('userId - ', currentUserId);
     if (!unionTextbookIds.length) {
       res.status(400).send({ message: MESSAGE.EMPTY_DATA_CONFIRM });
       return;

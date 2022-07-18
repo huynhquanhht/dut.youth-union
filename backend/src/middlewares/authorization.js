@@ -3,12 +3,14 @@ const MESSAGE = require('../utils/message');
 const userService = require('../services/user');
 
 const authorize = async (req, res, next) => {
+  console.log('h');
   try {
     const functionId = req.headers.function_id;
     if (!functionId) {
       res.status(403).send({ message: MESSAGE.NO_PERMISSION });
       return;
     }
+    console.log('ak');
     let user = await userService.authorize(req.payload, functionId);
     user = JSON.parse(JSON.stringify(user));
     if (!!user && user.rows[0].roles[0].functions[0].permission.is_access) {

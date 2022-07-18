@@ -18,7 +18,6 @@ const getById = async (permissionId) => {
 
 const update = async (permission) => {
   let condition = {};
-  console.log('permissionService - ', permission);
   condition.where = { id: permission.id };
   const data = {
     is_access: permission.isAccess,

@@ -16,10 +16,10 @@ router.put('/close-registration/:id', authenticateToken, activityController.clos
 router.delete('/', authen.authenticateToken, author.authorize, activityController.deleteActivity);
 router.get('/registered-list/:id', authen.authenticateToken, author.authorize, activityController.getRegisteredListById);
 router.post('/register/:id', authen.authenticateToken, author.authorize, activityController.register);
-router.put('/attend/:id', authen.authenticateToken, author.authorize, activityController.attend);
 router.post('/add-participant', authen.authenticateToken, author.authorize, activityController.addParticipant);
 router.put('/attend-participants', authen.authenticateToken, author.authorize,  activityController.attendParticipants);
 router.delete('/delete-participants', authen.authenticateToken, author.authorize, activityController.deleteParticipants);
+router.put('/attend/:id', authen.authenticateToken, activityController.attend);
 router.get('/:id', authen.authenticateToken, author.authorize, activityController.getById);
 
 module.exports = router;

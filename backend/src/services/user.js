@@ -32,6 +32,7 @@ const authorize = async (payload, functionId) => {
     }
   ];
   // option.attributes =  {exclude: ['password']};
+  console.log('bk');
   option.where = { id: payload.userId, deleted_at: null };
   let user = await userRepo.get(option);
   console.log('user - ', user.rows[0].roles[0].functions);

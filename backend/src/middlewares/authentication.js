@@ -3,6 +3,7 @@ const MESSAGE = require('../utils/message');
 const jwt = require('jsonwebtoken');
 
 const authenticateToken = (req, res, next) => {
+  console.log('j');
   try {
     const authorHeader = req.headers['authorization'];
     const accessToken = authorHeader && authorHeader.split(' ')[1];

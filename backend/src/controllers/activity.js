@@ -41,6 +41,7 @@ const getByCurrentStudent = async (req, res) => {
 const getPointListOfCurrentStudent = async (req, res) => {
   try {
     const schoolYear = req.query.schoolYear;
+    console.log('so - ', schoolYear);
     const currentUserId = req.payload.userId;
     const pointList = await activityService.getPointListOfCurrentStudent(currentUserId, schoolYear);
     console.log('pointList -', pointList);
@@ -278,16 +279,17 @@ const register = async (req, res) => {
 };
 
 const attend = async (req, res) => {
+  console.log('z');
   const activityId = req.params.id;
   const userId = req.payload.userId;
   try {
     const isAttend = await activityService.attend(activityId, userId);
-    if (isAttend) {
+    console.log('isAttend - ', isAttend);
+    if (isAttend[0]) {
       res.status(200).send({ message: MESSAGE.ATTEND_SUCCESSFULLY});
       return;
     }
     res.status(400).send({ message: MESSAGE.ATTEND_FAIL});
-
   } catch (error) {
     res.status(500).send({ message: MESSAGE.SERVER_ERROR });
   }

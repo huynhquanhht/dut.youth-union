@@ -38,7 +38,6 @@ const create = async (req, res) => {
       res.status(400).send({message: MESSAGE.CREATE_FAIL});
     }
     const newStudent = await studentService.create(student);
-    console.log('new - ', newStudent);
     res.status(200).send({
       message: MESSAGE.CREATE_SUCCESS,
       newStudent: newStudent,
@@ -74,7 +73,6 @@ const createByCSV = async (req, res) => {
     const file = req.file;
     const isCreated = await studentService.createMany(file);
     if (isCreated) {
-      console.log('isCreated a- ', isCreated);
       res.status(200).send({message: MESSAGE.CREATE_SUCCESS});
       return;
     }
@@ -89,7 +87,6 @@ const deleteStudent = async (req, res) => {
   try {
     const studentId = req.params.id;
     const isDeleted = await studentService.deleteStudent(studentId);
-    console.log('isDeleted - ', isDeleted);
     if (isDeleted) {
       res.status(200).send({ message: MESSAGE.DELETE_SUCCESS });
       return;

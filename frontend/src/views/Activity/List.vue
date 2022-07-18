@@ -384,6 +384,7 @@ export default {
       const qrCode = await jwt.sign(payload, process.env.VUE_APP_QR_KEY, {
         expiresIn: process.env.VUE_APP_TOKEN_TIMEOUT,
       });
+      // const qrCode = payload;
       this.qrData = {
         activityId: this.selected[0].id,
         activityName: this.selected[0].name,

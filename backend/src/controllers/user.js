@@ -15,7 +15,6 @@ const login = async (req, res) => {
     }
     return res.status(200).send({ loginResult });
   } catch (error) {
-    console.log(error);
     return res.status(500).send({ message: MESSAGE.SERVER_ERROR });
   }
 };
@@ -23,12 +22,10 @@ const login = async (req, res) => {
 // [GET]: /user
 const get = async (req, res) => {
   try {
-    console.log('abc');
     let query = req.query;
     const result = await userService.get(query);
     res.status(200).send(result);
   } catch (error) {
-    console.log(error);
     res.status(500).send({ message: MESSAGE.SERVER_ERROR});
   }
 }
@@ -40,7 +37,6 @@ const getById = async (req, res) => {
     const user = await userService.getById(userId);
     res.status(200).send(user);
   } catch (error) {
-    console.log(error);
     res.status(500).send({ message: MESSAGE.SERVER_ERROR});
   }
 };
@@ -52,7 +48,6 @@ const getCurrentUserProfile = async (req, res) => {
     const userProfile = await userService.getUserProfile(userId);
     res.status(200).send(userProfile);
   } catch (error) {
-    console.log(error);
     res.status(500).send({ message: MESSAGE.SERVER_ERROR});
   }
 }

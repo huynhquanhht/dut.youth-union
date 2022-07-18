@@ -67,7 +67,8 @@ const register = (activityId) => {
 }
 
 const attend = (activityId) => {
-  return axiosUtils.putRequest(`${BASE_URL}/attend/${activityId}, 'AC-09'`);
+  let url = `${BASE_URL}/attend/${activityId}`;
+  return axiosUtils.putRequest(url);
 }
 
 const addParticipant = (participantInfo) => {

@@ -22,7 +22,6 @@
       <div class="result-text-block">
         <span class="result-text">Điểm danh thành công</span>
       </div>
-
     </div>
     <div class="attendance-fail" v-if="fail">
       <cross-icon/>
@@ -37,7 +36,7 @@
       color="primary"
       width="90px"
       @click="reset"
-      :disabled="isAttending"
+      :disabled="isAttending || success"
     >
       Làm mới
     </v-btn>
@@ -84,7 +83,8 @@ export default {
   },
   methods: {
     onDecode (decodedString) {
-      console.log('decodedString - ', decodedString);
+      // console.log('abc - ', decodedString);
+      console.log('decodedString');
       this.$emit('qr-code-reader-dialog', {command: 'Ok', code: decodedString})
     },
     dialogHandler() {
@@ -94,6 +94,9 @@ export default {
       this.success = false;
       this.fail = false;
     }
+  },
+  created() {
+    console.log('mmm');
   }
 }
 </script>
