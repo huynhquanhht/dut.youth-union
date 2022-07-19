@@ -151,9 +151,11 @@ const deleteParticipants = async (req, res) => {
 };
 
 const attendParticipants = (req, res) => {
+  console.log('aaaaaaaa');
   try {
     const registrationIds = req.body.registrationIds;
     let isUpdated = activityService.attendParticipants(registrationIds);
+    console.log('isUpdated - ', isUpdated);
     if (isUpdated) {
       res.status(200).send({ message: MESSAGE.ATTEND_SUCCESSFULLY});
       return;
@@ -185,6 +187,7 @@ const update = async (req, res) => {
       res.status(400).send({ message: MESSAGE.UPDATE_FAIL });
     }
     const isUpdated = await activityService.update(activityId, newActivity);
+    console.log('isUpdated - ', isUpdated);
     if (isUpdated) {
       res.status(200).send({ message: MESSAGE.UPDATE_SUCCESS });
       return;

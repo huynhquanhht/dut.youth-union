@@ -26,8 +26,6 @@ const create = (newRegisterJoin) => {
 };
 
 const update = (condition, updatedRegisterJoin) => {
-  console.log('updatedRegisterJoin - ', updatedRegisterJoin);
-  console.log('condition - ', condition);
   return registerJoinModel.update(updatedRegisterJoin, condition);
 };
 

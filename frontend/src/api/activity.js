@@ -76,6 +76,7 @@ const addParticipant = (participantInfo) => {
 };
 
 const attendParticipants = (registrationIds) => {
+  console.log('abc');
   return axiosUtils.putRequest(`${BASE_URL}/attend-participants`, {registrationIds}, 'AC-11');
 };
 

@@ -34,8 +34,10 @@ const getById = async (req, res) => {
 const create = async (req, res) => {
   try {
     let student = req.body.student;
+    console.log('student - ', student);
     if (!student.id || !student.name) {
       res.status(400).send({message: MESSAGE.CREATE_FAIL});
+      return;
     }
     const newStudent = await studentService.create(student);
     res.status(200).send({
@@ -52,8 +54,10 @@ const create = async (req, res) => {
 const update = async (req, res) => {
   try {
     let student = req.body.student;
+    console.log('student - ', student);
     if (!student.id || !student.name) {
       res.status(400).send({ message: MESSAGE.UPDATE_FAIL });
+      return;
     }
     const isUpdated = await studentService.update(student);
     if (isUpdated) {

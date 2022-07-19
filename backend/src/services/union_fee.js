@@ -172,6 +172,7 @@ const confirmSubmission = async (currentUserId, submitUnionFeeIds) => {
     } else {
       await submitUnionFeeRepo.update({
         submitted: true,
+        submitted_at: timeUtils.getCurrentTime(),
         school_confirmed: timeUtils.getCurrentTime(),
         confirmed_by: currentUserId,
       }, submitUnionFeeIds, transaction);

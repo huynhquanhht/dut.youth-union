@@ -499,7 +499,7 @@ const attendParticipants = async (registrationIds) => {
       id: registrationIds,
     }
   };
-  return await registerJoinRepo.update(newUpdate, option);
+  return await registerJoinRepo.update(option, newUpdate);
 }
 
 module.exports = {
