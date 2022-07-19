@@ -9,17 +9,17 @@
           <div class="registration-quantity">
             <div class="open-quantity-block">
               <v-icon color="#E91E63" size="24">mdi-openid</v-icon>
-              <span class="quantity-text"> {{ activity.participant_quantity }}</span>
+              <span class="quantity-text"> {{ activity ? activity.participant_quantity : 0 }}</span>
               <span class="quantity-title">SỐ LƯỢNG MỞ</span>
             </div>
             <div class="registered-quantity-block">
               <v-icon color="#FF5722" size="24">mdi-account-multiple-plus</v-icon>
-              <span class="quantity-text"> {{activity.students ? activity.students.length : 0}}</span>
+              <span class="quantity-text"> {{ (activity && activity.students) ? activity.students.length : 0}}</span>
               <span class="quantity-title">ĐÃ ĐĂNG KÝ</span>
             </div>
             <div class="attendance-quantity-block">
               <v-icon color="#4CAF50" size="24">mdi-account-group</v-icon>
-              <span class="quantity-text"> {{ activity.attendanceQuantity }}</span>
+              <span class="quantity-text"> {{ activity ? activity.attendanceQuantity : 0 }}</span>
               <span class="quantity-title">ĐIỂM DANH</span>
             </div>
           </div>
@@ -30,14 +30,14 @@
                 color="#00ACED">mdi-clock
               </v-icon>
               <div class="open-time">
-                <span class="sub-title"> {{ formatDate(activity.begin_registration_at) }}</span>
+                <span class="sub-title"> {{ formatDate(activity ? activity.begin_registration_at : '') }}</span>
                 <span class="box-title">Mở đăng ký</span>
               </div>
             </div>
             <div class="close-time-block">
               <v-icon size="36px" color="#F44336">mdi-clock-remove</v-icon>
               <div class="close-time">
-                <span class="sub-title"> {{ formatDate(activity.end_registration_at) }}</span>
+                <span class="sub-title"> {{ formatDate(activity ? activity.end_registration_at : '') }}</span>
                 <span class="box-title">Đóng đăng ký</span>
               </div>
             </div>
@@ -139,6 +139,9 @@ export default {
     }),
     disabledRegistrationButton() {
       const currentTime = timeUtils.getCurrentTime();
+      if (!this.activity) {
+        return false;
+      }
       const beginRegistrationAt = timeUtils.formatTime(this.activity.begin_registration_at);
       const endRegistrationAt = timeUtils.formatTime(this.activity.end_registration_at);
       if (Date.parse(beginRegistrationAt) <= Date.parse(currentTime) ||
@@ -152,10 +155,10 @@ export default {
       return false;
     },
     disabledAttendButton() {
-      if (!this.activity.iscurrentUserRegistered) {
+      if (this.activity && !this.activity.iscurrentUserRegistered) {
         return true;
       }
-      if (this.activity.isCurrentUserAttended) {
+      if (this.activity && this.activity.isCurrentUserAttended) {
         return true;
       }
       return false;
@@ -192,20 +195,23 @@ export default {
         await jwt.verify(data.code, process.env.VUE_APP_QR_KEY, async (error, payload) => {
           if (error) {
             console.log('b');
-          this.isAttending = false;
+            this.isAttending = false;
             this.fail = true;
             return;
           }
           const activityId = this.$route.params.id;
+          console.log('payload - ', payload);
           if (payload.activityId !== activityId) {
             this.isAttending = false;
             this.fail = true;
           }
           const isAttended = await this.fetchAttend({ activityId: activityId });
+          console.log('isAttended - ', isAttended);
           if (isAttended) {
             console.log('c');
             this.isAttending = false;
             this.success = true;
+            this.fail = false;
             await this.fetchGetActivityById({ id: activityId });
           } else {
             this.isAttending = false;

@@ -25,7 +25,6 @@ const create = async (req, res) => {
 const getAll = async (req, res) => {
   try {
     const result = await roleService.getAll();
-    console.log('result - ', JSON.parse(JSON.stringify(result)));
     res.status(200).send(result);
   } catch (error) {
     res.status(500).send({ message: MESSAGE.SERVER_ERROR});

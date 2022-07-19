@@ -6,7 +6,6 @@ const sequelizeUtils = require('../utils/sequelize');
 const timeUtils = require('../utils/time');
 
 const get = async (query) => {
-  console.log('query - ', query['category']);
   let options = {};
   options.limit = query.size ? +query.size : 10;
   options.offset = query.page ? (query.page - 1) * query.size : 1;

@@ -130,7 +130,6 @@ const createMany = async (file) => {
       await transaction.rollback();
       return false;
     }
-    console.log('newStudents - ', newStudents);
     // Create union fee submission
     newStudents = JSON.parse(JSON.stringify(newStudents));
     const unionTextbooks = newStudents.map(student => ({

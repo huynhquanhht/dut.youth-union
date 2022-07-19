@@ -10,5 +10,5 @@ router.get('/students', authen.authenticateToken, author.authorize, unionFeeCont
 router.put('/submit', authen.authenticateToken, author.authorize, unionFeeController.submit);
 router.put('/confirm-submission', authen.authenticateToken, author.authorize, unionFeeController.confirmSubmission);
 router.post('/', authen.authenticateToken, author.authorize, unionFeeController.createUnionFee);
-router.get('/invoice', authen.authenticateToken, author.authorize, unionFeeController.getInvoice);
+router.get('/invoice', authen.authenticateToken, unionFeeController.getInvoice);
 module.exports = router;

@@ -224,8 +224,6 @@ const getByStudent = async (query, currentUserId) => {
   }
   student = await studentRepo.getOne(options);
   student = sequelizeUtils.convertJsonToObject(student);
-  console.log('student - ', student);
-
   let newActivityList = [];
   student.activities.forEach((item) => {
     if (Date.parse(item.end_at) > Date.parse(timeUtils.getCurrentTime())) {
@@ -250,55 +248,27 @@ const getPointListOfCurrentStudent = async (currentUserId, schoolYear) => {
   let student = await getStudentByUserId(currentUserId);
   student = JSON.parse(JSON.stringify(student));
   const activityPoints = [];
-  // Get school year
-  if (schoolYear === 'Tất cả') {
-    schoolYears = await activityRepo.getAll({
-      attributes: ['school_year'],
-    });
-  } else {
-    schoolYears = await activityRepo.getAll({
-      attributes: ['school_year'],
-      where: {
-        school_year: schoolYear
-      }
-    });
-  }
 
-  schoolYears = JSON.parse(JSON.stringify(schoolYears));
-  console.log('schoolYears - ', schoolYears);
-  // Filter school year
-  const registeredYear = new Date(student.created_at).getFullYear();
-  const startSchoolYear = registeredYear + ' - ' + (registeredYear + 1)
-  const schoolYearSet = new Set(schoolYears.filter(item => startSchoolYear <= item.school_year).map(item => item.school_year));
-  console.log('schoolYearSet - ', schoolYearSet);
-  for (let item of schoolYearSet) {
-    let totalPoint = 0;
-    options.include = [{
-      model: models.activity,
-      where: { school_year: item },
-      include: [{
-        model: models.student,
-        required: false,
-      }],
+  options.include = [{
+    model: models.activity,
+    where: { school_year: schoolYear },
+    include: [{
+      model: models.student,
       required: false,
-    }];
-    options.where = { id: student.id };
-    student = await studentRepo.getOne(options);
-    student = sequelizeUtils.convertJsonToObject(student);
-    // Calc total of activity point,
-    student.activities.forEach((activity) => {
-      if (activity.register_join.attended_at) {
-        activity.register_join.accumulated = activity.point;
-        totalPoint += activity.point;
-      }
-    });
-    activityPoints.push({
-      schoolYear: item,
-      activities: student.activities,
-      totalPoint: totalPoint,
-    })
+    }],
+    required: false,
+  }];
+  options.where = { id: student.id };
+  student = await studentRepo.getOne(options);
+  student = sequelizeUtils.convertJsonToObject(student);
+  let totalPoint = 0;
+  for (let i = 0; i < student.activities.length; i++) {
+    if (student.activities[i].register_join.attended_at) {
+      totalPoint += student.activities[i].point;
+    }
   }
-  return activityPoints;
+  student.totalPoint = totalPoint;
+  return student;
 };
 
 const getAll = async (page, size) => {
@@ -377,12 +347,10 @@ const isCurrentUserAttended = async (activityId, userId) => {
     }
   };
   let registerJoin = await registerJoinRepo.getOne(option);
-  console.log('resterjoin - ', registerJoin);
   return registerJoin ? true : false;
 };
 
 const create = async (newActivity, currentUserId) => {
-  console.log('newActivity - ', newActivity);
   const data = {
     name: newActivity.activityName,
     organization_unit: newActivity.organizationUnit,
@@ -422,15 +390,12 @@ const update = async (activityId, newActivity) => {
 
 const deleteByIds = async (activityIds) => {
   const options = { where: { id: activityIds } };
-  console.log('options - ', options);
   const deletionResult = await activityRepo.deleteByIds(options);
-  console.log('delete - ', deletionResult);
   return deletionResult;
 };
 
 const openRegistration = async (activityId) => {
   const condition = { where: { id: activityId }};
-  console.log('condition - ', condition);
   const data = {
     begin_registration_at: timeUtils.getCurrentTime(),
   };
@@ -457,16 +422,15 @@ const register = async (activityId, userId) => {
     activity_id: activityId,
     registered_at: timeUtils.getCurrentTime(),
   }
-  console.log('newRegisterJoin - ', newRegisterJoin);
   return await registerJoinRepo.create(newRegisterJoin);
 }
 
 const attend = async (activityId, userId) => {
-  const student = await studentRepo.get({ where: {user_id: userId}});
+  const student = await studentRepo.getOne({ where: {user_id: userId}});
   let option = {
     where: {
       student_id: student.id,
-      activity_id: activityId,
+      activity_id: +activityId,
     }
   };
   const newAttendance = {
@@ -513,7 +477,6 @@ const deleteParticipants = async (registrationIds) => {
       force: true
     };
     const deletionResult = await registerJoinRepo.deleteByIds(options);
-    console.log('deletetionResult - ', deletionResult)
     if (deletionResult === registrationIds.length) {
       await transaction.commit();
       return deletionResult;
@@ -536,7 +499,7 @@ const attendParticipants = async (registrationIds) => {
       id: registrationIds,
     }
   };
-  return await registerJoinRepo.update(newUpdate, option);
+  return await registerJoinRepo.update(option, newUpdate);
 }
 
 module.exports = {

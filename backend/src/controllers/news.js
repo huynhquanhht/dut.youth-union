@@ -26,7 +26,6 @@ const getById = async (req, res) => {
 }
 
 const create = async (req, res) => {
-  console.log('abc');
   try {
     const news = req.body.news;
     const currentUserId = req.payload.userId;

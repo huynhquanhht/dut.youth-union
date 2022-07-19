@@ -12,7 +12,6 @@ const unionTextbookService = require("../services/union_textbook");
 const get = async (req, res) => {
   try {
     let query = req.query;
-    console.log('query - ', query);
     let currentUserId = req.payload.userId;
     const result = await unionFeeService.get(currentUserId, query);
     res.status(200).send(result);

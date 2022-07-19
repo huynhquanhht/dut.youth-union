@@ -17,11 +17,10 @@
         single-line
       ></v-select>
     </div>
-    <div v-for="(activityList, index) in pointList" :key="index">
       <v-data-table
         v-model="selected"
         :headers="headers"
-        :items="activityList && activityList.activities ? activityList.activities : []"
+        :items="pointList && pointList.activities ? pointList.activities : []"
         :single-select="singleSelect"
         :items-per-page="selectedSize"
         scroll.sync="scrollSync"
@@ -32,11 +31,11 @@
         fixed-header
         hide-default-footer
       >
-        <template v-if="activityList && !activityList.activities " v-slot:no-data>
+        <template v-if="pointList && !pointList.activities " v-slot:no-data>
           Không có dữ liệu để hiển thị!
         </template>
         <template v-slot:top>
-          <v-card-title>{{ `DANH SÁCH HOẠT ĐỘNG ĐÃ THAM GIA VÀ ĐIỂM TÍCH LŨY NĂM HỌC ${activityList.schoolYear}`}}</v-card-title>
+          <v-card-title>{{ `DANH SÁCH HOẠT ĐỘNG ĐÃ THAM GIA VÀ ĐIỂM TÍCH LŨY NĂM HỌC ${selectedOption.schoolYear}`}}</v-card-title>
         </template>
         <template v-slot:item.begin_at="{ item }">
           <span>{{ item.begin_at ? formatTime(item.begin_at) : '-' }}</span>
@@ -44,17 +43,15 @@
         <template v-slot:item.register_join.attended_at="{ item }">
           <span>{{ item.register_join.attended_at ? formatTime(item.register_join.attended_at) : '-'}}</span>
         </template>
-        <template v-slot:item.register_join.accumulated="{ item }">
-          <span>{{ item.register_join.accumulated ? item.register_join.accumulated : '-'}}</span>
+        <template v-slot:item.register_join.attended_at="{ item }">
+          <span>{{ item.register_join.attended_at ? item.point : '-'}}</span>
         </template>
       </v-data-table>
       <div class="accumulated-point">
         <span>Tổng điểm tích lũy:</span>
-        <span> {{ activityList.totalPoint }} </span>
+        <span> {{ pointList.totalPoint }} </span>
       </div>
     </div>
-
-  </div>
 </template>
 
 <script>
@@ -86,7 +83,7 @@ export default {
   data() {
     return {
       singleSelect: false,
-      selected: '2022-2023',
+      selected: '2021 - 2022',
       loading: false,
       confirmDialog: false,
       formDialog: false,
@@ -102,13 +99,13 @@ export default {
       loadingButton: false,
       options: [
         {
-          schoolYear: '2022 - 2023',
+          schoolYear: '2020 - 2021',
         },
         {
-          schoolYear: 'Tất cả',
+          schoolYear: '2021 - 2022',
         },
       ],
-      selectedOption: '2022 - 2023',
+      selectedOption: '2021 - 2022',
       headers: [
         {text: 'Mã số', value: 'id',},
         {text: 'Tên hoạt động', value: 'name'},
@@ -116,7 +113,7 @@ export default {
         {text: 'Bắt đầu lúc', value: 'begin_at',},
         {text: 'Điểm hoạt động', value: 'point'},
         {text: 'Điểm danh lúc', value: 'register_join.attended_at'},
-        {text: 'Tích lũy', value: 'register_join.accumulated'}
+        {text: 'Tích lũy', value: 'register_join.attended_at'}
       ],
       dialogTitle: null,
       dialogContent: null,
@@ -155,9 +152,9 @@ export default {
     }
   },
   async created() {
-    this.selectedOption = '2022 - 2023';
+    this.selectedOption = { schoolYear: '2021 - 2022'};
     this.loading = true;
-    await this.fetchGetPointListOfCurrentStudent({schoolYear: '2022 - 2023'});
+    await this.fetchGetPointListOfCurrentStudent({schoolYear: '2021 - 2022'});
     this.loading = false;
   },
 };
@@ -314,40 +311,38 @@ export default {
                 font-size: 20px !important;
               }
             }
+            &:nth-child(1) {
+              min-width: 100px !important;
+              padding: 0px 8px;
+            }
 
+            &:nth-child(2) {
+              min-width: 200px !important;
+            }
 
-            //&:nth-child(1) {
-            //  min-width: 20px !important;
-            //  padding: 0px 8px;
-            //}
-            //
-            //&:nth-child(2) {
-            //  min-width: 100px !important;
-            //}
-            //
-            //&:nth-child(3) {
-            //  min-width: 200px !important;
-            //}
-            //
-            //&:nth-child(4) {
-            //  min-width: 100px !important;
-            //}
-            //
-            //&:nth-child(5) {
-            //  min-width: 120px !important;
-            //}
-            //
-            //&:nth-child(6) {
-            //  min-width: 120px !important;
-            //}
-            //
-            //&:nth-child(7) {
-            //  min-width: 130px !important;
-            //}
-            //
-            //&:nth-child(8) {
-            //  min-width: 300px !important;
-            //}
+            &:nth-child(3) {
+              min-width: 200px !important;
+            }
+
+            &:nth-child(4) {
+              min-width: 100px !important;
+            }
+
+            &:nth-child(5) {
+              min-width: 140px !important;
+            }
+
+            &:nth-child(6) {
+              min-width: 140px !important;
+            }
+
+            &:nth-child(7) {
+              min-width: 130px !important;
+            }
+
+            &:nth-child(8) {
+              min-width: 300px !important;
+            }
           }
 
           &:hover {
@@ -474,12 +469,13 @@ export default {
     column-gap: 12px;
     justify-content: flex-end;
     margin-top: 6px;
+    margin-right: 90px;
     span {
       &:first-child {
-        margin-right: 36px;
+        //margin-right: 36px;
       }
       &:last-child {
-        margin-right: 59px;
+        //margin-right: 59px;
       }
     }
   }

@@ -325,7 +325,7 @@ export default {
         activityName: this.activityName,
         organizationUnit: this.organizationUnit,
         beginAt: this.beginAt,
-        endAt: this.beginAt,
+        endAt: this.endAt,
         beginRegistrationAt: this.beginRegistrationAt,
         endRegistrationAt: this.beginRegistrationAt,
         place: this.place,
